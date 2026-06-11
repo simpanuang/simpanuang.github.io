@@ -150,30 +150,35 @@ button:active {
     flex: 1;
 }
 
-/* ACTION ROW (Menu Tombol) - PERBAIKAN RESPONSIVE */
+/* ACTION ROW (Menu Tombol) - DIPERBAIKI MENJADI 1 BARIS */
 .action-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-wrap: nowrap; /* Memaksa agar tetap satu baris sejajar */
+    gap: 6px;
     margin-bottom: 20px;
+    width: 100%;
 }
 
 .action-row > button, 
 .action-row > div {
-    flex: 1 1 calc(33.333% - 8px);
-    min-width: 80px;
+    flex: 1; /* Membagi ukuran merata untuk setiap tombol */
+    min-width: 0; /* Mencegah tombol melampaui lebar wadah pada layar kecil */
 }
 
 .action-row button {
     width: 100%;
-    padding: 10px 5px;
+    padding: 10px 0; /* Menghilangkan padding kiri-kanan agar teks lebih leluasa */
     border-radius: 10px;
-    font-size: 12px;
+    font-size: 11px; /* Ukuran font disesuaikan agar pas 5 tombol sejajar di HP */
     font-weight: bold;
     border: none;
     color: white;
     cursor: pointer;
     box-sizing: border-box;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Mengubah teks kepanjangan menjadi ... jika layar terlalu sempit */
 }
 
 #saveMenu div:hover {
@@ -397,6 +402,7 @@ h4 {
 
 <div id="toast">Notifikasi</div>
 
+<!-- MODAL KONFIRMASI -->
 <div id="confirmModal" class="modal">
     <div class="modal-content" style="text-align: center;">
         <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
@@ -408,6 +414,7 @@ h4 {
     </div>
 </div>
 
+<!-- MODAL PILIH KATEGORI -->
 <div id="categoryModal" class="modal">
     <div class="modal-content">
         <h3>Pilih Kategori</h3>
@@ -416,6 +423,7 @@ h4 {
     </div>
 </div>
 
+<!-- MODAL PILIH TIPE -->
 <div id="typeModal" class="modal">
     <div class="modal-content">
         <h3>Pilih Tipe</h3>
@@ -424,6 +432,7 @@ h4 {
     </div>
 </div>
 
+<!-- MODAL KETERANGAN (DENGAN INPUT MANUAL) -->
 <div id="descModal" class="modal">
     <div class="modal-content">
         <h3>Keterangan Transaksi</h3>
@@ -455,7 +464,7 @@ h4 {
     
     <div class="action-row" id="actionRowContainer">
         <button style="background: #6b7280;" onclick="toggleFilter()">Sortir ▾</button>
-        <button style="background: #3b82f6;" onclick="selectAllRows()">Pilih Semua</button>
+        <button style="background: #0d6efd;" onclick="selectAllRows()">Pilih Semua</button>
         <button style="background: #f59e0b; color: white;" onclick="editSelected()">Edit</button>
         
         <div style="position: relative;">
@@ -607,6 +616,7 @@ h4 {
 
 </div> 
 
+<!-- Modal Edit Transaksi -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>Edit Transaksi</h3>
@@ -655,6 +665,7 @@ h4 {
     </div>
 </div>
 
+<!-- Modal Edit Anggaran -->
 <div id="editBudgetModal" class="modal">
     <div class="modal-content">
         <h3>Edit Anggaran</h3>
