@@ -150,10 +150,10 @@ button:active {
     flex: 1;
 }
 
-/* ACTION ROW (Menu Tombol) - DIPERBAIKI MENJADI 1 BARIS */
+/* ACTION ROW (Menu Tombol) */
 .action-row {
     display: flex;
-    flex-wrap: nowrap; /* Memaksa agar tetap satu baris sejajar */
+    flex-wrap: nowrap; 
     gap: 6px;
     margin-bottom: 20px;
     width: 100%;
@@ -161,15 +161,15 @@ button:active {
 
 .action-row > button, 
 .action-row > div {
-    flex: 1; /* Membagi ukuran merata untuk setiap tombol */
-    min-width: 0; /* Mencegah tombol melampaui lebar wadah pada layar kecil */
+    flex: 1; 
+    min-width: 0; 
 }
 
 .action-row button {
     width: 100%;
-    padding: 10px 0; /* Menghilangkan padding kiri-kanan agar teks lebih leluasa */
+    padding: 10px 0; 
     border-radius: 10px;
-    font-size: 11px; /* Ukuran font disesuaikan agar pas 5 tombol sejajar di HP */
+    font-size: 11px; 
     font-weight: bold;
     border: none;
     color: white;
@@ -178,7 +178,7 @@ button:active {
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Mengubah teks kepanjangan menjadi ... jika layar terlalu sempit */
+    text-overflow: ellipsis; 
 }
 
 #saveMenu div:hover {
@@ -396,13 +396,16 @@ h4 {
     opacity: 1;
 }
 </style>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
 </head>
 
 <body>
 
 <div id="toast">Notifikasi</div>
 
-<!-- MODAL KONFIRMASI -->
 <div id="confirmModal" class="modal">
     <div class="modal-content" style="text-align: center;">
         <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
@@ -414,7 +417,6 @@ h4 {
     </div>
 </div>
 
-<!-- MODAL PILIH KATEGORI -->
 <div id="categoryModal" class="modal">
     <div class="modal-content">
         <h3>Pilih Kategori</h3>
@@ -423,7 +425,6 @@ h4 {
     </div>
 </div>
 
-<!-- MODAL PILIH TIPE -->
 <div id="typeModal" class="modal">
     <div class="modal-content">
         <h3>Pilih Tipe</h3>
@@ -432,7 +433,6 @@ h4 {
     </div>
 </div>
 
-<!-- MODAL KETERANGAN (DENGAN INPUT MANUAL) -->
 <div id="descModal" class="modal">
     <div class="modal-content">
         <h3>Keterangan Transaksi</h3>
@@ -616,7 +616,6 @@ h4 {
 
 </div> 
 
-<!-- Modal Edit Transaksi -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>Edit Transaksi</h3>
@@ -665,7 +664,6 @@ h4 {
     </div>
 </div>
 
-<!-- Modal Edit Anggaran -->
 <div id="editBudgetModal" class="modal">
     <div class="modal-content">
         <h3>Edit Anggaran</h3>
@@ -698,6 +696,13 @@ h4 {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
+// INISIALISASI FIREBASE
+const firebaseConfig = {
+    databaseURL: "https://keuangan-ebdd9-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 // Data utama
 let data = [];
 let budgets = [];
@@ -710,6 +715,29 @@ let editBudgetOldCategory = null;
 let categoryPickerTarget = 'add'; 
 let typePickerTarget = 'add';
 let descPickerTarget = 'add';
+
+// =====================
+// SINKRONISASI REAL-TIME DARI FIREBASE
+// =====================
+database.ref('transactions').on('value', (snapshot) => {
+    data = [];
+    snapshot.forEach((childSnapshot) => {
+        data.push(childSnapshot.val());
+    });
+    applyFilter();
+    renderBudget();
+    renderCharts();
+    updateDescHistory();
+});
+
+database.ref('budgets').on('value', (snapshot) => {
+    budgets = [];
+    snapshot.forEach((childSnapshot) => {
+        budgets.push(childSnapshot.val());
+    });
+    renderBudget();
+    updateCategoryDropdown();
+});
 
 // FUNGSI FORMAT RUPIAH
 function formatRupiah(angka) {
@@ -810,7 +838,6 @@ function renderTypePickerList() {
 function openDescPicker(target) {
     descPickerTarget = target;
     
-    // Set input dengan value yang ada sekarang (jika ada)
     let currentVal = descPickerTarget === 'add' 
         ? document.getElementById('desc').value 
         : document.getElementById('editDesc').value;
@@ -871,6 +898,10 @@ function renderDescPickerList() {
         `;
     });
     list.innerHTML = html;
+}
+
+function updateDescHistory() {
+    renderDescPickerList();
 }
 
 // =====================
@@ -1045,8 +1076,6 @@ function renderTable() {
     const currentData = getFilteredData();
 
     currentData.forEach(item => {
-        if(!item.id) item.id = Date.now().toString() + Math.random().toString(36).substr(2, 5);
-        
         const isSelected = selectedIds.includes(item.id.toString()) ? 'selected' : '';
 
         tbody.innerHTML += `
@@ -1106,7 +1135,9 @@ function renderBudget() {
     document.getElementById('totBudgetRemaining').innerText = formatRupiah(totalLimit - totalUsed);
 }
 
-// TAMBAH TRANSAKSI & ANGGARAN
+// =====================
+// TRANSAKSI & ANGGARAN KE FIREBASE
+// =====================
 function addData() {
     const date = document.getElementById('date').value;
     const desc = document.getElementById('desc').value.trim();
@@ -1122,19 +1153,22 @@ function addData() {
     }
 
     const id = Date.now().toString();
-    data.push({ id, date, desc, type, category, amount });
-
-    applyFilter();
-    renderBudget();
-    renderCharts();
-
-    // Reset Form Input
-    document.getElementById('desc').value = "";
-    document.getElementById('selectedDescText').innerText = "Ketik atau pilih keterangan...";
-    document.getElementById('selectedDescText').style.color = "#888";
-    document.getElementById('amount').value = "";
     
-    showToast("Transaksi berhasil ditambahkan!");
+    // Simpan ke Firebase
+    database.ref('transactions/' + id).set({
+        id: id,
+        date: date,
+        desc: desc,
+        type: type,
+        category: category,
+        amount: amount
+    }).then(() => {
+        document.getElementById('desc').value = "";
+        document.getElementById('selectedDescText').innerText = "Ketik atau pilih keterangan...";
+        document.getElementById('selectedDescText').style.color = "#888";
+        document.getElementById('amount').value = "";
+        showToast("Transaksi berhasil ditambahkan!");
+    });
 }
 
 function addBudget() {
@@ -1152,18 +1186,21 @@ function addBudget() {
         return;
     }
 
-    budgets.push({ category, limit: amount });
-
-    renderBudget();
-    updateCategoryDropdown();
+    const id = Date.now().toString();
     
-    document.getElementById('budgetCategory').value = "";
-    document.getElementById('budgetAmount').value = "";
-    
-    showToast("Anggaran berhasil ditambahkan!");
+    // Simpan ke Firebase
+    database.ref('budgets/' + id).set({
+        id: id,
+        category: category,
+        limit: amount
+    }).then(() => {
+        document.getElementById('budgetCategory').value = "";
+        document.getElementById('budgetAmount').value = "";
+        showToast("Anggaran berhasil ditambahkan!");
+    });
 }
 
-// EDIT & HAPUS ANGGARAN
+// EDIT & HAPUS ANGGARAN FIREBASE
 function editBudgetSelected() {
     if (!selectedBudgetCategory) {
         showToast("Pilih satu baris anggaran terlebih dahulu.");
@@ -1194,25 +1231,26 @@ function saveEditBudget() {
         return;
     }
 
-    const index = budgets.findIndex(b => b.category === editBudgetOldCategory);
-    if (index > -1) {
-        budgets[index].category = newCategory;
-        budgets[index].limit = newLimit;
-        
-        if (newCategory !== editBudgetOldCategory) {
-            data.forEach(d => {
-                if (d.category === editBudgetOldCategory) d.category = newCategory;
-            });
-            applyFilter();
-            renderCharts();
-        }
+    const targetBudget = budgets.find(b => b.category === editBudgetOldCategory);
+    if (targetBudget) {
+        // Update ke Firebase
+        database.ref('budgets/' + targetBudget.id).update({
+            category: newCategory,
+            limit: newLimit
+        }).then(() => {
+            // Jika nama kategori berubah, update juga semua riwayat transaksi yang menggunakan kategori lama
+            if (newCategory !== editBudgetOldCategory) {
+                data.forEach(d => {
+                    if (d.category === editBudgetOldCategory) {
+                        database.ref('transactions/' + d.id).update({ category: newCategory });
+                    }
+                });
+            }
+            closeEditBudgetModal();
+            selectedBudgetCategory = null; 
+            showToast("Anggaran berhasil diperbarui!");
+        });
     }
-
-    closeEditBudgetModal();
-    selectedBudgetCategory = null; 
-    renderBudget();
-    updateCategoryDropdown();
-    showToast("Anggaran berhasil diperbarui!");
 }
 
 function closeEditBudgetModal() {
@@ -1227,15 +1265,17 @@ function deleteBudgetSelected() {
     }
 
     showConfirm(`Hapus anggaran '${selectedBudgetCategory}'? (Riwayat transaksi tidak ikut terhapus)`, () => {
-        budgets = budgets.filter(b => b.category !== selectedBudgetCategory);
-        selectedBudgetCategory = null;
-        renderBudget();
-        updateCategoryDropdown();
-        showToast("Anggaran berhasil dihapus!");
+        const targetBudget = budgets.find(b => b.category === selectedBudgetCategory);
+        if (targetBudget) {
+            database.ref('budgets/' + targetBudget.id).remove().then(() => {
+                selectedBudgetCategory = null;
+                showToast("Anggaran berhasil dihapus!");
+            });
+        }
     });
 }
 
-// EDIT & HAPUS TRANSAKSI
+// EDIT & HAPUS TRANSAKSI FIREBASE
 function editSelected() {
     if (selectedIds.length === 0) {
         showToast("Pilih SATU transaksi yang ingin diedit.");
@@ -1285,17 +1325,18 @@ function saveEdit() {
         return;
     }
 
-    const itemIndex = data.findIndex(d => d.id.toString() === editTargetId);
-    if (itemIndex > -1) {
-        data[itemIndex] = { id: editTargetId, date, desc, type, category, amount };
-    }
-
-    closeEditModal();
-    selectedIds = []; 
-    applyFilter();
-    renderBudget();
-    renderCharts();
-    showToast("Data berhasil diperbarui!");
+    // Update Firebase
+    database.ref('transactions/' + editTargetId).update({
+        date: date,
+        desc: desc,
+        type: type,
+        category: category,
+        amount: amount
+    }).then(() => {
+        closeEditModal();
+        selectedIds = []; 
+        showToast("Data berhasil diperbarui!");
+    });
 }
 
 function deleteSelected() {
@@ -1305,11 +1346,11 @@ function deleteSelected() {
     }
 
     showConfirm(`Hapus ${selectedIds.length} transaksi terpilih?`, () => {
-        data = data.filter(item => !selectedIds.includes(item.id.toString()));
+        // Hapus banyak data sekaligus dari Firebase
+        selectedIds.forEach(id => {
+            database.ref('transactions/' + id).remove();
+        });
         selectedIds = [];
-        applyFilter();
-        renderBudget();
-        renderCharts();
         showToast("Transaksi berhasil dihapus!");
     });
 }
@@ -1521,7 +1562,7 @@ window.addEventListener('click', function(event) {
     }
 });
 
-// INISIALISASI
+// INISIALISASI AWAL (Hanya form UI, data menyusul otomatis ditarik dari Firebase)
 updateCategoryDropdown();
 </script>
 
