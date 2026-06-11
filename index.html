@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aplikasi Keuangan Harian</title>
+
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 20px 10px 80px 10px;
+}
+
+/* CONTAINER */
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    max-width: 500px;
+    margin: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+h2 {
+    text-align: center;
+    color: #198754;
+    margin-bottom: 25px;
+    font-size: 1.4rem;
+}
+
+/* SUMMARY */
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.box {
+    background: #cfe2f3;
+    padding: 15px 10px;
+    border-radius: 16px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.box .val {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 6px;
+}
+
+/* FORM */
+.form-group {
+    display: grid;
+    gap: 15px;
+}
+
+.form-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-item label {
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #444;
+}
+
+.form-item input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    box-sizing: border-box;
+    height: 48px;
+    background-color: #fafafa;
+    transition: all 0.2s;
+}
+
+input:focus {
+    outline: none;
+    border: 2px solid #198754;
+    background-color: #fff;
+}
+
+/* KUSTOM DROPDOWN (KATEGORI, TIPE, KETERANGAN) */
+.custom-select {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    background: #fafafa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    height: 48px;
+    box-sizing: border-box;
+    color: #333;
+    transition: all 0.2s;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.custom-select:active {
+    background-color: #f1f1f1;
+}
+
+.custom-select .arrow {
+    font-size: 12px;
+    color: #888;
+    margin-left: 10px;
+}
+
+/* BUTTON */
+button {
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.btn-add { background: #198754; }
+.btn-delete { background: #dc3545; }
+.btn-secondary { background: #f3f4f6; color: #374151; }
+
+.btn-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.btn-group button {
+    flex: 1;
+}
+
+/* ACTION ROW (Menu Tombol) */
+.action-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.action-row button {
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+#saveMenu div:hover {
+    background-color: #f1f1f1;
+    border-radius: 8px;
+}
+
+/* TABLE */
+#tableData, #tableBudget {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 15px;
+    font-size: 13px;
+    table-layout: fixed;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+#tableData th, #tableBudget th {
+    background: #198754;
+    color: white;
+    padding: 12px 8px;
+}
+
+#tableData td, #tableBudget td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#tableData tbody tr:last-child td, #tableBudget tbody tr:last-child td {
+    border-bottom: none;
+}
+
+#tableData tbody tr, #tableBudget tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+    background: white;
+}
+
+#tableData tbody tr:hover, #tableBudget tbody tr:hover {
+    background: #f9fafb;
+}
+
+#tableData tbody tr.selected, #tableBudget tbody tr.selected {
+    background-color: #d1e7dd !important;
+}
+
+td {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+#tableData th:nth-child(1), #tableData td:nth-child(1) { width: 25%; }
+#tableData th:nth-child(2), #tableData td:nth-child(2) { width: 35%; }
+#tableData th:nth-child(3), #tableData td:nth-child(3) { width: 20%; }
+#tableData th:nth-child(4), #tableData td:nth-child(4) { width: 20%; }
+
+/* GRAFIK */
+.canvas-container {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+}
+
+h4 {
+    margin: 0 0 15px 0;
+    color: #198754;
+    text-align: center;
+}
+
+/* NAVBAR */
+.navbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #1f2937;
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+}
+
+.nav-item {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 13px;
+    flex: 1;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.nav-item.active {
+    color: white;
+    font-weight: bold;
+}
+
+/* GAYA POP-UP (MODAL) PROFESIONAL DI TENGAH */
+.modal {
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    background: rgba(17, 24, 39, 0.6); 
+    backdrop-filter: blur(4px); 
+    z-index: 2000; 
+    justify-content: center; 
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: #ffffff; 
+    padding: 25px 20px; 
+    border-radius: 20px; 
+    width: 100%; 
+    max-width: 400px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    box-sizing: border-box;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #111827;
+    text-align: center;
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+}
+
+/* LIST ITEM DALAM MODAL */
+.custom-list {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-top: 10px;
+    border: 1px solid #f3f4f6;
+    border-radius: 12px;
+}
+
+.custom-item {
+    padding: 14px 15px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #374151;
+    transition: background 0.2s;
+}
+
+.custom-item:hover {
+    background-color: #f9fafb;
+}
+
+.custom-item:active {
+    background-color: #f3f4f6;
+}
+
+.custom-item:last-child {
+    border-bottom: none;
+}
+
+.custom-item.selected {
+    background-color: #f0fdf4;
+    color: #166534;
+    font-weight: 600;
+}
+
+.custom-item .check {
+    color: #16a34a;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* NOTIFIKASI TOAST HALUS */
+#toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #1f2937;
+    color: #fff;
+    text-align: center;
+    border-radius: 10px;
+    padding: 14px;
+    position: fixed;
+    z-index: 3000;
+    left: 50%;
+    bottom: 90px;
+    transform: translateX(-50%);
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+#toast.show {
+    visibility: visible;
+    opacity: 1;
+}
+</style>
+</head>
+
+<body>
+
+<div id="toast">Notifikasi</div>
+
+<!-- MODAL KONFIRMASI -->
+<div id="confirmModal" class="modal">
+    <div class="modal-content" style="text-align: center;">
+        <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
+        <p style="color: #6b7280; font-size: 14px; margin-top: 0; margin-bottom: 25px;">Tindakan ini tidak dapat dibatalkan.</p>
+        <div class="btn-group">
+            <button class="btn-secondary" id="btnConfirmNo">Batal</button>
+            <button class="btn-delete" id="btnConfirmYes">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PILIH KATEGORI -->
+<div id="categoryModal" class="modal">
+    <div class="modal-content">
+        <h3>Pilih Kategori</h3>
+        <div id="categoryList" class="custom-list"></div>
+        <button class="btn-secondary" onclick="closeCategoryPicker()" style="width: 100%; margin-top: 20px;">Batal</button>
+    </div>
+</div>
+
+<!-- MODAL PILIH TIPE -->
+<div id="typeModal" class="modal">
+    <div class="modal-content">
+        <h3>Pilih Tipe</h3>
+        <div id="typeList" class="custom-list"></div>
+        <button class="btn-secondary" onclick="closeTypePicker()" style="width: 100%; margin-top: 20px;">Batal</button>
+    </div>
+</div>
+
+<!-- MODAL KETERANGAN (DENGAN INPUT MANUAL) -->
+<div id="descModal" class="modal">
+    <div class="modal-content">
+        <h3>Keterangan Transaksi</h3>
+        <input type="text" id="customDescInput" placeholder="Ketik keterangan baru di sini..." style="margin-bottom: 10px; border-color: #198754; box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.1);">
+        
+        <p style="font-size: 12px; color: #6b7280; font-weight: 600; margin: 15px 0 5px 0;">Atau pilih dari riwayat:</p>
+        <div id="descList" class="custom-list" style="margin-top: 0; max-height: 180px;"></div>
+        
+        <div class="btn-group">
+            <button class="btn-secondary" onclick="closeDescPicker()">Batal</button>
+            <button class="btn-add" onclick="applyCustomDesc()">Simpan</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="container" id="printArea">
+
+<h2 id="judul">LAPORAN KEUANGAN HARIAN</h2>
+
+<div id="menu-ringkasan">
+    <div class="summary">
+        <div class="box">Pemasukan:<div class="val">Rp <span id="income">0</span></div></div>
+        <div class="box">Pengeluaran:<div class="val">Rp <span id="expense">0</span></div></div>
+        <div class="box">Saldo Akhir:<div class="val">Rp <span id="balance">0</span></div></div>
+    </div>
+
+    <h3 style="text-align: center; margin-top: 25px; margin-bottom: 15px; color: #374151;">Data Transaksi</h3>
+    
+    <div class="action-row" id="actionRowContainer">
+        <button style="background: #6b7280;" onclick="toggleFilter()">Sortir ▾</button>
+        <button style="background: #3b82f6;" onclick="selectAllRows()">Pilih Semua</button>
+        <button style="background: #f59e0b; color: white;" onclick="editSelected()">Edit</button>
+        
+        <div style="position: relative; display: inline-block;">
+            <button id="btnSimpan" style="background: #10b981;" onclick="toggleSaveMenu()">Simpan ▾</button>
+            <div id="saveMenu" style="display:none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 5px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 100; min-width: 120px; text-align: center; margin-top: 8px;">
+                <div onclick="savePDF()" style="padding: 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #374151; font-weight: 500;">Ke PDF</div>
+                <div onclick="saveExcel()" style="padding: 12px; cursor: pointer; font-size: 13px; color: #374151; font-weight: 500;">Ke Excel</div>
+            </div>
+        </div>
+
+        <button style="background: #ef4444;" onclick="deleteSelected()">Hapus</button>
+    </div>
+        
+    <div id="filterContainer" style="display: none; background: #f3f4f6; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: left;">
+        <label style="font-size: 13px; font-weight: 600; color: #4b5563;">Tampilkan Berdasarkan Waktu:</label>
+        <select id="filterSelect" onchange="handleFilterChange()" style="width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 13px; height: 40px; background: white;">
+            <option value="all">Semua Waktu</option>
+            <option value="daily">Harian (Hari Ini)</option>
+            <option value="weekly">Mingguan (7 Hari Terakhir)</option>
+            <option value="monthly">Bulanan (Bulan Ini)</option>
+            <option value="custom">Pilih Tanggal Sendiri</option>
+        </select>
+
+        <div id="customDateContainer" style="display: none; margin-top: 15px;">
+            <label style="font-size: 12px; font-weight: 600; color: #4b5563;">Rentang Tanggal:</label>
+            <div style="display: flex; gap: 10px; margin-top: 8px;">
+                <input type="date" id="filterStartDate" onchange="applyFilter()" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 12px; height: 40px;">
+                <input type="date" id="filterEndDate" onchange="applyFilter()" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 12px; height: 40px;">
+            </div>
+        </div>
+    </div>
+
+    <table id="tableData">
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Keterangan</th>
+                <th>Tipe</th>
+                <th>Jumlah</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih transaksi</p>
+</div>
+
+<div id="menu-transaksi" style="display:none;">
+    <div class="form-group">
+        <div class="form-item">
+            <label>Tanggal</label>
+            <input type="date" id="date">
+        </div>
+        
+        <div class="form-item">
+            <label>Keterangan</label>
+            <div class="custom-select" onclick="openDescPicker('add')">
+                <span id="selectedDescText" style="color: #888;">Ketik atau pilih keterangan...</span>
+                <span class="arrow">▼</span>
+            </div>
+            <input type="hidden" id="desc">
+        </div>
+
+        <div class="form-item">
+            <label>Kategori</label>
+            <div class="custom-select" onclick="openCategoryPicker('add')">
+                <span id="selectedCategoryText">Pilih Kategori</span>
+                <span class="arrow">▼</span>
+            </div>
+            <input type="hidden" id="category">
+        </div>
+        
+        <div class="form-item">
+            <label>Tipe</label>
+            <div class="custom-select" onclick="openTypePicker('add')">
+                <span id="selectedTypeText">Pengeluaran</span>
+                <span class="arrow">▼</span>
+            </div>
+            <input type="hidden" id="type" value="expense">
+        </div>
+
+        <div class="form-item">
+            <label>Jumlah (Rp)</label>
+            <input type="text" inputmode="numeric" id="amount" placeholder="0" oninput="formatInputRupiah(this)">
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-add" onclick="addData()">Tambah Transaksi</button>
+    </div>
+</div>
+
+<div id="menu-anggaran" style="display:none;">
+    <div class="summary" style="margin-bottom: 25px;">
+        <div class="box" style="background: #f3f4f6;">Total Limit:<div class="val" style="color: #374151;">Rp <span id="totBudgetLimit">0</span></div></div>
+        <div class="box" style="background: #fee2e2;">Terpakai:<div class="val" style="color: #b91c1c;">Rp <span id="totBudgetUsed">0</span></div></div>
+        <div class="box" style="background: #d1fae5;">Sisa:<div class="val" style="color: #047857;">Rp <span id="totBudgetRemaining">0</span></div></div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-item">
+            <label>Kategori</label>
+            <input type="text" id="budgetCategory" placeholder="Misal: Makanan, Transport">
+        </div>
+        <div class="form-item">
+            <label>Limit Anggaran (Rp)</label>
+            <input type="text" inputmode="numeric" id="budgetAmount" placeholder="0" oninput="formatInputRupiah(this)">
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-add" onclick="addBudget()">Tambah</button>
+        <button style="background: #f59e0b; color: white;" onclick="editBudgetSelected()">Edit</button>
+        <button class="btn-delete" onclick="deleteBudgetSelected()">Hapus</button>
+    </div>
+
+    <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Anggaran</h3>
+    <table id="tableBudget">
+        <thead>
+            <tr>
+                <th>Kategori</th>
+                <th>Limit</th>
+                <th>Terpakai</th>
+                <th>Sisa</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih anggaran</p>
+</div>
+
+<div id="menu-grafik" style="display:none;">
+    <h3 style="color: #374151;">Grafik Pengeluaran</h3>
+    
+    <div class="canvas-container">
+        <h4>Pengeluaran Harian</h4>
+        <canvas id="chartHarian"></canvas>
+    </div>
+
+    <div class="canvas-container">
+        <h4>Pengeluaran Bulanan</h4>
+        <canvas id="chartBulanan"></canvas>
+    </div>
+
+    <div class="canvas-container">
+        <h4>Pengeluaran per Kategori</h4>
+        <canvas id="chartKategori"></canvas>
+    </div>
+</div>
+
+</div> 
+
+<!-- Modal Edit Transaksi -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3>Edit Transaksi</h3>
+        <div class="form-group">
+            <div class="form-item">
+                <label>Tanggal</label>
+                <input type="date" id="editDate">
+            </div>
+            
+            <div class="form-item">
+                <label>Keterangan</label>
+                <div class="custom-select" onclick="openDescPicker('edit')">
+                    <span id="selectedEditDescText"></span>
+                    <span class="arrow">▼</span>
+                </div>
+                <input type="hidden" id="editDesc">
+            </div>
+
+            <div class="form-item">
+                <label>Kategori</label>
+                <div class="custom-select" onclick="openCategoryPicker('edit')">
+                    <span id="selectedEditCategoryText">Pilih Kategori</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <input type="hidden" id="editCategory">
+            </div>
+            
+            <div class="form-item">
+                <label>Tipe</label>
+                <div class="custom-select" onclick="openTypePicker('edit')">
+                    <span id="selectedEditTypeText">Pengeluaran</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <input type="hidden" id="editType">
+            </div>
+
+            <div class="form-item">
+                <label>Jumlah (Rp)</label>
+                <input type="text" inputmode="numeric" id="editAmount" oninput="formatInputRupiah(this)">
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-secondary" onclick="closeEditModal()">Batal</button>
+            <button class="btn-add" onclick="saveEdit()">Simpan</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Anggaran -->
+<div id="editBudgetModal" class="modal">
+    <div class="modal-content">
+        <h3>Edit Anggaran</h3>
+        <div class="form-group">
+            <div class="form-item">
+                <label>Kategori</label>
+                <input type="text" id="editBudgetCategoryInput">
+            </div>
+            <div class="form-item">
+                <label>Limit Anggaran (Rp)</label>
+                <input type="text" inputmode="numeric" id="editBudgetAmount" oninput="formatInputRupiah(this)">
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-secondary" onclick="closeEditBudgetModal()">Batal</button>
+            <button class="btn-add" onclick="saveEditBudget()">Simpan</button>
+        </div>
+    </div>
+</div>
+
+<div class="navbar">
+    <div class="nav-item" data-index="0">Transaksi</div>
+    <div class="nav-item active" data-index="1">Ringkasan</div>
+    <div class="nav-item" data-index="2">Anggaran</div>
+    <div class="nav-item" data-index="3">Grafik</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+// Data utama
+let data = [];
+let budgets = [];
+let chartHarian, chartBulanan, chartKategori;
+let selectedIds = []; 
+let editTargetId = null; 
+let selectedBudgetCategory = null; 
+let editBudgetOldCategory = null; 
+
+let categoryPickerTarget = 'add'; 
+let typePickerTarget = 'add';
+let descPickerTarget = 'add';
+
+// FUNGSI FORMAT RUPIAH
+function formatRupiah(angka) {
+    return angka ? angka.toLocaleString('id-ID') : "0";
+}
+
+function formatInputRupiah(input) {
+    let value = input.value.replace(/\D/g, ''); 
+    if (value !== '') {
+        input.value = parseInt(value, 10).toLocaleString('id-ID');
+    } else {
+        input.value = '';
+    }
+}
+
+// NOTIFIKASI TOAST 
+let toastTimeout;
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.classList.add("show");
+    
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
+}
+
+// MODAL KONFIRMASI KUSTOM
+let confirmCallback = null;
+function showConfirm(message, callback) {
+    document.getElementById("confirmMessage").innerText = message;
+    document.getElementById("confirmModal").style.display = "flex";
+    confirmCallback = callback;
+}
+
+document.getElementById("btnConfirmYes").onclick = function() {
+    document.getElementById("confirmModal").style.display = "none";
+    if(confirmCallback) confirmCallback();
+};
+
+document.getElementById("btnConfirmNo").onclick = function() {
+    document.getElementById("confirmModal").style.display = "none";
+    confirmCallback = null;
+};
+
+// =====================
+// KONTROL MODAL TIPE
+// =====================
+function openTypePicker(target) {
+    typePickerTarget = target;
+    renderTypePickerList();
+    document.getElementById('typeModal').style.display = 'flex';
+}
+
+function closeTypePicker() {
+    document.getElementById('typeModal').style.display = 'none';
+}
+
+function selectType(val, label) {
+    if (typePickerTarget === 'add') {
+        document.getElementById('type').value = val;
+        document.getElementById('selectedTypeText').innerText = label;
+        document.getElementById('selectedTypeText').style.color = "#333";
+    } else {
+        document.getElementById('editType').value = val;
+        document.getElementById('selectedEditTypeText').innerText = label;
+    }
+    closeTypePicker();
+}
+
+function renderTypePickerList() {
+    let currentSelected = typePickerTarget === 'add' 
+        ? document.getElementById('type').value 
+        : document.getElementById('editType').value;
+    
+    const options = [
+        { val: 'income', label: 'Pemasukan' },
+        { val: 'expense', label: 'Pengeluaran' }
+    ];
+
+    let html = '';
+    options.forEach(opt => {
+        const isSelected = opt.val === currentSelected;
+        html += `
+            <div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectType('${opt.val}', '${opt.label}')">
+                <span>${opt.label}</span>
+                ${isSelected ? '<span class="check">✓</span>' : ''}
+            </div>
+        `;
+    });
+    document.getElementById('typeList').innerHTML = html;
+}
+
+// =====================
+// KONTROL MODAL KETERANGAN
+// =====================
+function openDescPicker(target) {
+    descPickerTarget = target;
+    
+    // Set input dengan value yang ada sekarang (jika ada)
+    let currentVal = descPickerTarget === 'add' 
+        ? document.getElementById('desc').value 
+        : document.getElementById('editDesc').value;
+        
+    document.getElementById('customDescInput').value = currentVal;
+    
+    renderDescPickerList();
+    document.getElementById('descModal').style.display = 'flex';
+    setTimeout(() => document.getElementById('customDescInput').focus(), 100);
+}
+
+function closeDescPicker() {
+    document.getElementById('descModal').style.display = 'none';
+}
+
+function selectDesc(val) {
+    if (descPickerTarget === 'add') {
+        document.getElementById('desc').value = val;
+        document.getElementById('selectedDescText').innerText = val;
+        document.getElementById('selectedDescText').style.color = "#333";
+    } else {
+        document.getElementById('editDesc').value = val;
+        document.getElementById('selectedEditDescText').innerText = val;
+    }
+    closeDescPicker();
+}
+
+function applyCustomDesc() {
+    const val = document.getElementById('customDescInput').value.trim();
+    if (!val) {
+        showToast("Keterangan tidak boleh kosong!");
+        return;
+    }
+    selectDesc(val);
+}
+
+function renderDescPickerList() {
+    const uniqueDescs = [...new Set(data.map(item => item.desc))];
+    const list = document.getElementById('descList');
+    
+    if (uniqueDescs.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding: 20px; color: #6b7280; font-size: 13px;">Belum ada riwayat.</div>`;
+        return;
+    }
+
+    let currentSelected = descPickerTarget === 'add' 
+        ? document.getElementById('desc').value 
+        : document.getElementById('editDesc').value;
+
+    let html = '';
+    uniqueDescs.forEach(d => {
+        const isSelected = d === currentSelected;
+        html += `
+            <div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectDesc('${d}')">
+                <span>${d}</span>
+                ${isSelected ? '<span class="check">✓</span>' : ''}
+            </div>
+        `;
+    });
+    list.innerHTML = html;
+}
+
+// =====================
+// KONTROL MODAL KATEGORI
+// =====================
+function updateCategoryDropdown() {
+    if (budgets.length > 0) {
+        const firstCat = budgets[0].category;
+        if (!document.getElementById('category').value) {
+            document.getElementById('category').value = firstCat;
+            document.getElementById('selectedCategoryText').innerText = firstCat;
+        }
+    } else {
+        document.getElementById('category').value = "";
+        document.getElementById('selectedCategoryText').innerText = "Tambah anggaran dulu";
+        document.getElementById('editCategory').value = "";
+        document.getElementById('selectedEditCategoryText').innerText = "Tambah anggaran dulu";
+    }
+}
+
+function openCategoryPicker(target) {
+    categoryPickerTarget = target;
+    renderCategoryPickerList();
+    document.getElementById('categoryModal').style.display = 'flex';
+}
+
+function closeCategoryPicker() {
+    document.getElementById('categoryModal').style.display = 'none';
+}
+
+function selectCategory(cat) {
+    if (categoryPickerTarget === 'add') {
+        document.getElementById('category').value = cat;
+        document.getElementById('selectedCategoryText').innerText = cat;
+        document.getElementById('selectedCategoryText').style.color = "#333";
+    } else {
+        document.getElementById('editCategory').value = cat;
+        document.getElementById('selectedEditCategoryText').innerText = cat;
+    }
+    closeCategoryPicker();
+}
+
+function renderCategoryPickerList() {
+    const list = document.getElementById('categoryList');
+    if (budgets.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding: 20px; color: #6b7280; font-size: 14px;">Silakan tambah anggaran terlebih dahulu di menu Anggaran.</div>`;
+        return;
+    }
+
+    let currentSelected = categoryPickerTarget === 'add' 
+        ? document.getElementById('category').value 
+        : document.getElementById('editCategory').value;
+
+    let html = '';
+    budgets.forEach(b => {
+        const isSelected = b.category === currentSelected;
+        html += `
+            <div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectCategory('${b.category}')">
+                <span>${b.category}</span>
+                ${isSelected ? '<span class="check">✓</span>' : ''}
+            </div>
+        `;
+    });
+    list.innerHTML = html;
+}
+
+// FUNGSI MENU SIMPAN
+function toggleSaveMenu() {
+    const menu = document.getElementById('saveMenu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+// SORTIR & FILTER
+function toggleFilter() {
+    const container = document.getElementById('filterContainer');
+    container.style.display = container.style.display === 'none' ? 'block' : 'none';
+}
+
+function handleFilterChange() {
+    const filterValue = document.getElementById('filterSelect').value;
+    const customDateContainer = document.getElementById('customDateContainer');
+    if (filterValue === 'custom') {
+        customDateContainer.style.display = 'block';
+    } else {
+        customDateContainer.style.display = 'none';
+    }
+    applyFilter();
+}
+
+function getFilteredData() {
+    const filterValue = document.getElementById('filterSelect').value;
+    if (filterValue === 'all') return data;
+
+    const t = new Date();
+    const yyyy = t.getFullYear();
+    const mm = String(t.getMonth() + 1).padStart(2, '0');
+    const dd = String(t.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    
+    const todayObj = new Date(t.setHours(0,0,0,0));
+    const lastWeekObj = new Date(todayObj);
+    lastWeekObj.setDate(lastWeekObj.getDate() - 7);
+
+    return data.filter(item => {
+        if (filterValue === 'daily') return item.date === todayStr;
+        if (filterValue === 'weekly') {
+            const itemDateObj = new Date(item.date);
+            itemDateObj.setHours(0,0,0,0);
+            return itemDateObj >= lastWeekObj && itemDateObj <= todayObj;
+        }
+        if (filterValue === 'monthly') return item.date.substring(0, 7) === todayStr.substring(0, 7);
+        if (filterValue === 'custom') {
+            const startVal = document.getElementById('filterStartDate').value;
+            const endVal = document.getElementById('filterEndDate').value;
+            if (startVal && endVal) return item.date >= startVal && item.date <= endVal;
+        }
+        return true;
+    });
+}
+
+function applyFilter() {
+    selectedIds = [];
+    updateSummary();
+    renderTable();
+}
+
+function updateSummary() {
+    let income = 0, expense = 0;
+    const currentData = getFilteredData();
+    
+    currentData.forEach(item => {
+        if (item.type === 'income') income += item.amount;
+        else expense += item.amount;
+    });
+
+    document.getElementById('income').innerText = formatRupiah(income);
+    document.getElementById('expense').innerText = formatRupiah(expense);
+    document.getElementById('balance').innerText = formatRupiah(income - expense);
+}
+
+// SELEKSI TRANSAKSI
+function toggleSelection(rowElement, id) {
+    const index = selectedIds.indexOf(id);
+    if (index > -1) {
+        selectedIds.splice(index, 1);
+        rowElement.classList.remove('selected');
+    } else {
+        selectedIds.push(id);
+        rowElement.classList.add('selected');
+    }
+}
+
+function selectAllRows() {
+    const rows = document.querySelectorAll("#tableData tbody tr");
+    const currentData = getFilteredData();
+    
+    const isAllSelected = selectedIds.length === currentData.length && currentData.length > 0;
+
+    if (isAllSelected) {
+        selectedIds = [];
+        rows.forEach(row => row.classList.remove('selected'));
+    } else {
+        selectedIds = currentData.map(item => item.id.toString());
+        rows.forEach(row => row.classList.add('selected'));
+    }
+}
+
+function renderTable() {
+    const tbody = document.querySelector("#tableData tbody");
+    tbody.innerHTML = "";
+
+    const currentData = getFilteredData();
+
+    currentData.forEach(item => {
+        if(!item.id) item.id = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+        
+        const isSelected = selectedIds.includes(item.id.toString()) ? 'selected' : '';
+
+        tbody.innerHTML += `
+        <tr class="${isSelected}" onclick="toggleSelection(this, '${item.id}')">
+            <td>${item.date}</td>
+            <td style="text-align:left">${item.desc}</td>
+            <td>${item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</td>
+            <td style="text-align:right">Rp ${formatRupiah(item.amount)}</td>
+        </tr>`;
+    });
+}
+
+// SELEKSI ANGGARAN
+function toggleBudgetSelection(rowElement, category) {
+    const rows = document.querySelectorAll("#tableBudget tbody tr");
+    rows.forEach(r => r.classList.remove('selected'));
+
+    if (selectedBudgetCategory === category) {
+        selectedBudgetCategory = null;
+    } else {
+        selectedBudgetCategory = category;
+        rowElement.classList.add('selected');
+    }
+}
+
+function renderBudget() {
+    const tbody = document.querySelector("#tableBudget tbody");
+    tbody.innerHTML = "";
+    
+    let totalLimit = 0;
+    let totalUsed = 0;
+
+    budgets.forEach(b => {
+        const used = data
+            .filter(d => d.type === 'expense' && d.category === b.category)
+            .reduce((sum, d) => sum + d.amount, 0);
+
+        const remaining = b.limit - used;
+        totalLimit += b.limit;
+        totalUsed += used;
+
+        const isSelected = selectedBudgetCategory === b.category ? 'selected' : '';
+
+        tbody.innerHTML += `
+        <tr class="${isSelected}" onclick="toggleBudgetSelection(this, '${b.category}')">
+            <td>${b.category}</td>
+            <td>Rp ${formatRupiah(b.limit)}</td>
+            <td>Rp ${formatRupiah(used)}</td>
+            <td style="color:${remaining < 0 ? '#dc3545' : '#198754'}">
+                Rp ${formatRupiah(remaining)}
+            </td>
+        </tr>`;
+    });
+    
+    document.getElementById('totBudgetLimit').innerText = formatRupiah(totalLimit);
+    document.getElementById('totBudgetUsed').innerText = formatRupiah(totalUsed);
+    document.getElementById('totBudgetRemaining').innerText = formatRupiah(totalLimit - totalUsed);
+}
+
+// TAMBAH TRANSAKSI & ANGGARAN
+function addData() {
+    const date = document.getElementById('date').value;
+    const desc = document.getElementById('desc').value.trim();
+    const type = document.getElementById('type').value;
+    const category = document.getElementById('category').value;
+    
+    const amountStr = document.getElementById('amount').value.replace(/\./g, '');
+    const amount = parseInt(amountStr, 10);
+
+    if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) {
+        showToast("Mohon isi semua data dengan lengkap!");
+        return;
+    }
+
+    const id = Date.now().toString();
+    data.push({ id, date, desc, type, category, amount });
+
+    applyFilter();
+    renderBudget();
+    renderCharts();
+
+    // Reset Form Input
+    document.getElementById('desc').value = "";
+    document.getElementById('selectedDescText').innerText = "Ketik atau pilih keterangan...";
+    document.getElementById('selectedDescText').style.color = "#888";
+    document.getElementById('amount').value = "";
+    
+    showToast("Transaksi berhasil ditambahkan!");
+}
+
+function addBudget() {
+    const category = document.getElementById('budgetCategory').value.trim();
+    const amountStr = document.getElementById('budgetAmount').value.replace(/\./g, '');
+    const amount = parseInt(amountStr, 10);
+
+    if (!category || isNaN(amount) || amount <= 0) {
+        showToast("Isi kategori dan limit anggaran dengan benar!");
+        return;
+    }
+
+    if (budgets.some(b => b.category.toLowerCase() === category.toLowerCase())) {
+        showToast("Kategori anggaran ini sudah ada!");
+        return;
+    }
+
+    budgets.push({ category, limit: amount });
+
+    renderBudget();
+    updateCategoryDropdown();
+    
+    document.getElementById('budgetCategory').value = "";
+    document.getElementById('budgetAmount').value = "";
+    
+    showToast("Anggaran berhasil ditambahkan!");
+}
+
+// EDIT & HAPUS ANGGARAN
+function editBudgetSelected() {
+    if (!selectedBudgetCategory) {
+        showToast("Pilih satu baris anggaran terlebih dahulu.");
+        return;
+    }
+    
+    const targetBudget = budgets.find(b => b.category === selectedBudgetCategory);
+    if (targetBudget) {
+        editBudgetOldCategory = targetBudget.category;
+        document.getElementById('editBudgetCategoryInput').value = targetBudget.category;
+        document.getElementById('editBudgetAmount').value = targetBudget.limit.toLocaleString('id-ID');
+        document.getElementById('editBudgetModal').style.display = 'flex';
+    }
+}
+
+function saveEditBudget() {
+    const newCategory = document.getElementById('editBudgetCategoryInput').value.trim();
+    const amountStr = document.getElementById('editBudgetAmount').value.replace(/\./g, '');
+    const newLimit = parseInt(amountStr, 10);
+
+    if (!newCategory || isNaN(newLimit) || newLimit <= 0) {
+        showToast("Isi kategori dan limit anggaran dengan benar!");
+        return;
+    }
+
+    if (newCategory !== editBudgetOldCategory && budgets.some(b => b.category.toLowerCase() === newCategory.toLowerCase())) {
+        showToast("Nama kategori ini sudah dipakai!");
+        return;
+    }
+
+    const index = budgets.findIndex(b => b.category === editBudgetOldCategory);
+    if (index > -1) {
+        budgets[index].category = newCategory;
+        budgets[index].limit = newLimit;
+        
+        if (newCategory !== editBudgetOldCategory) {
+            data.forEach(d => {
+                if (d.category === editBudgetOldCategory) d.category = newCategory;
+            });
+            applyFilter();
+            renderCharts();
+        }
+    }
+
+    closeEditBudgetModal();
+    selectedBudgetCategory = null; 
+    renderBudget();
+    updateCategoryDropdown();
+    showToast("Anggaran berhasil diperbarui!");
+}
+
+function closeEditBudgetModal() {
+    document.getElementById('editBudgetModal').style.display = 'none';
+    editBudgetOldCategory = null;
+}
+
+function deleteBudgetSelected() {
+    if (!selectedBudgetCategory) {
+        showToast("Pilih satu baris anggaran yang ingin dihapus.");
+        return;
+    }
+
+    showConfirm(`Hapus anggaran '${selectedBudgetCategory}'? (Riwayat transaksi tidak ikut terhapus)`, () => {
+        budgets = budgets.filter(b => b.category !== selectedBudgetCategory);
+        selectedBudgetCategory = null;
+        renderBudget();
+        updateCategoryDropdown();
+        showToast("Anggaran berhasil dihapus!");
+    });
+}
+
+// EDIT & HAPUS TRANSAKSI
+function editSelected() {
+    if (selectedIds.length === 0) {
+        showToast("Pilih SATU transaksi yang ingin diedit.");
+        return;
+    }
+    if (selectedIds.length > 1) {
+        showToast("Hanya bisa edit satu transaksi sekaligus.");
+        return;
+    }
+
+    editTargetId = selectedIds[0];
+    const item = data.find(d => d.id.toString() === editTargetId);
+
+    if (item) {
+        document.getElementById('editDate').value = item.date;
+        
+        document.getElementById('editDesc').value = item.desc;
+        document.getElementById('selectedEditDescText').innerText = item.desc || "Pilih Keterangan";
+        
+        document.getElementById('editType').value = item.type;
+        document.getElementById('selectedEditTypeText').innerText = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
+        
+        document.getElementById('editCategory').value = item.category || "";
+        document.getElementById('selectedEditCategoryText').innerText = item.category || "Pilih Kategori";
+        
+        document.getElementById('editAmount').value = item.amount.toLocaleString('id-ID');
+        document.getElementById('editModal').style.display = 'flex';
+    }
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+    editTargetId = null;
+}
+
+function saveEdit() {
+    const date = document.getElementById('editDate').value;
+    const desc = document.getElementById('editDesc').value.trim();
+    const type = document.getElementById('editType').value;
+    const category = document.getElementById('editCategory').value;
+    
+    const amountStr = document.getElementById('editAmount').value.replace(/\./g, '');
+    const amount = parseInt(amountStr, 10);
+
+    if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) {
+        showToast("Mohon isi semua data dengan benar!");
+        return;
+    }
+
+    const itemIndex = data.findIndex(d => d.id.toString() === editTargetId);
+    if (itemIndex > -1) {
+        data[itemIndex] = { id: editTargetId, date, desc, type, category, amount };
+    }
+
+    closeEditModal();
+    selectedIds = []; 
+    applyFilter();
+    renderBudget();
+    renderCharts();
+    showToast("Data berhasil diperbarui!");
+}
+
+function deleteSelected() {
+    if (selectedIds.length === 0) {
+        showToast("Pilih transaksi yang ingin dihapus.");
+        return;
+    }
+
+    showConfirm(`Hapus ${selectedIds.length} transaksi terpilih?`, () => {
+        data = data.filter(item => !selectedIds.includes(item.id.toString()));
+        selectedIds = [];
+        applyFilter();
+        renderBudget();
+        renderCharts();
+        showToast("Transaksi berhasil dihapus!");
+    });
+}
+
+// EKSPOR EXCEL & PDF
+function saveExcel() {
+    let tableHtml = `
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Keterangan</th>
+                    <th>Kategori</th>
+                    <th>Tipe</th>
+                    <th>Jumlah (Rp)</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    const currentData = getFilteredData();
+    
+    if (currentData.length === 0) {
+        showToast("Tidak ada data untuk diekspor.");
+        document.getElementById('saveMenu').style.display = 'none';
+        return;
+    }
+
+    currentData.forEach(item => {
+        let tipe = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
+        let kategori = item.category ? item.category : "-";
+        tableHtml += `<tr>
+            <td>${item.date}</td>
+            <td>${item.desc}</td>
+            <td>${kategori}</td>
+            <td>${tipe}</td>
+            <td>${item.amount}</td>
+        </tr>`;
+    });
+    tableHtml += "</tbody></table>";
+
+    const blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Laporan_Keuangan_Harian.xls";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast("Berhasil disimpan ke Excel!");
+    document.getElementById('saveMenu').style.display = 'none';
+}
+
+function savePDF() {
+    const { jsPDF } = window.jspdf;
+    
+    const rows = document.querySelectorAll("#tableData tbody tr");
+    rows.forEach(row => row.classList.remove('selected'));
+
+    document.getElementById('actionRowContainer').style.display = 'none';
+    document.getElementById('filterContainer').style.display = 'none';
+
+    showToast("Menyiapkan PDF...");
+
+    html2canvas(document.getElementById("printArea"), { scale: 2 }).then(canvas => {
+        let pdf = new jsPDF('p', 'mm', 'a4');
+        let width = pdf.internal.pageSize.getWidth();
+        let height = (canvas.height * width) / canvas.width;
+        pdf.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0, width, height);
+        pdf.save("Laporan_Keuangan_Harian.pdf");
+        
+        document.getElementById('actionRowContainer').style.display = 'flex';
+        renderTable(); 
+        document.getElementById('saveMenu').style.display = 'none';
+    });
+}
+
+// GRAFIK
+function renderCharts() {
+    const expenses = data.filter(item => item.type === 'expense');
+
+    const dailyMap = {};
+    expenses.forEach(item => {
+        if (!dailyMap[item.date]) dailyMap[item.date] = 0;
+        dailyMap[item.date] += item.amount;
+    });
+    const dailyLabels = Object.keys(dailyMap).sort();
+    const dailyData = dailyLabels.map(date => dailyMap[date]);
+
+    if (chartHarian) chartHarian.destroy();
+    chartHarian = new Chart(document.getElementById('chartHarian'), {
+        type: 'bar',
+        data: {
+            labels: dailyLabels,
+            datasets: [{ 
+                label: 'Pengeluaran (Rp)', 
+                data: dailyData, 
+                backgroundColor: '#ef4444',
+                borderRadius: 4
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } }}
+    });
+
+    const monthlyMap = {};
+    expenses.forEach(item => {
+        const month = item.date.substring(0, 7);
+        if (!monthlyMap[month]) monthlyMap[month] = 0;
+        monthlyMap[month] += item.amount;
+    });
+    const monthlyLabels = Object.keys(monthlyMap).sort();
+    const monthlyData = monthlyLabels.map(m => monthlyMap[m]);
+
+    if (chartBulanan) chartBulanan.destroy();
+    chartBulanan = new Chart(document.getElementById('chartBulanan'), {
+        type: 'bar',
+        data: {
+            labels: monthlyLabels,
+            datasets: [{ 
+                label: 'Pengeluaran (Rp)', 
+                data: monthlyData, 
+                backgroundColor: '#3b82f6',
+                borderRadius: 4
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } }}
+    });
+
+    const catMap = {};
+    expenses.forEach(item => {
+        if (!catMap[item.category]) catMap[item.category] = 0;
+        catMap[item.category] += item.amount;
+    });
+    const catLabels = Object.keys(catMap);
+    const catData = catLabels.map(cat => catMap[cat]);
+
+    if (chartKategori) chartKategori.destroy();
+    chartKategori = new Chart(document.getElementById('chartKategori'), {
+        type: 'doughnut',
+        data: {
+            labels: catLabels,
+            datasets: [{
+                data: catData,
+                backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6'],
+                borderWidth: 0
+            }]
+        },
+        options: { responsive: true }
+    });
+}
+
+// NAVIGASI
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+
+        document.getElementById('menu-ringkasan').style.display = "none";
+        document.getElementById('menu-transaksi').style.display = "none";
+        document.getElementById('menu-anggaran').style.display = "none";
+        document.getElementById('menu-grafik').style.display = "none";
+
+        const index = parseInt(item.getAttribute('data-index'));
+
+        if (index === 0) {
+            document.getElementById('menu-transaksi').style.display = "block";
+            document.getElementById('judul').innerText = "TAMBAH TRANSAKSI";
+            if(!document.getElementById('date').value) {
+                document.getElementById('date').valueAsDate = new Date();
+            }
+        } else if (index === 1) {
+            document.getElementById('menu-ringkasan').style.display = "block";
+            document.getElementById('judul').innerText = "LAPORAN KEUANGAN HARIAN";
+        } else if (index === 2) {
+            document.getElementById('menu-anggaran').style.display = "block";
+            document.getElementById('judul').innerText = "KELOLA ANGGARAN";
+        } else if (index === 3) {
+            document.getElementById('menu-grafik').style.display = "block";
+            document.getElementById('judul').innerText = "GRAFIK PENGELUARAN";
+            renderCharts();   
+        }
+    });
+});
+
+// TUTUP MODAL JIKA KLIK DI LUAR
+window.addEventListener('click', function(event) {
+    const editMod = document.getElementById('editModal');
+    const editBdgMod = document.getElementById('editBudgetModal');
+    const confMod = document.getElementById('confirmModal');
+    
+    const catMod = document.getElementById('categoryModal');
+    const typeMod = document.getElementById('typeModal');
+    const descMod = document.getElementById('descModal');
+    
+    const btnSimpan = document.getElementById('btnSimpan');
+    const saveMenu = document.getElementById('saveMenu');
+    
+    if (event.target == editMod) closeEditModal();
+    if (event.target == editBdgMod) closeEditBudgetModal();
+    if (event.target == confMod) confMod.style.display = "none";
+    
+    if (event.target == catMod) closeCategoryPicker();
+    if (event.target == typeMod) closeTypePicker();
+    if (event.target == descMod) closeDescPicker();
+
+    if (btnSimpan && saveMenu) {
+        if (!btnSimpan.contains(event.target) && !saveMenu.contains(event.target)) {
+            saveMenu.style.display = 'none';
+        }
+    }
+});
+
+// INISIALISASI
+updateCategoryDropdown();
+</script>
+
+</body>
+</html>
