@@ -202,11 +202,11 @@ button:active {
 #tableData th, #tableBudget th {
     background: #198754;
     color: white;
-    padding: 12px 8px;
+    padding: 12px 4px; /* Sedikit mengurangi padding agar muat */
 }
 
 #tableData td, #tableBudget td {
-    padding: 12px 8px;
+    padding: 12px 4px; /* Sedikit mengurangi padding agar muat */
     border-bottom: 1px solid #e5e7eb;
     text-align: center;
     vertical-align: middle;
@@ -235,10 +235,11 @@ td {
     overflow-wrap: break-word;
 }
 
-#tableData th:nth-child(1), #tableData td:nth-child(1) { width: 25%; }
-#tableData th:nth-child(2), #tableData td:nth-child(2) { width: 35%; }
-#tableData th:nth-child(3), #tableData td:nth-child(3) { width: 20%; }
-#tableData th:nth-child(4), #tableData td:nth-child(4) { width: 20%; }
+/* UKURAN KOLOM TABEL TRANSAKSI (PERBAIKAN AGAR TIDAK TERPOTONG) */
+#tableData th:nth-child(1), #tableData td:nth-child(1) { width: 22%; font-size: 12px; } /* Tanggal */
+#tableData th:nth-child(2), #tableData td:nth-child(2) { width: 30%; } /* Keterangan */
+#tableData th:nth-child(3), #tableData td:nth-child(3) { width: 24%; font-size: 12px; white-space: nowrap; } /* Tipe (nowrap memaksa agar 1 baris) */
+#tableData th:nth-child(4), #tableData td:nth-child(4) { width: 24%; font-size: 12px; } /* Jumlah */
 
 /* GRAFIK */
 .canvas-container {
@@ -397,7 +398,9 @@ h4 {
 }
 </style>
 
+<!-- Firebase App (the core Firebase SDK) -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<!-- Firebase Realtime Database -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 </head>
@@ -406,6 +409,7 @@ h4 {
 
 <div id="toast">Notifikasi</div>
 
+<!-- MODAL KONFIRMASI -->
 <div id="confirmModal" class="modal">
     <div class="modal-content" style="text-align: center;">
         <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
@@ -417,6 +421,7 @@ h4 {
     </div>
 </div>
 
+<!-- MODAL PILIH KATEGORI -->
 <div id="categoryModal" class="modal">
     <div class="modal-content">
         <h3>Pilih Kategori</h3>
@@ -425,6 +430,7 @@ h4 {
     </div>
 </div>
 
+<!-- MODAL PILIH TIPE -->
 <div id="typeModal" class="modal">
     <div class="modal-content">
         <h3>Pilih Tipe</h3>
@@ -433,6 +439,7 @@ h4 {
     </div>
 </div>
 
+<!-- MODAL KETERANGAN (DENGAN INPUT MANUAL) -->
 <div id="descModal" class="modal">
     <div class="modal-content">
         <h3>Keterangan Transaksi</h3>
@@ -616,6 +623,7 @@ h4 {
 
 </div> 
 
+<!-- Modal Edit Transaksi -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>Edit Transaksi</h3>
@@ -664,6 +672,7 @@ h4 {
     </div>
 </div>
 
+<!-- Modal Edit Anggaran -->
 <div id="editBudgetModal" class="modal">
     <div class="modal-content">
         <h3>Edit Anggaran</h3>
