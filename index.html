@@ -186,8 +186,8 @@ button:active {
     border-radius: 8px;
 }
 
-/* TABLE */
-#tableData, #tableBudget, #tableViewBudget {
+/* TABLE UMUM */
+#tableData, #tableBudget, #tableViewBudget, #tableSaving {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
@@ -199,34 +199,34 @@ button:active {
     border: 1px solid #e5e7eb;
 }
 
-#tableData th, #tableBudget th, #tableViewBudget th {
+#tableData th, #tableBudget th, #tableViewBudget th, #tableSaving th {
     background: #198754;
     color: white;
     padding: 12px 4px; 
 }
 
-#tableData td, #tableBudget td, #tableViewBudget td {
+#tableData td, #tableBudget td, #tableViewBudget td, #tableSaving td {
     padding: 12px 4px; 
     border-bottom: 1px solid #e5e7eb;
     text-align: center;
     vertical-align: middle;
 }
 
-#tableData tbody tr:last-child td, #tableBudget tbody tr:last-child td, #tableViewBudget tbody tr:last-child td {
+#tableData tbody tr:last-child td, #tableBudget tbody tr:last-child td, #tableViewBudget tbody tr:last-child td, #tableSaving tbody tr:last-child td {
     border-bottom: none;
 }
 
-#tableData tbody tr, #tableBudget tbody tr {
+#tableData tbody tr, #tableBudget tbody tr, #tableSaving tbody tr {
     cursor: pointer;
     transition: background-color 0.2s;
     background: white;
 }
 
-#tableData tbody tr:hover, #tableBudget tbody tr:hover {
+#tableData tbody tr:hover, #tableBudget tbody tr:hover, #tableSaving tbody tr:hover {
     background: #f9fafb;
 }
 
-#tableData tbody tr.selected, #tableBudget tbody tr.selected {
+#tableData tbody tr.selected, #tableBudget tbody tr.selected, #tableSaving tbody tr.selected {
     background-color: #d1e7dd !important;
 }
 
@@ -235,18 +235,20 @@ td {
     overflow-wrap: break-word;
 }
 
-/* UKURAN KOLOM TABEL TRANSAKSI */
+/* UKURAN KOLOM TABEL KHUSUS */
 #tableData th:nth-child(1), #tableData td:nth-child(1) { width: 22%; font-size: 12px; } 
 #tableData th:nth-child(2), #tableData td:nth-child(2) { width: 30%; } 
 #tableData th:nth-child(3), #tableData td:nth-child(3) { width: 24%; font-size: 12px; white-space: nowrap; } 
 #tableData th:nth-child(4), #tableData td:nth-child(4) { width: 24%; font-size: 12px; } 
 
-/* UKURAN KOLOM TABEL RINCIAN ANGGARAN */
 #tableViewBudget { font-size: 12px; }
 #tableViewBudget th:nth-child(1), #tableViewBudget td:nth-child(1) { width: 25%; }
 #tableViewBudget th:nth-child(2), #tableViewBudget td:nth-child(2) { width: 45%; text-align: left; padding-left: 8px; }
 #tableViewBudget th:nth-child(3), #tableViewBudget td:nth-child(3) { width: 30%; text-align: right; padding-right: 8px; }
 #tableViewBudget tbody tr:nth-child(even) { background: #f9fafb; }
+
+#tableSaving th:nth-child(1), #tableSaving td:nth-child(1) { width: 50%; }
+#tableSaving th:nth-child(2), #tableSaving td:nth-child(2) { width: 50%; }
 
 /* GRAFIK */
 .canvas-container {
@@ -263,7 +265,7 @@ h4 {
     text-align: center;
 }
 
-/* NAVBAR */
+/* NAVBAR - DIPERBARUI AGAR 5 MENU MUAT */
 .navbar {
     position: fixed;
     bottom: 0;
@@ -272,19 +274,21 @@ h4 {
     background: #1f2937;
     display: flex;
     justify-content: space-around;
-    padding: 15px 0;
+    padding: 12px 0;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+    z-index: 1000;
 }
 
 .nav-item {
     text-align: center;
     color: #9ca3af;
-    font-size: 13px;
+    font-size: 12px;
     flex: 1;
     cursor: pointer;
     transition: color 0.2s;
+    white-space: nowrap;
 }
 
 .nav-item.active {
@@ -405,7 +409,9 @@ h4 {
 }
 </style>
 
+<!-- Firebase App (the core Firebase SDK) -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<!-- Firebase Realtime Database -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 </head>
@@ -414,6 +420,7 @@ h4 {
 
 <div id="toast">Notifikasi</div>
 
+<!-- MODAL KONFIRMASI -->
 <div id="confirmModal" class="modal">
     <div class="modal-content" style="text-align: center;">
         <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
@@ -425,6 +432,7 @@ h4 {
     </div>
 </div>
 
+<!-- MODAL PILIH KATEGORI -->
 <div id="categoryModal" class="modal">
     <div class="modal-content">
         <h3>Pilih Kategori</h3>
@@ -433,6 +441,7 @@ h4 {
     </div>
 </div>
 
+<!-- MODAL PILIH TIPE -->
 <div id="typeModal" class="modal">
     <div class="modal-content">
         <h3>Pilih Tipe</h3>
@@ -441,6 +450,7 @@ h4 {
     </div>
 </div>
 
+<!-- MODAL KETERANGAN (DENGAN INPUT MANUAL) -->
 <div id="descModal" class="modal">
     <div class="modal-content">
         <h3>Keterangan Transaksi</h3>
@@ -456,6 +466,7 @@ h4 {
     </div>
 </div>
 
+<!-- MODAL LIHAT RINCIAN ANGGARAN -->
 <div id="viewBudgetModal" class="modal">
     <div class="modal-content" style="max-width: 450px;">
         <h3 id="viewBudgetTitle" style="margin-bottom: 10px;">Rincian Anggaran</h3>
@@ -478,10 +489,12 @@ h4 {
     </div>
 </div>
 
+
 <div class="container" id="printArea">
 
 <h2 id="judul">LAPORAN KEUANGAN HARIAN</h2>
 
+<!-- MENU RINGKASAN -->
 <div id="menu-ringkasan">
     <div class="summary">
         <div class="box">Pemasukan:<div class="val">Rp <span id="income">0</span></div></div>
@@ -540,6 +553,7 @@ h4 {
     <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih transaksi</p>
 </div>
 
+<!-- MENU TRANSAKSI -->
 <div id="menu-transaksi" style="display:none;">
     <div class="form-group">
         <div class="form-item">
@@ -585,6 +599,7 @@ h4 {
     </div>
 </div>
 
+<!-- MENU ANGGARAN -->
 <div id="menu-anggaran" style="display:none;">
     <div class="summary" style="margin-bottom: 25px;">
         <div class="box" style="background: #f3f4f6;">Total Limit:<div class="val" style="color: #374151;">Rp <span id="totBudgetLimit">0</span></div></div>
@@ -625,9 +640,8 @@ h4 {
     <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih anggaran</p>
 </div>
 
+<!-- MENU GRAFIK -->
 <div id="menu-grafik" style="display:none;">
-    <h3 style="color: #374151;">Grafik Pengeluaran</h3>
-    
     <div class="canvas-container">
         <h4>Pengeluaran Harian</h4>
         <canvas id="chartHarian"></canvas>
@@ -644,8 +658,45 @@ h4 {
     </div>
 </div>
 
+<!-- MENU NABUNG -->
+<div id="menu-nabung" style="display:none;">
+    <div class="summary" style="margin-bottom: 25px; grid-template-columns: 1fr;">
+        <div class="box" style="background: #d1e7dd;">Total Tabungan:<div class="val" style="color: #0f5132;">Rp <span id="totSavings">0</span></div></div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-item">
+            <label>Tanggal Masuk</label>
+            <input type="date" id="savingDate">
+        </div>
+        <div class="form-item">
+            <label>Jumlah Uang (Rp)</label>
+            <input type="text" inputmode="numeric" id="savingAmount" placeholder="0" oninput="formatInputRupiah(this)">
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addSaving()">Tambah</button>
+        <button style="background: #f59e0b; color: white; padding: 12px 5px; font-size: 12px;" onclick="editSavingSelected()">Edit</button>
+        <button class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteSavingSelected()">Hapus</button>
+    </div>
+
+    <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Tabungan</h3>
+    <table id="tableSaving">
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Jumlah (Rp)</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih tabungan</p>
+</div>
+
 </div> 
 
+<!-- Modal Edit Transaksi -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>Edit Transaksi</h3>
@@ -694,6 +745,7 @@ h4 {
     </div>
 </div>
 
+<!-- Modal Edit Anggaran -->
 <div id="editBudgetModal" class="modal">
     <div class="modal-content">
         <h3>Edit Anggaran</h3>
@@ -714,11 +766,33 @@ h4 {
     </div>
 </div>
 
+<!-- Modal Edit Tabungan -->
+<div id="editSavingModal" class="modal">
+    <div class="modal-content">
+        <h3>Edit Tabungan</h3>
+        <div class="form-group">
+            <div class="form-item">
+                <label>Tanggal</label>
+                <input type="date" id="editSavingDate">
+            </div>
+            <div class="form-item">
+                <label>Jumlah Uang (Rp)</label>
+                <input type="text" inputmode="numeric" id="editSavingAmount" oninput="formatInputRupiah(this)">
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-secondary" onclick="closeEditSavingModal()">Batal</button>
+            <button class="btn-add" onclick="saveEditSaving()">Simpan</button>
+        </div>
+    </div>
+</div>
+
 <div class="navbar">
     <div class="nav-item" data-index="0">Transaksi</div>
     <div class="nav-item active" data-index="1">Ringkasan</div>
     <div class="nav-item" data-index="2">Anggaran</div>
     <div class="nav-item" data-index="3">Grafik</div>
+    <div class="nav-item" data-index="4">Nabung</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
@@ -736,11 +810,13 @@ const database = firebase.database();
 // Data utama
 let data = [];
 let budgets = [];
+let savings = [];
 let chartHarian, chartBulanan, chartKategori;
 let selectedIds = []; 
 let editTargetId = null; 
 let selectedBudgetCategory = null; 
 let editBudgetOldCategory = null; 
+let selectedSavingId = null; 
 
 let categoryPickerTarget = 'add'; 
 let typePickerTarget = 'add';
@@ -767,6 +843,14 @@ database.ref('budgets').on('value', (snapshot) => {
     });
     renderBudget();
     updateCategoryDropdown();
+});
+
+database.ref('savings').on('value', (snapshot) => {
+    savings = [];
+    snapshot.forEach((childSnapshot) => {
+        savings.push(childSnapshot.val());
+    });
+    renderSavings();
 });
 
 // FUNGSI FORMAT RUPIAH
@@ -1164,6 +1248,115 @@ function renderBudget() {
     document.getElementById('totBudgetUsed').innerText = formatRupiah(totalUsed);
     document.getElementById('totBudgetRemaining').innerText = formatRupiah(totalLimit - totalUsed);
 }
+
+// =====================
+// NABUNG (TABUNGAN)
+// =====================
+function toggleSavingSelection(rowElement, id) {
+    const rows = document.querySelectorAll("#tableSaving tbody tr");
+    rows.forEach(r => r.classList.remove('selected'));
+
+    if (selectedSavingId === id) {
+        selectedSavingId = null;
+    } else {
+        selectedSavingId = id;
+        rowElement.classList.add('selected');
+    }
+}
+
+function renderSavings() {
+    const tbody = document.querySelector("#tableSaving tbody");
+    tbody.innerHTML = "";
+    let total = 0;
+
+    const sortedSavings = [...savings].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    sortedSavings.forEach(s => {
+        total += s.amount;
+        const isSelected = selectedSavingId === s.id ? 'selected' : '';
+        tbody.innerHTML += `
+        <tr class="${isSelected}" onclick="toggleSavingSelection(this, '${s.id}')">
+            <td>${s.date}</td>
+            <td style="color:#198754; font-weight:bold;">Rp ${formatRupiah(s.amount)}</td>
+        </tr>`;
+    });
+    
+    document.getElementById('totSavings').innerText = formatRupiah(total);
+}
+
+function addSaving() {
+    const date = document.getElementById('savingDate').value;
+    const amountStr = document.getElementById('savingAmount').value.replace(/\./g, '');
+    const amount = parseInt(amountStr, 10);
+
+    if (!date || isNaN(amount) || amount <= 0) {
+        showToast("Isi tanggal dan jumlah dengan benar!");
+        return;
+    }
+
+    const id = Date.now().toString();
+    database.ref('savings/' + id).set({
+        id: id,
+        date: date,
+        amount: amount
+    }).then(() => {
+        document.getElementById('savingAmount').value = "";
+        showToast("Tabungan berhasil ditambahkan!");
+    });
+}
+
+function editSavingSelected() {
+    if (!selectedSavingId) {
+        showToast("Pilih satu baris tabungan terlebih dahulu.");
+        return;
+    }
+    
+    const target = savings.find(s => s.id === selectedSavingId);
+    if (target) {
+        document.getElementById('editSavingDate').value = target.date;
+        document.getElementById('editSavingAmount').value = target.amount.toLocaleString('id-ID');
+        document.getElementById('editSavingModal').style.display = 'flex';
+    }
+}
+
+function saveEditSaving() {
+    const date = document.getElementById('editSavingDate').value;
+    const amountStr = document.getElementById('editSavingAmount').value.replace(/\./g, '');
+    const amount = parseInt(amountStr, 10);
+
+    if (!date || isNaN(amount) || amount <= 0) {
+        showToast("Isi tanggal dan jumlah dengan benar!");
+        return;
+    }
+
+    database.ref('savings/' + selectedSavingId).update({
+        date: date,
+        amount: amount
+    }).then(() => {
+        closeEditSavingModal();
+        selectedSavingId = null; 
+        showToast("Tabungan berhasil diperbarui!");
+    });
+}
+
+function closeEditSavingModal() {
+    document.getElementById('editSavingModal').style.display = 'none';
+}
+
+function deleteSavingSelected() {
+    if (!selectedSavingId) {
+        showToast("Pilih satu baris tabungan yang ingin dihapus.");
+        return;
+    }
+
+    showConfirm("Hapus data tabungan ini?", () => {
+        database.ref('savings/' + selectedSavingId).remove().then(() => {
+            selectedSavingId = null;
+            showToast("Tabungan berhasil dihapus!");
+        });
+    });
+}
+
 
 // =====================
 // TRANSAKSI & ANGGARAN KE FIREBASE
@@ -1583,6 +1776,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
         document.getElementById('menu-transaksi').style.display = "none";
         document.getElementById('menu-anggaran').style.display = "none";
         document.getElementById('menu-grafik').style.display = "none";
+        document.getElementById('menu-nabung').style.display = "none"; // Sembunyikan menu nabung
 
         const index = parseInt(item.getAttribute('data-index'));
 
@@ -1602,6 +1796,12 @@ document.querySelectorAll('.nav-item').forEach(item => {
             document.getElementById('menu-grafik').style.display = "block";
             document.getElementById('judul').innerText = "GRAFIK PENGELUARAN";
             renderCharts();   
+        } else if (index === 4) { // Logika Menu Nabung Baru
+            document.getElementById('menu-nabung').style.display = "block";
+            document.getElementById('judul').innerText = "CATAT TABUNGAN";
+            if(!document.getElementById('savingDate').value) {
+                document.getElementById('savingDate').valueAsDate = new Date();
+            }
         }
     });
 });
@@ -1611,6 +1811,7 @@ window.addEventListener('click', function(event) {
     const editMod = document.getElementById('editModal');
     const editBdgMod = document.getElementById('editBudgetModal');
     const viewBdgMod = document.getElementById('viewBudgetModal');
+    const editSavMod = document.getElementById('editSavingModal');
     const confMod = document.getElementById('confirmModal');
     
     const catMod = document.getElementById('categoryModal');
@@ -1623,6 +1824,7 @@ window.addEventListener('click', function(event) {
     if (event.target == editMod) closeEditModal();
     if (event.target == editBdgMod) closeEditBudgetModal();
     if (event.target == viewBdgMod) closeViewBudgetModal();
+    if (event.target == editSavMod) closeEditSavingModal();
     if (event.target == confMod) confMod.style.display = "none";
     
     if (event.target == catMod) closeCategoryPicker();
@@ -1636,7 +1838,7 @@ window.addEventListener('click', function(event) {
     }
 });
 
-// INISIALISASI AWAL (Hanya form UI, data menyusul otomatis ditarik dari Firebase)
+// INISIALISASI AWAL
 updateCategoryDropdown();
 </script>
 
