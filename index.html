@@ -142,7 +142,7 @@ button:active {
 
 .btn-group {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     margin-top: 15px;
 }
 
@@ -187,7 +187,7 @@ button:active {
 }
 
 /* TABLE */
-#tableData, #tableBudget {
+#tableData, #tableBudget, #tableViewBudget {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
@@ -199,20 +199,20 @@ button:active {
     border: 1px solid #e5e7eb;
 }
 
-#tableData th, #tableBudget th {
+#tableData th, #tableBudget th, #tableViewBudget th {
     background: #198754;
     color: white;
-    padding: 12px 4px; /* Sedikit mengurangi padding agar muat */
+    padding: 12px 4px; 
 }
 
-#tableData td, #tableBudget td {
-    padding: 12px 4px; /* Sedikit mengurangi padding agar muat */
+#tableData td, #tableBudget td, #tableViewBudget td {
+    padding: 12px 4px; 
     border-bottom: 1px solid #e5e7eb;
     text-align: center;
     vertical-align: middle;
 }
 
-#tableData tbody tr:last-child td, #tableBudget tbody tr:last-child td {
+#tableData tbody tr:last-child td, #tableBudget tbody tr:last-child td, #tableViewBudget tbody tr:last-child td {
     border-bottom: none;
 }
 
@@ -235,11 +235,18 @@ td {
     overflow-wrap: break-word;
 }
 
-/* UKURAN KOLOM TABEL TRANSAKSI (PERBAIKAN AGAR TIDAK TERPOTONG) */
-#tableData th:nth-child(1), #tableData td:nth-child(1) { width: 22%; font-size: 12px; } /* Tanggal */
-#tableData th:nth-child(2), #tableData td:nth-child(2) { width: 30%; } /* Keterangan */
-#tableData th:nth-child(3), #tableData td:nth-child(3) { width: 24%; font-size: 12px; white-space: nowrap; } /* Tipe (nowrap memaksa agar 1 baris) */
-#tableData th:nth-child(4), #tableData td:nth-child(4) { width: 24%; font-size: 12px; } /* Jumlah */
+/* UKURAN KOLOM TABEL TRANSAKSI */
+#tableData th:nth-child(1), #tableData td:nth-child(1) { width: 22%; font-size: 12px; } 
+#tableData th:nth-child(2), #tableData td:nth-child(2) { width: 30%; } 
+#tableData th:nth-child(3), #tableData td:nth-child(3) { width: 24%; font-size: 12px; white-space: nowrap; } 
+#tableData th:nth-child(4), #tableData td:nth-child(4) { width: 24%; font-size: 12px; } 
+
+/* UKURAN KOLOM TABEL RINCIAN ANGGARAN */
+#tableViewBudget { font-size: 12px; }
+#tableViewBudget th:nth-child(1), #tableViewBudget td:nth-child(1) { width: 25%; }
+#tableViewBudget th:nth-child(2), #tableViewBudget td:nth-child(2) { width: 45%; text-align: left; padding-left: 8px; }
+#tableViewBudget th:nth-child(3), #tableViewBudget td:nth-child(3) { width: 30%; text-align: right; padding-right: 8px; }
+#tableViewBudget tbody tr:nth-child(even) { background: #f9fafb; }
 
 /* GRAFIK */
 .canvas-container {
@@ -398,9 +405,7 @@ h4 {
 }
 </style>
 
-<!-- Firebase App (the core Firebase SDK) -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<!-- Firebase Realtime Database -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 </head>
@@ -409,7 +414,6 @@ h4 {
 
 <div id="toast">Notifikasi</div>
 
-<!-- MODAL KONFIRMASI -->
 <div id="confirmModal" class="modal">
     <div class="modal-content" style="text-align: center;">
         <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
@@ -421,7 +425,6 @@ h4 {
     </div>
 </div>
 
-<!-- MODAL PILIH KATEGORI -->
 <div id="categoryModal" class="modal">
     <div class="modal-content">
         <h3>Pilih Kategori</h3>
@@ -430,7 +433,6 @@ h4 {
     </div>
 </div>
 
-<!-- MODAL PILIH TIPE -->
 <div id="typeModal" class="modal">
     <div class="modal-content">
         <h3>Pilih Tipe</h3>
@@ -439,7 +441,6 @@ h4 {
     </div>
 </div>
 
-<!-- MODAL KETERANGAN (DENGAN INPUT MANUAL) -->
 <div id="descModal" class="modal">
     <div class="modal-content">
         <h3>Keterangan Transaksi</h3>
@@ -455,6 +456,27 @@ h4 {
     </div>
 </div>
 
+<div id="viewBudgetModal" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+        <h3 id="viewBudgetTitle" style="margin-bottom: 10px;">Rincian Anggaran</h3>
+        <p id="viewBudgetTotal" style="text-align: center; color: #b91c1c; font-weight: bold; margin-top: 0; margin-bottom: 15px;">Total: Rp 0</p>
+        
+        <div style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
+            <table id="tableViewBudget">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th style="text-align: left; padding-left: 8px;">Keterangan</th>
+                        <th style="text-align: right; padding-right: 8px;">Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <p id="viewBudgetEmpty" style="text-align: center; font-size: 13px; color: #6b7280; display: none; margin-top: 20px;">Belum ada pengeluaran untuk kategori ini.</p>
+        </div>
+        <button class="btn-secondary" onclick="closeViewBudgetModal()" style="width: 100%;">Tutup</button>
+    </div>
+</div>
 
 <div class="container" id="printArea">
 
@@ -582,9 +604,10 @@ h4 {
     </div>
 
     <div class="btn-group">
-        <button class="btn-add" onclick="addBudget()">Tambah</button>
-        <button style="background: #f59e0b; color: white;" onclick="editBudgetSelected()">Edit</button>
-        <button class="btn-delete" onclick="deleteBudgetSelected()">Hapus</button>
+        <button class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addBudget()">Tambah</button>
+        <button style="background: #f59e0b; color: white; padding: 12px 5px; font-size: 12px;" onclick="editBudgetSelected()">Edit</button>
+        <button style="background: #3b82f6; color: white; padding: 12px 5px; font-size: 12px;" onclick="viewBudgetDetails()">Lihat</button>
+        <button class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteBudgetSelected()">Hapus</button>
     </div>
 
     <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Anggaran</h3>
@@ -623,7 +646,6 @@ h4 {
 
 </div> 
 
-<!-- Modal Edit Transaksi -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>Edit Transaksi</h3>
@@ -672,7 +694,6 @@ h4 {
     </div>
 </div>
 
-<!-- Modal Edit Anggaran -->
 <div id="editBudgetModal" class="modal">
     <div class="modal-content">
         <h3>Edit Anggaran</h3>
@@ -1209,7 +1230,7 @@ function addBudget() {
     });
 }
 
-// EDIT & HAPUS ANGGARAN FIREBASE
+// EDIT, LIHAT & HAPUS ANGGARAN FIREBASE
 function editBudgetSelected() {
     if (!selectedBudgetCategory) {
         showToast("Pilih satu baris anggaran terlebih dahulu.");
@@ -1247,7 +1268,6 @@ function saveEditBudget() {
             category: newCategory,
             limit: newLimit
         }).then(() => {
-            // Jika nama kategori berubah, update juga semua riwayat transaksi yang menggunakan kategori lama
             if (newCategory !== editBudgetOldCategory) {
                 data.forEach(d => {
                     if (d.category === editBudgetOldCategory) {
@@ -1283,6 +1303,49 @@ function deleteBudgetSelected() {
         }
     });
 }
+
+function viewBudgetDetails() {
+    if (!selectedBudgetCategory) {
+        showToast("Pilih satu baris anggaran terlebih dahulu.");
+        return;
+    }
+
+    document.getElementById('viewBudgetTitle').innerText = "Rincian: " + selectedBudgetCategory;
+    
+    const tbody = document.querySelector("#tableViewBudget tbody");
+    tbody.innerHTML = "";
+    
+    // Filter khusus pengeluaran sesuai kategori yang dipilih
+    const expenses = data.filter(d => d.type === 'expense' && d.category === selectedBudgetCategory);
+    
+    if (expenses.length === 0) {
+        document.getElementById('viewBudgetEmpty').style.display = 'block';
+        document.getElementById('tableViewBudget').style.display = 'none';
+        document.getElementById('viewBudgetTotal').innerText = "Total: Rp 0";
+    } else {
+        document.getElementById('viewBudgetEmpty').style.display = 'none';
+        document.getElementById('tableViewBudget').style.display = 'table';
+        
+        let total = 0;
+        expenses.forEach(item => {
+            total += item.amount;
+            tbody.innerHTML += `
+            <tr>
+                <td>${item.date}</td>
+                <td>${item.desc}</td>
+                <td>Rp ${formatRupiah(item.amount)}</td>
+            </tr>`;
+        });
+        document.getElementById('viewBudgetTotal').innerText = "Total: Rp " + formatRupiah(total);
+    }
+    
+    document.getElementById('viewBudgetModal').style.display = 'flex';
+}
+
+function closeViewBudgetModal() {
+    document.getElementById('viewBudgetModal').style.display = 'none';
+}
+
 
 // EDIT & HAPUS TRANSAKSI FIREBASE
 function editSelected() {
@@ -1547,6 +1610,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
 window.addEventListener('click', function(event) {
     const editMod = document.getElementById('editModal');
     const editBdgMod = document.getElementById('editBudgetModal');
+    const viewBdgMod = document.getElementById('viewBudgetModal');
     const confMod = document.getElementById('confirmModal');
     
     const catMod = document.getElementById('categoryModal');
@@ -1558,6 +1622,7 @@ window.addEventListener('click', function(event) {
     
     if (event.target == editMod) closeEditModal();
     if (event.target == editBdgMod) closeEditBudgetModal();
+    if (event.target == viewBdgMod) closeViewBudgetModal();
     if (event.target == confMod) confMod.style.display = "none";
     
     if (event.target == catMod) closeCategoryPicker();
