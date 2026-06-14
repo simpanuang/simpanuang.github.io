@@ -89,7 +89,7 @@ input:focus {
     background-color: #fff;
 }
 
-/* KUSTOM DROPDOWN (KATEGORI, TIPE, KETERANGAN) */
+/* KUSTOM DROPDOWN */
 .custom-select {
     width: 100%;
     padding: 12px 15px;
@@ -187,7 +187,7 @@ button:active {
 }
 
 /* TABLE UMUM */
-#tableData, #tableBudget, #tableViewBudget, #tableSaving {
+#tableData, #tableBudget, #tableViewBudget, #tableSaving, #tableLoan {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
@@ -199,34 +199,34 @@ button:active {
     border: 1px solid #e5e7eb;
 }
 
-#tableData th, #tableBudget th, #tableViewBudget th, #tableSaving th {
+#tableData th, #tableBudget th, #tableViewBudget th, #tableSaving th, #tableLoan th {
     background: #198754;
     color: white;
     padding: 12px 4px; 
 }
 
-#tableData td, #tableBudget td, #tableViewBudget td, #tableSaving td {
+#tableData td, #tableBudget td, #tableViewBudget td, #tableSaving td, #tableLoan td {
     padding: 12px 4px; 
     border-bottom: 1px solid #e5e7eb;
     text-align: center;
     vertical-align: middle;
 }
 
-#tableData tbody tr:last-child td, #tableBudget tbody tr:last-child td, #tableViewBudget tbody tr:last-child td, #tableSaving tbody tr:last-child td {
+#tableData tbody tr:last-child td, #tableBudget tbody tr:last-child td, #tableViewBudget tbody tr:last-child td, #tableSaving tbody tr:last-child td, #tableLoan tbody tr:last-child td {
     border-bottom: none;
 }
 
-#tableData tbody tr, #tableBudget tbody tr, #tableSaving tbody tr {
+#tableData tbody tr, #tableBudget tbody tr, #tableSaving tbody tr, #tableLoan tbody tr {
     cursor: pointer;
     transition: background-color 0.2s;
     background: white;
 }
 
-#tableData tbody tr:hover, #tableBudget tbody tr:hover, #tableSaving tbody tr:hover {
+#tableData tbody tr:hover, #tableBudget tbody tr:hover, #tableSaving tbody tr:hover, #tableLoan tbody tr:hover {
     background: #f9fafb;
 }
 
-#tableData tbody tr.selected, #tableBudget tbody tr.selected, #tableSaving tbody tr.selected {
+#tableData tbody tr.selected, #tableBudget tbody tr.selected, #tableSaving tbody tr.selected, #tableLoan tbody tr.selected {
     background-color: #d1e7dd !important;
 }
 
@@ -250,6 +250,10 @@ td {
 #tableSaving th:nth-child(1), #tableSaving td:nth-child(1) { width: 50%; }
 #tableSaving th:nth-child(2), #tableSaving td:nth-child(2) { width: 50%; }
 
+#tableLoan th:nth-child(1), #tableLoan td:nth-child(1) { width: 22%; font-size: 11px; }
+#tableLoan th:nth-child(2), #tableLoan td:nth-child(2) { width: 40%; text-align: left; padding-left: 8px; }
+#tableLoan th:nth-child(3), #tableLoan td:nth-child(3) { width: 38%; text-align: right; padding-right: 8px; }
+
 /* GRAFIK */
 .canvas-container {
     margin: 20px 0;
@@ -265,7 +269,7 @@ h4 {
     text-align: center;
 }
 
-/* NAVBAR - DIPERBARUI AGAR 5 MENU MUAT */
+/* NAVBAR */
 .navbar {
     position: fixed;
     bottom: 0;
@@ -284,7 +288,7 @@ h4 {
 .nav-item {
     text-align: center;
     color: #9ca3af;
-    font-size: 12px;
+    font-size: 11px; /* Disesuaikan agar 6 menu muat */
     flex: 1;
     cursor: pointer;
     transition: color 0.2s;
@@ -409,7 +413,7 @@ h4 {
 }
 </style>
 
-<!-- Firebase App (the core Firebase SDK) -->
+<!-- Firebase App -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <!-- Firebase Realtime Database -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -441,7 +445,7 @@ h4 {
     </div>
 </div>
 
-<!-- MODAL PILIH TIPE -->
+<!-- MODAL PILIH TIPE (TRANSAKSI) -->
 <div id="typeModal" class="modal">
     <div class="modal-content">
         <h3>Pilih Tipe</h3>
@@ -450,15 +454,22 @@ h4 {
     </div>
 </div>
 
-<!-- MODAL KETERANGAN (DENGAN INPUT MANUAL) -->
+<!-- MODAL PILIH TIPE (PINJAMAN) -->
+<div id="loanTypeModal" class="modal">
+    <div class="modal-content">
+        <h3>Tipe Pinjaman</h3>
+        <div id="loanTypeList" class="custom-list"></div>
+        <button class="btn-secondary" onclick="closeLoanTypePicker()" style="width: 100%; margin-top: 20px;">Batal</button>
+    </div>
+</div>
+
+<!-- MODAL KETERANGAN -->
 <div id="descModal" class="modal">
     <div class="modal-content">
         <h3>Keterangan Transaksi</h3>
         <input type="text" id="customDescInput" placeholder="Ketik keterangan baru di sini..." style="margin-bottom: 10px; border-color: #198754; box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.1);">
-        
         <p style="font-size: 12px; color: #6b7280; font-weight: 600; margin: 15px 0 5px 0;">Atau pilih dari riwayat:</p>
         <div id="descList" class="custom-list" style="margin-top: 0; max-height: 180px;"></div>
-        
         <div class="btn-group">
             <button class="btn-secondary" onclick="closeDescPicker()">Batal</button>
             <button class="btn-add" onclick="applyCustomDesc()">Simpan</button>
@@ -694,6 +705,56 @@ h4 {
     <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih tabungan</p>
 </div>
 
+<!-- MENU PINJAMAN -->
+<div id="menu-pinjaman" style="display:none;">
+    <div class="summary" style="margin-bottom: 25px; grid-template-columns: 1fr 1fr;">
+        <div class="box" style="background: #cfe2f3;">Total Dipinjamkan:<div class="val" style="color: #0d6efd;">Rp <span id="totLent">0</span></div></div>
+        <div class="box" style="background: #f8d7da;">Total Utang Saya:<div class="val" style="color: #b91c1c;">Rp <span id="totBorrowed">0</span></div></div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-item">
+            <label>Tanggal</label>
+            <input type="date" id="loanDate">
+        </div>
+        <div class="form-item">
+            <label>Nama Orang / Pihak</label>
+            <input type="text" id="loanPerson" placeholder="Contoh: Budi, Bank, dll">
+        </div>
+        <div class="form-item">
+            <label>Tipe Pinjaman</label>
+            <div class="custom-select" onclick="openLoanTypePicker('add')">
+                <span id="selectedLoanTypeText" style="color: #333;">Saya Meminjamkan (Piutang)</span>
+                <span class="arrow">▼</span>
+            </div>
+            <input type="hidden" id="loanType" value="lent">
+        </div>
+        <div class="form-item">
+            <label>Jumlah Uang (Rp)</label>
+            <input type="text" inputmode="numeric" id="loanAmount" placeholder="0" oninput="formatInputRupiah(this)">
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addLoan()">Tambah</button>
+        <button style="background: #f59e0b; color: white; padding: 12px 5px; font-size: 12px;" onclick="editLoanSelected()">Edit</button>
+        <button class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteLoanSelected()">Hapus</button>
+    </div>
+
+    <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Pinjaman</h3>
+    <table id="tableLoan">
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th style="text-align: left; padding-left: 8px;">Nama & Tipe</th>
+                <th style="text-align: right; padding-right: 8px;">Jumlah</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih pinjaman</p>
+</div>
+
 </div> 
 
 <!-- Modal Edit Transaksi -->
@@ -705,7 +766,6 @@ h4 {
                 <label>Tanggal</label>
                 <input type="date" id="editDate">
             </div>
-            
             <div class="form-item">
                 <label>Keterangan</label>
                 <div class="custom-select" onclick="openDescPicker('edit')">
@@ -714,7 +774,6 @@ h4 {
                 </div>
                 <input type="hidden" id="editDesc">
             </div>
-
             <div class="form-item">
                 <label>Kategori</label>
                 <div class="custom-select" onclick="openCategoryPicker('edit')">
@@ -723,7 +782,6 @@ h4 {
                 </div>
                 <input type="hidden" id="editCategory">
             </div>
-            
             <div class="form-item">
                 <label>Tipe</label>
                 <div class="custom-select" onclick="openTypePicker('edit')">
@@ -732,7 +790,6 @@ h4 {
                 </div>
                 <input type="hidden" id="editType">
             </div>
-
             <div class="form-item">
                 <label>Jumlah (Rp)</label>
                 <input type="text" inputmode="numeric" id="editAmount" oninput="formatInputRupiah(this)">
@@ -787,12 +844,46 @@ h4 {
     </div>
 </div>
 
+<!-- Modal Edit Pinjaman -->
+<div id="editLoanModal" class="modal">
+    <div class="modal-content">
+        <h3>Edit Pinjaman</h3>
+        <div class="form-group">
+            <div class="form-item">
+                <label>Tanggal</label>
+                <input type="date" id="editLoanDate">
+            </div>
+            <div class="form-item">
+                <label>Nama Orang / Pihak</label>
+                <input type="text" id="editLoanPerson">
+            </div>
+            <div class="form-item">
+                <label>Tipe Pinjaman</label>
+                <div class="custom-select" onclick="openLoanTypePicker('edit')">
+                    <span id="selectedEditLoanTypeText"></span>
+                    <span class="arrow">▼</span>
+                </div>
+                <input type="hidden" id="editLoanType">
+            </div>
+            <div class="form-item">
+                <label>Jumlah Uang (Rp)</label>
+                <input type="text" inputmode="numeric" id="editLoanAmount" oninput="formatInputRupiah(this)">
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-secondary" onclick="closeEditLoanModal()">Batal</button>
+            <button class="btn-add" onclick="saveEditLoan()">Simpan</button>
+        </div>
+    </div>
+</div>
+
 <div class="navbar">
     <div class="nav-item" data-index="0">Transaksi</div>
     <div class="nav-item active" data-index="1">Ringkasan</div>
     <div class="nav-item" data-index="2">Anggaran</div>
     <div class="nav-item" data-index="3">Grafik</div>
     <div class="nav-item" data-index="4">Nabung</div>
+    <div class="nav-item" data-index="5">Pinjaman</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
@@ -811,16 +902,20 @@ const database = firebase.database();
 let data = [];
 let budgets = [];
 let savings = [];
+let loans = [];
+
 let chartHarian, chartBulanan, chartKategori;
 let selectedIds = []; 
 let editTargetId = null; 
 let selectedBudgetCategory = null; 
 let editBudgetOldCategory = null; 
 let selectedSavingId = null; 
+let selectedLoanId = null;
 
 let categoryPickerTarget = 'add'; 
 let typePickerTarget = 'add';
 let descPickerTarget = 'add';
+let loanTypePickerTarget = 'add';
 
 // =====================
 // SINKRONISASI REAL-TIME DARI FIREBASE
@@ -851,6 +946,14 @@ database.ref('savings').on('value', (snapshot) => {
         savings.push(childSnapshot.val());
     });
     renderSavings();
+});
+
+database.ref('loans').on('value', (snapshot) => {
+    loans = [];
+    snapshot.forEach((childSnapshot) => {
+        loans.push(childSnapshot.val());
+    });
+    renderLoans();
 });
 
 // FUNGSI FORMAT RUPIAH
@@ -899,7 +1002,55 @@ document.getElementById("btnConfirmNo").onclick = function() {
 };
 
 // =====================
-// KONTROL MODAL TIPE
+// KONTROL MODAL TIPE PINJAMAN
+// =====================
+function openLoanTypePicker(target) {
+    loanTypePickerTarget = target;
+    renderLoanTypePickerList();
+    document.getElementById('loanTypeModal').style.display = 'flex';
+}
+
+function closeLoanTypePicker() {
+    document.getElementById('loanTypeModal').style.display = 'none';
+}
+
+function selectLoanType(val, label) {
+    if (loanTypePickerTarget === 'add') {
+        document.getElementById('loanType').value = val;
+        document.getElementById('selectedLoanTypeText').innerText = label;
+        document.getElementById('selectedLoanTypeText').style.color = "#333";
+    } else {
+        document.getElementById('editLoanType').value = val;
+        document.getElementById('selectedEditLoanTypeText').innerText = label;
+    }
+    closeLoanTypePicker();
+}
+
+function renderLoanTypePickerList() {
+    let currentSelected = loanTypePickerTarget === 'add' 
+        ? document.getElementById('loanType').value 
+        : document.getElementById('editLoanType').value;
+    
+    const options = [
+        { val: 'lent', label: 'Saya Meminjamkan (Piutang)' },
+        { val: 'borrowed', label: 'Saya Meminjam (Utang)' }
+    ];
+
+    let html = '';
+    options.forEach(opt => {
+        const isSelected = opt.val === currentSelected;
+        html += `
+            <div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectLoanType('${opt.val}', '${opt.label}')">
+                <span>${opt.label}</span>
+                ${isSelected ? '<span class="check">✓</span>' : ''}
+            </div>
+        `;
+    });
+    document.getElementById('loanTypeList').innerHTML = html;
+}
+
+// =====================
+// KONTROL MODAL TIPE TRANSAKSI
 // =====================
 function openTypePicker(target) {
     typePickerTarget = target;
@@ -951,13 +1102,8 @@ function renderTypePickerList() {
 // =====================
 function openDescPicker(target) {
     descPickerTarget = target;
-    
-    let currentVal = descPickerTarget === 'add' 
-        ? document.getElementById('desc').value 
-        : document.getElementById('editDesc').value;
-        
+    let currentVal = descPickerTarget === 'add' ? document.getElementById('desc').value : document.getElementById('editDesc').value;
     document.getElementById('customDescInput').value = currentVal;
-    
     renderDescPickerList();
     document.getElementById('descModal').style.display = 'flex';
     setTimeout(() => document.getElementById('customDescInput').focus(), 100);
@@ -997,19 +1143,11 @@ function renderDescPickerList() {
         return;
     }
 
-    let currentSelected = descPickerTarget === 'add' 
-        ? document.getElementById('desc').value 
-        : document.getElementById('editDesc').value;
-
+    let currentSelected = descPickerTarget === 'add' ? document.getElementById('desc').value : document.getElementById('editDesc').value;
     let html = '';
     uniqueDescs.forEach(d => {
         const isSelected = d === currentSelected;
-        html += `
-            <div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectDesc('${d}')">
-                <span>${d}</span>
-                ${isSelected ? '<span class="check">✓</span>' : ''}
-            </div>
-        `;
+        html += `<div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectDesc('${d}')"><span>${d}</span>${isSelected ? '<span class="check">✓</span>' : ''}</div>`;
     });
     list.innerHTML = html;
 }
@@ -1065,19 +1203,11 @@ function renderCategoryPickerList() {
         return;
     }
 
-    let currentSelected = categoryPickerTarget === 'add' 
-        ? document.getElementById('category').value 
-        : document.getElementById('editCategory').value;
-
+    let currentSelected = categoryPickerTarget === 'add' ? document.getElementById('category').value : document.getElementById('editCategory').value;
     let html = '';
     budgets.forEach(b => {
         const isSelected = b.category === currentSelected;
-        html += `
-            <div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectCategory('${b.category}')">
-                <span>${b.category}</span>
-                ${isSelected ? '<span class="check">✓</span>' : ''}
-            </div>
-        `;
+        html += `<div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectCategory('${b.category}')"><span>${b.category}</span>${isSelected ? '<span class="check">✓</span>' : ''}</div>`;
     });
     list.innerHTML = html;
 }
@@ -1097,11 +1227,8 @@ function toggleFilter() {
 function handleFilterChange() {
     const filterValue = document.getElementById('filterSelect').value;
     const customDateContainer = document.getElementById('customDateContainer');
-    if (filterValue === 'custom') {
-        customDateContainer.style.display = 'block';
-    } else {
-        customDateContainer.style.display = 'none';
-    }
+    if (filterValue === 'custom') customDateContainer.style.display = 'block';
+    else customDateContainer.style.display = 'none';
     applyFilter();
 }
 
@@ -1145,12 +1272,10 @@ function applyFilter() {
 function updateSummary() {
     let income = 0, expense = 0;
     const currentData = getFilteredData();
-    
     currentData.forEach(item => {
         if (item.type === 'income') income += item.amount;
         else expense += item.amount;
     });
-
     document.getElementById('income').innerText = formatRupiah(income);
     document.getElementById('expense').innerText = formatRupiah(expense);
     document.getElementById('balance').innerText = formatRupiah(income - expense);
@@ -1171,9 +1296,7 @@ function toggleSelection(rowElement, id) {
 function selectAllRows() {
     const rows = document.querySelectorAll("#tableData tbody tr");
     const currentData = getFilteredData();
-    
     const isAllSelected = selectedIds.length === currentData.length && currentData.length > 0;
-
     if (isAllSelected) {
         selectedIds = [];
         rows.forEach(row => row.classList.remove('selected'));
@@ -1186,12 +1309,9 @@ function selectAllRows() {
 function renderTable() {
     const tbody = document.querySelector("#tableData tbody");
     tbody.innerHTML = "";
-
     const currentData = getFilteredData();
-
     currentData.forEach(item => {
         const isSelected = selectedIds.includes(item.id.toString()) ? 'selected' : '';
-
         tbody.innerHTML += `
         <tr class="${isSelected}" onclick="toggleSelection(this, '${item.id}')">
             <td>${item.date}</td>
@@ -1206,7 +1326,6 @@ function renderTable() {
 function toggleBudgetSelection(rowElement, category) {
     const rows = document.querySelectorAll("#tableBudget tbody tr");
     rows.forEach(r => r.classList.remove('selected'));
-
     if (selectedBudgetCategory === category) {
         selectedBudgetCategory = null;
     } else {
@@ -1218,19 +1337,14 @@ function toggleBudgetSelection(rowElement, category) {
 function renderBudget() {
     const tbody = document.querySelector("#tableBudget tbody");
     tbody.innerHTML = "";
-    
     let totalLimit = 0;
     let totalUsed = 0;
 
     budgets.forEach(b => {
-        const used = data
-            .filter(d => d.type === 'expense' && d.category === b.category)
-            .reduce((sum, d) => sum + d.amount, 0);
-
+        const used = data.filter(d => d.type === 'expense' && d.category === b.category).reduce((sum, d) => sum + d.amount, 0);
         const remaining = b.limit - used;
         totalLimit += b.limit;
         totalUsed += used;
-
         const isSelected = selectedBudgetCategory === b.category ? 'selected' : '';
 
         tbody.innerHTML += `
@@ -1238,9 +1352,7 @@ function renderBudget() {
             <td>${b.category}</td>
             <td>Rp ${formatRupiah(b.limit)}</td>
             <td>Rp ${formatRupiah(used)}</td>
-            <td style="color:${remaining < 0 ? '#dc3545' : '#198754'}">
-                Rp ${formatRupiah(remaining)}
-            </td>
+            <td style="color:${remaining < 0 ? '#dc3545' : '#198754'}">Rp ${formatRupiah(remaining)}</td>
         </tr>`;
     });
     
@@ -1255,7 +1367,6 @@ function renderBudget() {
 function toggleSavingSelection(rowElement, id) {
     const rows = document.querySelectorAll("#tableSaving tbody tr");
     rows.forEach(r => r.classList.remove('selected'));
-
     if (selectedSavingId === id) {
         selectedSavingId = null;
     } else {
@@ -1268,7 +1379,6 @@ function renderSavings() {
     const tbody = document.querySelector("#tableSaving tbody");
     tbody.innerHTML = "";
     let total = 0;
-
     const sortedSavings = [...savings].sort((a,b) => new Date(b.date) - new Date(a.date));
 
     sortedSavings.forEach(s => {
@@ -1280,7 +1390,6 @@ function renderSavings() {
             <td style="color:#198754; font-weight:bold;">Rp ${formatRupiah(s.amount)}</td>
         </tr>`;
     });
-    
     document.getElementById('totSavings').innerText = formatRupiah(total);
 }
 
@@ -1296,9 +1405,7 @@ function addSaving() {
 
     const id = Date.now().toString();
     database.ref('savings/' + id).set({
-        id: id,
-        date: date,
-        amount: amount
+        id: id, date: date, amount: amount
     }).then(() => {
         document.getElementById('savingAmount').value = "";
         showToast("Tabungan berhasil ditambahkan!");
@@ -1306,11 +1413,7 @@ function addSaving() {
 }
 
 function editSavingSelected() {
-    if (!selectedSavingId) {
-        showToast("Pilih satu baris tabungan terlebih dahulu.");
-        return;
-    }
-    
+    if (!selectedSavingId) return showToast("Pilih satu baris tabungan terlebih dahulu.");
     const target = savings.find(s => s.id === selectedSavingId);
     if (target) {
         document.getElementById('editSavingDate').value = target.date;
@@ -1324,15 +1427,9 @@ function saveEditSaving() {
     const amountStr = document.getElementById('editSavingAmount').value.replace(/\./g, '');
     const amount = parseInt(amountStr, 10);
 
-    if (!date || isNaN(amount) || amount <= 0) {
-        showToast("Isi tanggal dan jumlah dengan benar!");
-        return;
-    }
+    if (!date || isNaN(amount) || amount <= 0) return showToast("Isi tanggal dan jumlah dengan benar!");
 
-    database.ref('savings/' + selectedSavingId).update({
-        date: date,
-        amount: amount
-    }).then(() => {
+    database.ref('savings/' + selectedSavingId).update({ date: date, amount: amount }).then(() => {
         closeEditSavingModal();
         selectedSavingId = null; 
         showToast("Tabungan berhasil diperbarui!");
@@ -1344,11 +1441,7 @@ function closeEditSavingModal() {
 }
 
 function deleteSavingSelected() {
-    if (!selectedSavingId) {
-        showToast("Pilih satu baris tabungan yang ingin dihapus.");
-        return;
-    }
-
+    if (!selectedSavingId) return showToast("Pilih satu baris tabungan yang ingin dihapus.");
     showConfirm("Hapus data tabungan ini?", () => {
         database.ref('savings/' + selectedSavingId).remove().then(() => {
             selectedSavingId = null;
@@ -1357,6 +1450,117 @@ function deleteSavingSelected() {
     });
 }
 
+// =====================
+// PINJAMAN
+// =====================
+function toggleLoanSelection(rowElement, id) {
+    const rows = document.querySelectorAll("#tableLoan tbody tr");
+    rows.forEach(r => r.classList.remove('selected'));
+    if (selectedLoanId === id) {
+        selectedLoanId = null;
+    } else {
+        selectedLoanId = id;
+        rowElement.classList.add('selected');
+    }
+}
+
+function renderLoans() {
+    const tbody = document.querySelector("#tableLoan tbody");
+    tbody.innerHTML = "";
+    let totLent = 0;
+    let totBorrowed = 0;
+    const sortedLoans = [...loans].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    sortedLoans.forEach(l => {
+        if(l.type === 'lent') totLent += l.amount;
+        else totBorrowed += l.amount;
+
+        const isSelected = selectedLoanId === l.id ? 'selected' : '';
+        const typeLabel = l.type === 'lent' ? 'Meminjamkan' : 'Berutang';
+        const color = l.type === 'lent' ? '#0d6efd' : '#dc3545';
+
+        tbody.innerHTML += `
+        <tr class="${isSelected}" onclick="toggleLoanSelection(this, '${l.id}')">
+            <td style="font-size: 11px;">${l.date}</td>
+            <td style="text-align: left; padding-left: 8px;">
+                <b>${l.person}</b><br>
+                <span style="font-size: 10px; color: ${color};">${typeLabel}</span>
+            </td>
+            <td style="text-align: right; padding-right: 8px; font-weight:bold;">Rp ${formatRupiah(l.amount)}</td>
+        </tr>`;
+    });
+    
+    document.getElementById('totLent').innerText = formatRupiah(totLent);
+    document.getElementById('totBorrowed').innerText = formatRupiah(totBorrowed);
+}
+
+function addLoan() {
+    const date = document.getElementById('loanDate').value;
+    const person = document.getElementById('loanPerson').value.trim();
+    const type = document.getElementById('loanType').value;
+    const amountStr = document.getElementById('loanAmount').value.replace(/\./g, '');
+    const amount = parseInt(amountStr, 10);
+
+    if (!date || !person || isNaN(amount) || amount <= 0) {
+        showToast("Isi semua data pinjaman dengan benar!");
+        return;
+    }
+
+    const id = Date.now().toString();
+    database.ref('loans/' + id).set({
+        id: id, date: date, person: person, type: type, amount: amount
+    }).then(() => {
+        document.getElementById('loanPerson').value = "";
+        document.getElementById('loanAmount').value = "";
+        showToast("Pinjaman berhasil ditambahkan!");
+    });
+}
+
+function editLoanSelected() {
+    if (!selectedLoanId) return showToast("Pilih satu baris pinjaman terlebih dahulu.");
+    const target = loans.find(l => l.id === selectedLoanId);
+    if (target) {
+        document.getElementById('editLoanDate').value = target.date;
+        document.getElementById('editLoanPerson').value = target.person;
+        document.getElementById('editLoanType').value = target.type;
+        const label = target.type === 'lent' ? 'Saya Meminjamkan (Piutang)' : 'Saya Meminjam (Utang)';
+        document.getElementById('selectedEditLoanTypeText').innerText = label;
+        document.getElementById('editLoanAmount').value = target.amount.toLocaleString('id-ID');
+        document.getElementById('editLoanModal').style.display = 'flex';
+    }
+}
+
+function saveEditLoan() {
+    const date = document.getElementById('editLoanDate').value;
+    const person = document.getElementById('editLoanPerson').value.trim();
+    const type = document.getElementById('editLoanType').value;
+    const amountStr = document.getElementById('editLoanAmount').value.replace(/\./g, '');
+    const amount = parseInt(amountStr, 10);
+
+    if (!date || !person || isNaN(amount) || amount <= 0) return showToast("Isi semua data pinjaman dengan benar!");
+
+    database.ref('loans/' + selectedLoanId).update({
+        date: date, person: person, type: type, amount: amount
+    }).then(() => {
+        closeEditLoanModal();
+        selectedLoanId = null; 
+        showToast("Pinjaman berhasil diperbarui!");
+    });
+}
+
+function closeEditLoanModal() {
+    document.getElementById('editLoanModal').style.display = 'none';
+}
+
+function deleteLoanSelected() {
+    if (!selectedLoanId) return showToast("Pilih satu baris pinjaman yang ingin dihapus.");
+    showConfirm("Hapus data pinjaman ini?", () => {
+        database.ref('loans/' + selectedLoanId).remove().then(() => {
+            selectedLoanId = null;
+            showToast("Pinjaman berhasil dihapus!");
+        });
+    });
+}
 
 // =====================
 // TRANSAKSI & ANGGARAN KE FIREBASE
@@ -1366,7 +1570,6 @@ function addData() {
     const desc = document.getElementById('desc').value.trim();
     const type = document.getElementById('type').value;
     const category = document.getElementById('category').value;
-    
     const amountStr = document.getElementById('amount').value.replace(/\./g, '');
     const amount = parseInt(amountStr, 10);
 
@@ -1376,15 +1579,8 @@ function addData() {
     }
 
     const id = Date.now().toString();
-    
-    // Simpan ke Firebase
     database.ref('transactions/' + id).set({
-        id: id,
-        date: date,
-        desc: desc,
-        type: type,
-        category: category,
-        amount: amount
+        id: id, date: date, desc: desc, type: type, category: category, amount: amount
     }).then(() => {
         document.getElementById('desc').value = "";
         document.getElementById('selectedDescText').innerText = "Ketik atau pilih keterangan...";
@@ -1399,37 +1595,19 @@ function addBudget() {
     const amountStr = document.getElementById('budgetAmount').value.replace(/\./g, '');
     const amount = parseInt(amountStr, 10);
 
-    if (!category || isNaN(amount) || amount <= 0) {
-        showToast("Isi kategori dan limit anggaran dengan benar!");
-        return;
-    }
-
-    if (budgets.some(b => b.category.toLowerCase() === category.toLowerCase())) {
-        showToast("Kategori anggaran ini sudah ada!");
-        return;
-    }
+    if (!category || isNaN(amount) || amount <= 0) return showToast("Isi kategori dan limit anggaran dengan benar!");
+    if (budgets.some(b => b.category.toLowerCase() === category.toLowerCase())) return showToast("Kategori anggaran ini sudah ada!");
 
     const id = Date.now().toString();
-    
-    // Simpan ke Firebase
-    database.ref('budgets/' + id).set({
-        id: id,
-        category: category,
-        limit: amount
-    }).then(() => {
+    database.ref('budgets/' + id).set({ id: id, category: category, limit: amount }).then(() => {
         document.getElementById('budgetCategory').value = "";
         document.getElementById('budgetAmount').value = "";
         showToast("Anggaran berhasil ditambahkan!");
     });
 }
 
-// EDIT, LIHAT & HAPUS ANGGARAN FIREBASE
 function editBudgetSelected() {
-    if (!selectedBudgetCategory) {
-        showToast("Pilih satu baris anggaran terlebih dahulu.");
-        return;
-    }
-    
+    if (!selectedBudgetCategory) return showToast("Pilih satu baris anggaran terlebih dahulu.");
     const targetBudget = budgets.find(b => b.category === selectedBudgetCategory);
     if (targetBudget) {
         editBudgetOldCategory = targetBudget.category;
@@ -1444,28 +1622,15 @@ function saveEditBudget() {
     const amountStr = document.getElementById('editBudgetAmount').value.replace(/\./g, '');
     const newLimit = parseInt(amountStr, 10);
 
-    if (!newCategory || isNaN(newLimit) || newLimit <= 0) {
-        showToast("Isi kategori dan limit anggaran dengan benar!");
-        return;
-    }
-
-    if (newCategory !== editBudgetOldCategory && budgets.some(b => b.category.toLowerCase() === newCategory.toLowerCase())) {
-        showToast("Nama kategori ini sudah dipakai!");
-        return;
-    }
+    if (!newCategory || isNaN(newLimit) || newLimit <= 0) return showToast("Isi kategori dan limit anggaran dengan benar!");
+    if (newCategory !== editBudgetOldCategory && budgets.some(b => b.category.toLowerCase() === newCategory.toLowerCase())) return showToast("Nama kategori ini sudah dipakai!");
 
     const targetBudget = budgets.find(b => b.category === editBudgetOldCategory);
     if (targetBudget) {
-        // Update ke Firebase
-        database.ref('budgets/' + targetBudget.id).update({
-            category: newCategory,
-            limit: newLimit
-        }).then(() => {
+        database.ref('budgets/' + targetBudget.id).update({ category: newCategory, limit: newLimit }).then(() => {
             if (newCategory !== editBudgetOldCategory) {
                 data.forEach(d => {
-                    if (d.category === editBudgetOldCategory) {
-                        database.ref('transactions/' + d.id).update({ category: newCategory });
-                    }
+                    if (d.category === editBudgetOldCategory) database.ref('transactions/' + d.id).update({ category: newCategory });
                 });
             }
             closeEditBudgetModal();
@@ -1481,12 +1646,8 @@ function closeEditBudgetModal() {
 }
 
 function deleteBudgetSelected() {
-    if (!selectedBudgetCategory) {
-        showToast("Pilih satu baris anggaran yang ingin dihapus.");
-        return;
-    }
-
-    showConfirm(`Hapus anggaran '${selectedBudgetCategory}'? (Riwayat transaksi tidak ikut terhapus)`, () => {
+    if (!selectedBudgetCategory) return showToast("Pilih satu baris anggaran yang ingin dihapus.");
+    showConfirm(`Hapus anggaran '${selectedBudgetCategory}'?`, () => {
         const targetBudget = budgets.find(b => b.category === selectedBudgetCategory);
         if (targetBudget) {
             database.ref('budgets/' + targetBudget.id).remove().then(() => {
@@ -1498,19 +1659,12 @@ function deleteBudgetSelected() {
 }
 
 function viewBudgetDetails() {
-    if (!selectedBudgetCategory) {
-        showToast("Pilih satu baris anggaran terlebih dahulu.");
-        return;
-    }
-
+    if (!selectedBudgetCategory) return showToast("Pilih satu baris anggaran terlebih dahulu.");
     document.getElementById('viewBudgetTitle').innerText = "Rincian: " + selectedBudgetCategory;
-    
     const tbody = document.querySelector("#tableViewBudget tbody");
     tbody.innerHTML = "";
     
-    // Filter khusus pengeluaran sesuai kategori yang dipilih
     const expenses = data.filter(d => d.type === 'expense' && d.category === selectedBudgetCategory);
-    
     if (expenses.length === 0) {
         document.getElementById('viewBudgetEmpty').style.display = 'block';
         document.getElementById('tableViewBudget').style.display = 'none';
@@ -1518,20 +1672,13 @@ function viewBudgetDetails() {
     } else {
         document.getElementById('viewBudgetEmpty').style.display = 'none';
         document.getElementById('tableViewBudget').style.display = 'table';
-        
         let total = 0;
         expenses.forEach(item => {
             total += item.amount;
-            tbody.innerHTML += `
-            <tr>
-                <td>${item.date}</td>
-                <td>${item.desc}</td>
-                <td>Rp ${formatRupiah(item.amount)}</td>
-            </tr>`;
+            tbody.innerHTML += `<tr><td>${item.date}</td><td>${item.desc}</td><td>Rp ${formatRupiah(item.amount)}</td></tr>`;
         });
         document.getElementById('viewBudgetTotal').innerText = "Total: Rp " + formatRupiah(total);
     }
-    
     document.getElementById('viewBudgetModal').style.display = 'flex';
 }
 
@@ -1539,33 +1686,19 @@ function closeViewBudgetModal() {
     document.getElementById('viewBudgetModal').style.display = 'none';
 }
 
-
-// EDIT & HAPUS TRANSAKSI FIREBASE
 function editSelected() {
-    if (selectedIds.length === 0) {
-        showToast("Pilih SATU transaksi yang ingin diedit.");
-        return;
-    }
-    if (selectedIds.length > 1) {
-        showToast("Hanya bisa edit satu transaksi sekaligus.");
-        return;
-    }
-
+    if (selectedIds.length === 0) return showToast("Pilih SATU transaksi yang ingin diedit.");
+    if (selectedIds.length > 1) return showToast("Hanya bisa edit satu transaksi sekaligus.");
     editTargetId = selectedIds[0];
     const item = data.find(d => d.id.toString() === editTargetId);
-
     if (item) {
         document.getElementById('editDate').value = item.date;
-        
         document.getElementById('editDesc').value = item.desc;
         document.getElementById('selectedEditDescText').innerText = item.desc || "Pilih Keterangan";
-        
         document.getElementById('editType').value = item.type;
         document.getElementById('selectedEditTypeText').innerText = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
-        
         document.getElementById('editCategory').value = item.category || "";
         document.getElementById('selectedEditCategoryText').innerText = item.category || "Pilih Kategori";
-        
         document.getElementById('editAmount').value = item.amount.toLocaleString('id-ID');
         document.getElementById('editModal').style.display = 'flex';
     }
@@ -1581,22 +1714,13 @@ function saveEdit() {
     const desc = document.getElementById('editDesc').value.trim();
     const type = document.getElementById('editType').value;
     const category = document.getElementById('editCategory').value;
-    
     const amountStr = document.getElementById('editAmount').value.replace(/\./g, '');
     const amount = parseInt(amountStr, 10);
 
-    if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) {
-        showToast("Mohon isi semua data dengan benar!");
-        return;
-    }
+    if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) return showToast("Mohon isi semua data dengan benar!");
 
-    // Update Firebase
     database.ref('transactions/' + editTargetId).update({
-        date: date,
-        desc: desc,
-        type: type,
-        category: category,
-        amount: amount
+        date: date, desc: desc, type: type, category: category, amount: amount
     }).then(() => {
         closeEditModal();
         selectedIds = []; 
@@ -1605,16 +1729,9 @@ function saveEdit() {
 }
 
 function deleteSelected() {
-    if (selectedIds.length === 0) {
-        showToast("Pilih transaksi yang ingin dihapus.");
-        return;
-    }
-
+    if (selectedIds.length === 0) return showToast("Pilih transaksi yang ingin dihapus.");
     showConfirm(`Hapus ${selectedIds.length} transaksi terpilih?`, () => {
-        // Hapus banyak data sekaligus dari Firebase
-        selectedIds.forEach(id => {
-            database.ref('transactions/' + id).remove();
-        });
+        selectedIds.forEach(id => database.ref('transactions/' + id).remove());
         selectedIds = [];
         showToast("Transaksi berhasil dihapus!");
     });
@@ -1622,37 +1739,14 @@ function deleteSelected() {
 
 // EKSPOR EXCEL & PDF
 function saveExcel() {
-    let tableHtml = `
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Tanggal</th>
-                    <th>Keterangan</th>
-                    <th>Kategori</th>
-                    <th>Tipe</th>
-                    <th>Jumlah (Rp)</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+    let tableHtml = `<table border="1"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Tipe</th><th>Jumlah (Rp)</th></tr></thead><tbody>`;
     const currentData = getFilteredData();
-    
-    if (currentData.length === 0) {
-        showToast("Tidak ada data untuk diekspor.");
-        document.getElementById('saveMenu').style.display = 'none';
-        return;
-    }
+    if (currentData.length === 0) return showToast("Tidak ada data untuk diekspor.");
 
     currentData.forEach(item => {
         let tipe = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
         let kategori = item.category ? item.category : "-";
-        tableHtml += `<tr>
-            <td>${item.date}</td>
-            <td>${item.desc}</td>
-            <td>${kategori}</td>
-            <td>${tipe}</td>
-            <td>${item.amount}</td>
-        </tr>`;
+        tableHtml += `<tr><td>${item.date}</td><td>${item.desc}</td><td>${kategori}</td><td>${tipe}</td><td>${item.amount}</td></tr>`;
     });
     tableHtml += "</tbody></table>";
 
@@ -1663,20 +1757,16 @@ function saveExcel() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
     showToast("Berhasil disimpan ke Excel!");
     document.getElementById('saveMenu').style.display = 'none';
 }
 
 function savePDF() {
     const { jsPDF } = window.jspdf;
-    
     const rows = document.querySelectorAll("#tableData tbody tr");
     rows.forEach(row => row.classList.remove('selected'));
-
     document.getElementById('actionRowContainer').style.display = 'none';
     document.getElementById('filterContainer').style.display = 'none';
-
     showToast("Menyiapkan PDF...");
 
     html2canvas(document.getElementById("printArea"), { scale: 2 }).then(canvas => {
@@ -1685,7 +1775,6 @@ function savePDF() {
         let height = (canvas.height * width) / canvas.width;
         pdf.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0, width, height);
         pdf.save("Laporan_Keuangan_Harian.pdf");
-        
         document.getElementById('actionRowContainer').style.display = 'flex';
         renderTable(); 
         document.getElementById('saveMenu').style.display = 'none';
@@ -1695,7 +1784,6 @@ function savePDF() {
 // GRAFIK
 function renderCharts() {
     const expenses = data.filter(item => item.type === 'expense');
-
     const dailyMap = {};
     expenses.forEach(item => {
         if (!dailyMap[item.date]) dailyMap[item.date] = 0;
@@ -1706,16 +1794,7 @@ function renderCharts() {
 
     if (chartHarian) chartHarian.destroy();
     chartHarian = new Chart(document.getElementById('chartHarian'), {
-        type: 'bar',
-        data: {
-            labels: dailyLabels,
-            datasets: [{ 
-                label: 'Pengeluaran (Rp)', 
-                data: dailyData, 
-                backgroundColor: '#ef4444',
-                borderRadius: 4
-            }]
-        },
+        type: 'bar', data: { labels: dailyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: dailyData, backgroundColor: '#ef4444', borderRadius: 4 }] },
         options: { responsive: true, plugins: { legend: { display: false } }}
     });
 
@@ -1730,16 +1809,7 @@ function renderCharts() {
 
     if (chartBulanan) chartBulanan.destroy();
     chartBulanan = new Chart(document.getElementById('chartBulanan'), {
-        type: 'bar',
-        data: {
-            labels: monthlyLabels,
-            datasets: [{ 
-                label: 'Pengeluaran (Rp)', 
-                data: monthlyData, 
-                backgroundColor: '#3b82f6',
-                borderRadius: 4
-            }]
-        },
+        type: 'bar', data: { labels: monthlyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: monthlyData, backgroundColor: '#3b82f6', borderRadius: 4 }] },
         options: { responsive: true, plugins: { legend: { display: false } }}
     });
 
@@ -1753,15 +1823,7 @@ function renderCharts() {
 
     if (chartKategori) chartKategori.destroy();
     chartKategori = new Chart(document.getElementById('chartKategori'), {
-        type: 'doughnut',
-        data: {
-            labels: catLabels,
-            datasets: [{
-                data: catData,
-                backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6'],
-                borderWidth: 0
-            }]
-        },
+        type: 'doughnut', data: { labels: catLabels, datasets: [{ data: catData, backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6'], borderWidth: 0 }] },
         options: { responsive: true }
     });
 }
@@ -1776,16 +1838,15 @@ document.querySelectorAll('.nav-item').forEach(item => {
         document.getElementById('menu-transaksi').style.display = "none";
         document.getElementById('menu-anggaran').style.display = "none";
         document.getElementById('menu-grafik').style.display = "none";
-        document.getElementById('menu-nabung').style.display = "none"; // Sembunyikan menu nabung
+        document.getElementById('menu-nabung').style.display = "none"; 
+        document.getElementById('menu-pinjaman').style.display = "none"; // Sembunyikan pinjaman
 
         const index = parseInt(item.getAttribute('data-index'));
 
         if (index === 0) {
             document.getElementById('menu-transaksi').style.display = "block";
             document.getElementById('judul').innerText = "TAMBAH TRANSAKSI";
-            if(!document.getElementById('date').value) {
-                document.getElementById('date').valueAsDate = new Date();
-            }
+            if(!document.getElementById('date').value) document.getElementById('date').valueAsDate = new Date();
         } else if (index === 1) {
             document.getElementById('menu-ringkasan').style.display = "block";
             document.getElementById('judul').innerText = "LAPORAN KEUANGAN HARIAN";
@@ -1796,12 +1857,14 @@ document.querySelectorAll('.nav-item').forEach(item => {
             document.getElementById('menu-grafik').style.display = "block";
             document.getElementById('judul').innerText = "GRAFIK PENGELUARAN";
             renderCharts();   
-        } else if (index === 4) { // Logika Menu Nabung Baru
+        } else if (index === 4) { 
             document.getElementById('menu-nabung').style.display = "block";
             document.getElementById('judul').innerText = "CATAT TABUNGAN";
-            if(!document.getElementById('savingDate').value) {
-                document.getElementById('savingDate').valueAsDate = new Date();
-            }
+            if(!document.getElementById('savingDate').value) document.getElementById('savingDate').valueAsDate = new Date();
+        } else if (index === 5) { // MENU PINJAMAN
+            document.getElementById('menu-pinjaman').style.display = "block";
+            document.getElementById('judul').innerText = "CATAT PINJAMAN";
+            if(!document.getElementById('loanDate').value) document.getElementById('loanDate').valueAsDate = new Date();
         }
     });
 });
@@ -1812,11 +1875,13 @@ window.addEventListener('click', function(event) {
     const editBdgMod = document.getElementById('editBudgetModal');
     const viewBdgMod = document.getElementById('viewBudgetModal');
     const editSavMod = document.getElementById('editSavingModal');
+    const editLoanMod = document.getElementById('editLoanModal');
     const confMod = document.getElementById('confirmModal');
     
     const catMod = document.getElementById('categoryModal');
     const typeMod = document.getElementById('typeModal');
     const descMod = document.getElementById('descModal');
+    const loanTypeMod = document.getElementById('loanTypeModal');
     
     const btnSimpan = document.getElementById('btnSimpan');
     const saveMenu = document.getElementById('saveMenu');
@@ -1825,11 +1890,13 @@ window.addEventListener('click', function(event) {
     if (event.target == editBdgMod) closeEditBudgetModal();
     if (event.target == viewBdgMod) closeViewBudgetModal();
     if (event.target == editSavMod) closeEditSavingModal();
+    if (event.target == editLoanMod) closeEditLoanModal();
     if (event.target == confMod) confMod.style.display = "none";
     
     if (event.target == catMod) closeCategoryPicker();
     if (event.target == typeMod) closeTypePicker();
     if (event.target == descMod) closeDescPicker();
+    if (event.target == loanTypeMod) closeLoanTypePicker();
 
     if (btnSimpan && saveMenu) {
         if (!btnSimpan.contains(event.target) && !saveMenu.contains(event.target)) {
