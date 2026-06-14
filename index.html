@@ -49,19 +49,32 @@ body {
     max-width: 500px;
     margin: auto;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
+    position: relative; /* Penting untuk posisi absolut ikon logout */
 }
 
 h2 {
     color: #198754;
-    margin: 0;
+    margin-top: 0;
+    margin-bottom: 25px;
     font-size: 1.4rem;
+    text-align: center;
+}
+
+/* LOGOUT ICON */
+#btnLogout {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: none; /* Default disembunyikan */
+    transition: transform 0.2s;
+}
+
+#btnLogout:active {
+    transform: scale(0.9);
 }
 
 /* SUMMARY */
@@ -289,7 +302,7 @@ td {
 #tableLoan th:nth-child(2), #tableLoan td:nth-child(2) { width: 40%; text-align: left; padding-left: 8px; }
 #tableLoan th:nth-child(3), #tableLoan td:nth-child(3) { width: 38%; text-align: right; padding-right: 8px; }
 
-/* GRAFIK */
+/* GRAFIK / DASHBOARD */
 .canvas-container {
     margin: 20px 0;
     padding: 20px;
@@ -563,13 +576,21 @@ h4 {
     </div>
 
     <div class="container" id="printArea">
-        <div class="header-top">
-            <h2 id="judul">LAPORAN KEUANGAN</h2>
-            <button onclick="logout()" style="background: #ef4444; color: white; padding: 8px 12px; border-radius: 8px; font-size: 11px; border: none; cursor: pointer; font-weight: bold;">Logout</button>
-        </div>
+        
+        <!-- IKON LOGOUT (Khusus Dashboard) -->
+        <button id="btnLogout" onclick="logout()" title="Logout">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+        </button>
+
+        <!-- JUDUL UTAMA TENGAH -->
+        <h2 id="judul">DASHBOARD</h2>
 
         <!-- MENU RINGKASAN -->
-        <div id="menu-ringkasan">
+        <div id="menu-ringkasan" style="display:none;">
             <div class="summary">
                 <div class="box">Pemasukan:<div class="val">Rp <span id="income">0</span></div></div>
                 <div class="box">Pengeluaran:<div class="val">Rp <span id="expense">0</span></div></div>
@@ -714,8 +735,8 @@ h4 {
             <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih anggaran</p>
         </div>
 
-        <!-- MENU GRAFIK -->
-        <div id="menu-grafik" style="display:none;">
+        <!-- MENU DASHBOARD (Dulu Grafik) -->
+        <div id="menu-dashboard" style="display:block;"> <!-- Tampil default setelah login -->
             <div class="canvas-container">
                 <h4>Pengeluaran Harian</h4>
                 <canvas id="chartHarian"></canvas>
@@ -941,17 +962,13 @@ h4 {
 
     <div class="navbar">
         <div class="nav-item" data-index="0">Transaksi</div>
-        <div class="nav-item active" data-index="1">Ringkasan</div>
+        <div class="nav-item" data-index="1">Ringkasan</div>
         <div class="nav-item" data-index="2">Anggaran</div>
-        <div class="nav-item" data-index="3">Grafik</div>
+        <div class="nav-item active" data-index="3">Dashboard</div>
         <div class="nav-item" data-index="4">Nabung</div>
         <div class="nav-item" data-index="5">Pinjaman</div>
     </div>
 </div> <!-- End of main-app -->
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 // ==========================================
@@ -1046,6 +1063,9 @@ firebase.auth().onAuthStateChanged(user => {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'block';
         loadFirebaseData(); // Panggil data dari database
+        
+        // Paksa sistem untuk mengklik menu Dashboard pertama kali (index 3)
+        document.querySelector('.nav-item[data-index="3"]').click();
     } else {
         // Jika belum login
         document.getElementById('login-screen').style.display = 'flex';
@@ -1901,6 +1921,10 @@ function saveExcel() {
 
 function savePDF() {
     const { jsPDF } = window.jspdf;
+    
+    // Matikan tampilan ikon logout sementara agar tidak ikut di-print
+    document.getElementById('btnLogout').style.display = 'none';
+    
     const rows = document.querySelectorAll("#tableData tbody tr");
     rows.forEach(row => row.classList.remove('selected'));
     document.getElementById('actionRowContainer').style.display = 'none';
@@ -1913,9 +1937,14 @@ function savePDF() {
         let height = (canvas.height * width) / canvas.width;
         pdf.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0, width, height);
         pdf.save("Laporan_Keuangan_Harian.pdf");
+        
+        // Kembalikan tampilan
         document.getElementById('actionRowContainer').style.display = 'flex';
         renderTable(); 
         document.getElementById('saveMenu').style.display = 'none';
+        
+        // Munculkan kembali ikon logout (karena tombol Save PDF ada di menu Ringkasan, berarti disembunyikan lagi)
+        document.getElementById('btnLogout').style.display = 'none'; 
     });
 }
 
@@ -1975,9 +2004,12 @@ document.querySelectorAll('.nav-item').forEach(item => {
         document.getElementById('menu-ringkasan').style.display = "none";
         document.getElementById('menu-transaksi').style.display = "none";
         document.getElementById('menu-anggaran').style.display = "none";
-        document.getElementById('menu-grafik').style.display = "none";
+        document.getElementById('menu-dashboard').style.display = "none";
         document.getElementById('menu-nabung').style.display = "none"; 
         document.getElementById('menu-pinjaman').style.display = "none"; 
+        
+        // Sembunyikan tombol logout secara default
+        document.getElementById('btnLogout').style.display = "none";
 
         const index = parseInt(item.getAttribute('data-index'));
 
@@ -1992,8 +2024,9 @@ document.querySelectorAll('.nav-item').forEach(item => {
             document.getElementById('menu-anggaran').style.display = "block";
             document.getElementById('judul').innerText = "KELOLA ANGGARAN";
         } else if (index === 3) {
-            document.getElementById('menu-grafik').style.display = "block";
-            document.getElementById('judul').innerText = "GRAFIK PENGELUARAN";
+            document.getElementById('menu-dashboard').style.display = "block";
+            document.getElementById('judul').innerText = "DASHBOARD";
+            document.getElementById('btnLogout').style.display = "block"; // Munculkan hanya di Dashboard
             renderCharts();   
         } else if (index === 4) { 
             document.getElementById('menu-nabung').style.display = "block";
