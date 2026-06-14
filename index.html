@@ -10,7 +10,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f4f6f9;
     margin: 0;
-    padding: 0; /* Padding dipindahkan ke container utama agar login penuh */
+    padding: 0; 
 }
 
 /* LAYAR LOGIN */
@@ -37,7 +37,7 @@ body {
 }
 
 #main-app {
-    display: none; /* Disembunyikan sebelum login */
+    display: none; 
     padding: 20px 10px 80px 10px;
 }
 
@@ -448,6 +448,7 @@ h4 {
 }
 </style>
 
+<!-- Firebase App & Database & Auth -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -458,6 +459,7 @@ h4 {
 
 <div id="toast">Notifikasi</div>
 
+<!-- LAYAR LOGIN -->
 <div id="login-screen">
     <div class="login-box">
         <h2 style="color: #198754; margin-bottom: 5px;">Aplikasi Keuangan</h2>
@@ -481,8 +483,10 @@ h4 {
     </div>
 </div>
 
+<!-- CONTAINER UTAMA APLIKASI (Disembunyikan sebelum login) -->
 <div id="main-app">
 
+    <!-- MODAL KONFIRMASI -->
     <div id="confirmModal" class="modal">
         <div class="modal-content" style="text-align: center;">
             <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
@@ -494,6 +498,7 @@ h4 {
         </div>
     </div>
 
+    <!-- MODAL PILIH KATEGORI -->
     <div id="categoryModal" class="modal">
         <div class="modal-content">
             <h3>Pilih Kategori</h3>
@@ -502,6 +507,7 @@ h4 {
         </div>
     </div>
 
+    <!-- MODAL PILIH TIPE (TRANSAKSI) -->
     <div id="typeModal" class="modal">
         <div class="modal-content">
             <h3>Pilih Tipe</h3>
@@ -510,6 +516,7 @@ h4 {
         </div>
     </div>
 
+    <!-- MODAL PILIH TIPE (PINJAMAN) -->
     <div id="loanTypeModal" class="modal">
         <div class="modal-content">
             <h3>Tipe Pinjaman</h3>
@@ -518,6 +525,7 @@ h4 {
         </div>
     </div>
 
+    <!-- MODAL KETERANGAN -->
     <div id="descModal" class="modal">
         <div class="modal-content">
             <h3>Keterangan Transaksi</h3>
@@ -531,6 +539,7 @@ h4 {
         </div>
     </div>
 
+    <!-- MODAL LIHAT RINCIAN ANGGARAN -->
     <div id="viewBudgetModal" class="modal">
         <div class="modal-content" style="max-width: 450px;">
             <h3 id="viewBudgetTitle" style="margin-bottom: 10px;">Rincian Anggaran</h3>
@@ -559,6 +568,7 @@ h4 {
             <button onclick="logout()" style="background: #ef4444; color: white; padding: 8px 12px; border-radius: 8px; font-size: 11px; border: none; cursor: pointer; font-weight: bold;">Logout</button>
         </div>
 
+        <!-- MENU RINGKASAN -->
         <div id="menu-ringkasan">
             <div class="summary">
                 <div class="box">Pemasukan:<div class="val">Rp <span id="income">0</span></div></div>
@@ -617,6 +627,7 @@ h4 {
             <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih transaksi</p>
         </div>
 
+        <!-- MENU TRANSAKSI -->
         <div id="menu-transaksi" style="display:none;">
             <div class="form-group">
                 <div class="form-item">
@@ -662,6 +673,7 @@ h4 {
             </div>
         </div>
 
+        <!-- MENU ANGGARAN -->
         <div id="menu-anggaran" style="display:none;">
             <div class="summary" style="margin-bottom: 25px;">
                 <div class="box" style="background: #f3f4f6;">Total Limit:<div class="val" style="color: #374151;">Rp <span id="totBudgetLimit">0</span></div></div>
@@ -702,6 +714,7 @@ h4 {
             <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih anggaran</p>
         </div>
 
+        <!-- MENU GRAFIK -->
         <div id="menu-grafik" style="display:none;">
             <div class="canvas-container">
                 <h4>Pengeluaran Harian</h4>
@@ -719,6 +732,7 @@ h4 {
             </div>
         </div>
 
+        <!-- MENU NABUNG -->
         <div id="menu-nabung" style="display:none;">
             <div class="summary" style="margin-bottom: 25px; grid-template-columns: 1fr;">
                 <div class="box" style="background: #d1e7dd;">Total Tabungan:<div class="val" style="color: #0f5132;">Rp <span id="totSavings">0</span></div></div>
@@ -754,6 +768,7 @@ h4 {
             <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih tabungan</p>
         </div>
 
+        <!-- MENU PINJAMAN -->
         <div id="menu-pinjaman" style="display:none;">
             <div class="summary" style="margin-bottom: 25px; grid-template-columns: 1fr 1fr;">
                 <div class="box" style="background: #cfe2f3;">Total Dipinjamkan:<div class="val" style="color: #0d6efd;">Rp <span id="totLent">0</span></div></div>
@@ -804,6 +819,7 @@ h4 {
         </div>
     </div> 
 
+    <!-- Modal Edit Transaksi -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h3>Edit Transaksi</h3>
@@ -848,6 +864,7 @@ h4 {
         </div>
     </div>
 
+    <!-- Modal Edit Anggaran -->
     <div id="editBudgetModal" class="modal">
         <div class="modal-content">
             <h3>Edit Anggaran</h3>
@@ -868,6 +885,7 @@ h4 {
         </div>
     </div>
 
+    <!-- Modal Edit Tabungan -->
     <div id="editSavingModal" class="modal">
         <div class="modal-content">
             <h3>Edit Tabungan</h3>
@@ -888,6 +906,7 @@ h4 {
         </div>
     </div>
 
+    <!-- Modal Edit Pinjaman -->
     <div id="editLoanModal" class="modal">
         <div class="modal-content">
             <h3>Edit Pinjaman</h3>
@@ -928,14 +947,25 @@ h4 {
         <div class="nav-item" data-index="4">Nabung</div>
         <div class="nav-item" data-index="5">Pinjaman</div>
     </div>
-</div> <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+</div> <!-- End of main-app -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-// INISIALISASI FIREBASE
+// ==========================================
+// 1. INISIALISASI FIREBASE
+// ==========================================
 const firebaseConfig = {
-    databaseURL: "https://keuangan-ebdd9-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    apiKey: "AIzaSyAAeaP5WoSbHAuVNhy4ihkGUZSYnnnQrLw",
+    authDomain: "keuangan-ebdd9.firebaseapp.com",
+    databaseURL: "https://keuangan-ebdd9-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "keuangan-ebdd9",
+    storageBucket: "keuangan-ebdd9.firebasestorage.app",
+    messagingSenderId: "909592822715",
+    appId: "1:909592822715:web:9015e7a9282f7e079dba9e",
+    measurementId: "G-CY4SPQ2SNL"
 };
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
@@ -963,53 +993,68 @@ let loanTypePickerTarget = 'add';
 // AUTENTIKASI FIREBASE (LOGIN/REGISTER)
 // =====================
 function login() {
-    const email = document.getElementById('authEmail').value;
+    const email = document.getElementById('authEmail').value.trim();
     const pass = document.getElementById('authPassword').value;
-    if(!email || !pass) return showToast("Harap isi email dan password!");
+    
+    if(!email || !pass) {
+        return showToast("Harap isi email dan password!");
+    }
     
     showToast("Mencoba login...");
     firebase.auth().signInWithEmailAndPassword(email, pass)
-        .then(() => showToast("Login berhasil!"))
-        .catch(err => showToast("Gagal Login: Cek kembali data Anda."));
+        .then((userCredential) => {
+            showToast("Login berhasil!");
+        })
+        .catch((error) => {
+            console.error("Login Error:", error);
+            showToast("Gagal: " + error.message);
+        });
 }
 
 function register() {
-    const email = document.getElementById('authEmail').value;
+    const email = document.getElementById('authEmail').value.trim();
     const pass = document.getElementById('authPassword').value;
-    if(!email || !pass) return showToast("Harap isi email dan password!");
+    
+    if(!email || !pass) {
+        return showToast("Harap isi email dan password!");
+    }
     
     showToast("Mendaftarkan akun...");
     firebase.auth().createUserWithEmailAndPassword(email, pass)
-        .then(() => showToast("Akun berhasil dibuat dan login!"))
-        .catch(err => showToast("Gagal Daftar: Password minimal 6 karakter."));
+        .then((userCredential) => {
+            showToast("Akun berhasil dibuat dan login!");
+        })
+        .catch((error) => {
+            console.error("Register Error:", error);
+            showToast("Gagal: " + error.message);
+        });
 }
 
 function logout() {
     showConfirm("Yakin ingin logout?", () => {
         firebase.auth().signOut().then(() => {
             showToast("Berhasil logout.");
-            // Reload halaman agar semua data memori terhapus
             setTimeout(() => window.location.reload(), 1000); 
         });
     });
 }
 
-// Cek status user setiap kali aplikasi dibuka
+// Pantau status login
 firebase.auth().onAuthStateChanged(user => {
     if (user) {
-        // Jika sudah login, sembunyikan layar login dan tampilkan aplikasi
+        // Jika sudah login
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'block';
         loadFirebaseData(); // Panggil data dari database
     } else {
-        // Jika belum login, tampilkan layar login saja
+        // Jika belum login
         document.getElementById('login-screen').style.display = 'flex';
         document.getElementById('main-app').style.display = 'none';
     }
 });
 
 // =====================
-// SINKRONISASI REAL-TIME DARI FIREBASE (JIKA SUDAH LOGIN)
+// SINKRONISASI REAL-TIME DARI FIREBASE
 // =====================
 function loadFirebaseData() {
     database.ref('transactions').on('value', (snapshot) => {
@@ -1073,7 +1118,7 @@ function showToast(message) {
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(() => {
         toast.classList.remove("show");
-    }, 2500);
+    }, 3000);
 }
 
 // MODAL KONFIRMASI KUSTOM
@@ -1998,6 +2043,8 @@ window.addEventListener('click', function(event) {
     }
 });
 
+// INISIALISASI AWAL (Hanya form UI, data menyusul otomatis ditarik dari Firebase)
+updateCategoryDropdown();
 </script>
 
 </body>
