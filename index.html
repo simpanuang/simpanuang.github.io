@@ -309,6 +309,9 @@ td {
     background: #f8f9fa;
     border-radius: 16px;
     border: 1px solid #e5e7eb;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 h4 {
@@ -461,7 +464,6 @@ h4 {
 }
 </style>
 
-<!-- Firebase App & Database & Auth -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -472,7 +474,6 @@ h4 {
 
 <div id="toast">Notifikasi</div>
 
-<!-- LAYAR LOGIN -->
 <div id="login-screen">
     <div class="login-box">
         <h2 style="color: #198754; margin-bottom: 5px;">Aplikasi Keuangan</h2>
@@ -496,10 +497,8 @@ h4 {
     </div>
 </div>
 
-<!-- CONTAINER UTAMA APLIKASI (Disembunyikan sebelum login) -->
 <div id="main-app">
 
-    <!-- MODAL KONFIRMASI -->
     <div id="confirmModal" class="modal">
         <div class="modal-content" style="text-align: center;">
             <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
@@ -511,7 +510,6 @@ h4 {
         </div>
     </div>
 
-    <!-- MODAL PILIH KATEGORI -->
     <div id="categoryModal" class="modal">
         <div class="modal-content">
             <h3>Pilih Kategori</h3>
@@ -520,7 +518,6 @@ h4 {
         </div>
     </div>
 
-    <!-- MODAL PILIH TIPE (TRANSAKSI) -->
     <div id="typeModal" class="modal">
         <div class="modal-content">
             <h3>Pilih Tipe</h3>
@@ -529,7 +526,6 @@ h4 {
         </div>
     </div>
 
-    <!-- MODAL PILIH TIPE (PINJAMAN) -->
     <div id="loanTypeModal" class="modal">
         <div class="modal-content">
             <h3>Tipe Pinjaman</h3>
@@ -538,7 +534,6 @@ h4 {
         </div>
     </div>
 
-    <!-- MODAL KETERANGAN -->
     <div id="descModal" class="modal">
         <div class="modal-content">
             <h3>Keterangan Transaksi</h3>
@@ -552,7 +547,6 @@ h4 {
         </div>
     </div>
 
-    <!-- MODAL LIHAT RINCIAN ANGGARAN -->
     <div id="viewBudgetModal" class="modal">
         <div class="modal-content" style="max-width: 450px;">
             <h3 id="viewBudgetTitle" style="margin-bottom: 10px;">Rincian Anggaran</h3>
@@ -577,7 +571,6 @@ h4 {
 
     <div class="container" id="printArea">
         
-        <!-- IKON LOGOUT (Khusus Dashboard) -->
         <button id="btnLogout" onclick="logout()" title="Logout">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -586,10 +579,8 @@ h4 {
             </svg>
         </button>
 
-        <!-- JUDUL UTAMA TENGAH -->
         <h2 id="judul">DASHBOARD</h2>
 
-        <!-- MENU RINGKASAN -->
         <div id="menu-ringkasan" style="display:none;">
             <div class="summary">
                 <div class="box">Pemasukan:<div class="val">Rp <span id="income">0</span></div></div>
@@ -648,7 +639,6 @@ h4 {
             <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih transaksi</p>
         </div>
 
-        <!-- MENU TRANSAKSI -->
         <div id="menu-transaksi" style="display:none;">
             <div class="form-group">
                 <div class="form-item">
@@ -694,7 +684,6 @@ h4 {
             </div>
         </div>
 
-        <!-- MENU ANGGARAN -->
         <div id="menu-anggaran" style="display:none;">
             <div class="summary" style="margin-bottom: 25px;">
                 <div class="box" style="background: #f3f4f6;">Total Limit:<div class="val" style="color: #374151;">Rp <span id="totBudgetLimit">0</span></div></div>
@@ -735,8 +724,7 @@ h4 {
             <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih anggaran</p>
         </div>
 
-        <!-- MENU DASHBOARD (Dulu Grafik) -->
-        <div id="menu-dashboard" style="display:block;"> <!-- Tampil default setelah login -->
+        <div id="menu-dashboard" style="display:block;"> 
             <div class="canvas-container">
                 <h4>Pengeluaran Harian</h4>
                 <canvas id="chartHarian"></canvas>
@@ -753,7 +741,6 @@ h4 {
             </div>
         </div>
 
-        <!-- MENU NABUNG -->
         <div id="menu-nabung" style="display:none;">
             <div class="summary" style="margin-bottom: 25px; grid-template-columns: 1fr;">
                 <div class="box" style="background: #d1e7dd;">Total Tabungan:<div class="val" style="color: #0f5132;">Rp <span id="totSavings">0</span></div></div>
@@ -789,7 +776,6 @@ h4 {
             <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih tabungan</p>
         </div>
 
-        <!-- MENU PINJAMAN -->
         <div id="menu-pinjaman" style="display:none;">
             <div class="summary" style="margin-bottom: 25px; grid-template-columns: 1fr 1fr;">
                 <div class="box" style="background: #cfe2f3;">Total Dipinjamkan:<div class="val" style="color: #0d6efd;">Rp <span id="totLent">0</span></div></div>
@@ -840,7 +826,6 @@ h4 {
         </div>
     </div> 
 
-    <!-- Modal Edit Transaksi -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h3>Edit Transaksi</h3>
@@ -885,7 +870,6 @@ h4 {
         </div>
     </div>
 
-    <!-- Modal Edit Anggaran -->
     <div id="editBudgetModal" class="modal">
         <div class="modal-content">
             <h3>Edit Anggaran</h3>
@@ -906,7 +890,6 @@ h4 {
         </div>
     </div>
 
-    <!-- Modal Edit Tabungan -->
     <div id="editSavingModal" class="modal">
         <div class="modal-content">
             <h3>Edit Tabungan</h3>
@@ -927,7 +910,6 @@ h4 {
         </div>
     </div>
 
-    <!-- Modal Edit Pinjaman -->
     <div id="editLoanModal" class="modal">
         <div class="modal-content">
             <h3>Edit Pinjaman</h3>
@@ -968,7 +950,9 @@ h4 {
         <div class="nav-item" data-index="4">Nabung</div>
         <div class="nav-item" data-index="5">Pinjaman</div>
     </div>
-</div> <!-- End of main-app -->
+</div> <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 // ==========================================
@@ -1062,9 +1046,9 @@ firebase.auth().onAuthStateChanged(user => {
         // Jika sudah login
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'block';
-        loadFirebaseData(); // Panggil data dari database
+        loadFirebaseData(); 
         
-        // Paksa sistem untuk mengklik menu Dashboard pertama kali (index 3)
+        // Pindah ke Dashboard secara otomatis
         document.querySelector('.nav-item[data-index="3"]').click();
     } else {
         // Jika belum login
@@ -1921,14 +1905,12 @@ function saveExcel() {
 
 function savePDF() {
     const { jsPDF } = window.jspdf;
-    
-    // Matikan tampilan ikon logout sementara agar tidak ikut di-print
-    document.getElementById('btnLogout').style.display = 'none';
-    
     const rows = document.querySelectorAll("#tableData tbody tr");
     rows.forEach(row => row.classList.remove('selected'));
     document.getElementById('actionRowContainer').style.display = 'none';
     document.getElementById('filterContainer').style.display = 'none';
+    document.getElementById('btnLogout').style.display = 'none';
+    
     showToast("Menyiapkan PDF...");
 
     html2canvas(document.getElementById("printArea"), { scale: 2 }).then(canvas => {
@@ -1938,18 +1920,19 @@ function savePDF() {
         pdf.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0, width, height);
         pdf.save("Laporan_Keuangan_Harian.pdf");
         
-        // Kembalikan tampilan
         document.getElementById('actionRowContainer').style.display = 'flex';
         renderTable(); 
         document.getElementById('saveMenu').style.display = 'none';
-        
-        // Munculkan kembali ikon logout (karena tombol Save PDF ada di menu Ringkasan, berarti disembunyikan lagi)
-        document.getElementById('btnLogout').style.display = 'none'; 
     });
 }
 
 // GRAFIK
 function renderCharts() {
+    if (typeof Chart === 'undefined') {
+        setTimeout(renderCharts, 200);
+        return;
+    }
+
     const expenses = data.filter(item => item.type === 'expense');
     const dailyMap = {};
     expenses.forEach(item => {
@@ -2008,7 +1991,6 @@ document.querySelectorAll('.nav-item').forEach(item => {
         document.getElementById('menu-nabung').style.display = "none"; 
         document.getElementById('menu-pinjaman').style.display = "none"; 
         
-        // Sembunyikan tombol logout secara default
         document.getElementById('btnLogout').style.display = "none";
 
         const index = parseInt(item.getAttribute('data-index'));
@@ -2026,8 +2008,8 @@ document.querySelectorAll('.nav-item').forEach(item => {
         } else if (index === 3) {
             document.getElementById('menu-dashboard').style.display = "block";
             document.getElementById('judul').innerText = "DASHBOARD";
-            document.getElementById('btnLogout').style.display = "block"; // Munculkan hanya di Dashboard
-            renderCharts();   
+            document.getElementById('btnLogout').style.display = "block"; 
+            setTimeout(() => { renderCharts(); }, 50);   
         } else if (index === 4) { 
             document.getElementById('menu-nabung').style.display = "block";
             document.getElementById('judul').innerText = "CATAT TABUNGAN";
@@ -2076,7 +2058,7 @@ window.addEventListener('click', function(event) {
     }
 });
 
-// INISIALISASI AWAL (Hanya form UI, data menyusul otomatis ditarik dari Firebase)
+// INISIALISASI AWAL
 updateCategoryDropdown();
 </script>
 
