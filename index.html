@@ -480,6 +480,7 @@ h4 {
 
 <div id="toast">Notifikasi</div>
 
+<!-- LAYAR LOGIN -->
 <div id="login-screen">
     <div class="login-box">
         <h2 style="color: #198754; margin-bottom: 5px;">Aplikasi Keuangan</h2>
@@ -503,8 +504,10 @@ h4 {
     </div>
 </div>
 
+<!-- CONTAINER UTAMA APLIKASI -->
 <div id="main-app">
 
+    <!-- MODAL KONFIRMASI -->
     <div id="confirmModal" class="modal">
         <div class="modal-content" style="text-align: center;">
             <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
@@ -516,6 +519,7 @@ h4 {
         </div>
     </div>
 
+    <!-- MODAL PILIH KATEGORI -->
     <div id="categoryModal" class="modal">
         <div class="modal-content">
             <h3>Pilih Kategori</h3>
@@ -524,6 +528,7 @@ h4 {
         </div>
     </div>
 
+    <!-- MODAL PILIH TIPE (TRANSAKSI) -->
     <div id="typeModal" class="modal">
         <div class="modal-content">
             <h3>Pilih Tipe</h3>
@@ -532,6 +537,7 @@ h4 {
         </div>
     </div>
 
+    <!-- MODAL PILIH TIPE (PINJAMAN) -->
     <div id="loanTypeModal" class="modal">
         <div class="modal-content">
             <h3>Tipe Pinjaman</h3>
@@ -540,6 +546,7 @@ h4 {
         </div>
     </div>
 
+    <!-- MODAL KETERANGAN -->
     <div id="descModal" class="modal">
         <div class="modal-content">
             <h3>Keterangan Transaksi</h3>
@@ -553,6 +560,7 @@ h4 {
         </div>
     </div>
 
+    <!-- MODAL LIHAT RINCIAN ANGGARAN -->
     <div id="viewBudgetModal" class="modal">
         <div class="modal-content" style="max-width: 450px;">
             <h3 id="viewBudgetTitle" style="margin-bottom: 10px;">Rincian Anggaran</h3>
@@ -575,6 +583,7 @@ h4 {
         </div>
     </div>
 
+    <!-- MODAL LIHAT RINCIAN PINJAMAN & CICILAN -->
     <div id="viewLoanModal" class="modal">
         <div class="modal-content" style="max-width: 450px;">
             <h3 id="viewLoanTitle" style="margin-bottom: 10px;">Rincian Pinjaman</h3>
@@ -584,6 +593,7 @@ h4 {
                 <div class="box" style="background: #d1fae5; padding: 10px;">Sisa:<br><span id="viewLoanRemaining" style="color: #047857;">Rp 0</span></div>
             </div>
 
+            <!-- FORM TAMBAH CICILAN -->
             <div style="background: #f9fafb; padding: 12px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 15px;">
                 <h4 style="margin: 0 0 10px 0; font-size: 13px; color: #444; text-align: left;">Catat Cicilan Baru</h4>
                 <div style="display: flex; gap: 8px;">
@@ -612,6 +622,8 @@ h4 {
 
 
     <div class="container" id="printArea">
+        
+        <!-- IKON LOGOUT (Khusus Dashboard) -->
         <button id="btnLogout" onclick="logout()" title="Logout">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -620,8 +632,10 @@ h4 {
             </svg>
         </button>
 
+        <!-- JUDUL UTAMA TENGAH -->
         <h2 id="judul">DASHBOARD</h2>
 
+        <!-- MENU RINGKASAN -->
         <div id="menu-ringkasan" style="display:none;">
             <div class="summary">
                 <div class="box">Pemasukan:<div class="val">Rp <span id="income">0</span></div></div>
@@ -680,6 +694,7 @@ h4 {
             <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih transaksi</p>
         </div>
 
+        <!-- MENU TRANSAKSI -->
         <div id="menu-transaksi" style="display:none;">
             <div class="form-group">
                 <div class="form-item">
@@ -725,6 +740,7 @@ h4 {
             </div>
         </div>
 
+        <!-- MENU ANGGARAN -->
         <div id="menu-anggaran" style="display:none;">
             <div class="summary" style="margin-bottom: 25px;">
                 <div class="box" style="background: #f3f4f6;">Total Limit:<div class="val" style="color: #374151;">Rp <span id="totBudgetLimit">0</span></div></div>
@@ -765,23 +781,28 @@ h4 {
             <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih anggaran</p>
         </div>
 
-        <div id="menu-dashboard" style="display:block;"> 
+        <!-- MENU DASHBOARD -->
+        <div id="menu-dashboard" style="display:block;"> <!-- Tampil default setelah login -->
+            
             <div class="canvas-container">
                 <h4>Pengeluaran Harian</h4>
-                <div class="chart-wrapper"><canvas id="chartHarian"></canvas></div>
+                <!-- Wrapper id digunakan untuk reset canvas agar tidak blank/0px saat load di background -->
+                <div class="chart-wrapper" id="wrapperHarian"><canvas id="chartHarian"></canvas></div>
             </div>
 
             <div class="canvas-container">
                 <h4>Pengeluaran Bulanan</h4>
-                <div class="chart-wrapper"><canvas id="chartBulanan"></canvas></div>
+                <div class="chart-wrapper" id="wrapperBulanan"><canvas id="chartBulanan"></canvas></div>
             </div>
 
             <div class="canvas-container">
                 <h4>Pengeluaran per Kategori</h4>
-                <div class="chart-wrapper"><canvas id="chartKategori"></canvas></div>
+                <div class="chart-wrapper" id="wrapperKategori"><canvas id="chartKategori"></canvas></div>
             </div>
+            
         </div>
 
+        <!-- MENU NABUNG -->
         <div id="menu-nabung" style="display:none;">
             <div class="summary" style="margin-bottom: 25px; grid-template-columns: 1fr;">
                 <div class="box" style="background: #d1e7dd;">Total Tabungan:<div class="val" style="color: #0f5132;">Rp <span id="totSavings">0</span></div></div>
@@ -817,6 +838,7 @@ h4 {
             <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih tabungan</p>
         </div>
 
+        <!-- MENU PINJAMAN -->
         <div id="menu-pinjaman" style="display:none;">
             <div class="summary" style="margin-bottom: 25px; grid-template-columns: 1fr 1fr;">
                 <div class="box" style="background: #cfe2f3;">Sisa Dipinjamkan:<div class="val" style="color: #0d6efd;">Rp <span id="totLent">0</span></div></div>
@@ -868,6 +890,7 @@ h4 {
         </div>
     </div> 
 
+    <!-- Modal Edit Transaksi -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h3>Edit Transaksi</h3>
@@ -912,6 +935,7 @@ h4 {
         </div>
     </div>
 
+    <!-- Modal Edit Anggaran -->
     <div id="editBudgetModal" class="modal">
         <div class="modal-content">
             <h3>Edit Anggaran</h3>
@@ -932,6 +956,7 @@ h4 {
         </div>
     </div>
 
+    <!-- Modal Edit Tabungan -->
     <div id="editSavingModal" class="modal">
         <div class="modal-content">
             <h3>Edit Tabungan</h3>
@@ -952,6 +977,7 @@ h4 {
         </div>
     </div>
 
+    <!-- Modal Edit Pinjaman -->
     <div id="editLoanModal" class="modal">
         <div class="modal-content">
             <h3>Edit Pinjaman</h3>
@@ -992,7 +1018,13 @@ h4 {
         <div class="nav-item" data-index="4">Nabung</div>
         <div class="nav-item" data-index="5">Pinjaman</div>
     </div>
-</div> <script>
+</div> <!-- End of main-app -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
 // ==========================================
 // 1. INISIALISASI FIREBASE
 // ==========================================
@@ -2077,20 +2109,28 @@ function savePDF() {
         document.getElementById('actionRowContainer').style.display = 'flex';
         renderTable(); 
         document.getElementById('saveMenu').style.display = 'none';
-        
-        // Munculkan kembali ikon logout (karena tombol Save PDF ada di menu Ringkasan, berarti disembunyikan lagi)
-        document.getElementById('btnLogout').style.display = 'none'; 
     });
 }
 
-// GRAFIK
+// =====================
+// GRAFIK DASHBOARD
+// =====================
 function renderCharts() {
+    const dashboard = document.getElementById('menu-dashboard');
+    if (!dashboard || dashboard.style.display === 'none') return; // Wajib! Cegah render saat disembunyikan
+
     if (typeof Chart === 'undefined') {
         setTimeout(renderCharts, 200);
         return;
     }
 
+    // Reset isi wrapper canvas untuk menghindari bug "blank/0px" saat tab disembunyikan
+    document.getElementById('wrapperHarian').innerHTML = '<canvas id="chartHarian"></canvas>';
+    document.getElementById('wrapperBulanan').innerHTML = '<canvas id="chartBulanan"></canvas>';
+    document.getElementById('wrapperKategori').innerHTML = '<canvas id="chartKategori"></canvas>';
+
     const expenses = data.filter(item => item.type === 'expense');
+    
     const dailyMap = {};
     expenses.forEach(item => {
         if (!dailyMap[item.date]) dailyMap[item.date] = 0;
@@ -2099,7 +2139,6 @@ function renderCharts() {
     const dailyLabels = Object.keys(dailyMap).sort();
     const dailyData = dailyLabels.map(date => dailyMap[date]);
 
-    if (chartHarian) chartHarian.destroy();
     chartHarian = new Chart(document.getElementById('chartHarian'), {
         type: 'bar', 
         data: { labels: dailyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: dailyData, backgroundColor: '#ef4444', borderRadius: 4 }] },
@@ -2115,7 +2154,6 @@ function renderCharts() {
     const monthlyLabels = Object.keys(monthlyMap).sort();
     const monthlyData = monthlyLabels.map(m => monthlyMap[m]);
 
-    if (chartBulanan) chartBulanan.destroy();
     chartBulanan = new Chart(document.getElementById('chartBulanan'), {
         type: 'bar', 
         data: { labels: monthlyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: monthlyData, backgroundColor: '#3b82f6', borderRadius: 4 }] },
@@ -2130,7 +2168,6 @@ function renderCharts() {
     const catLabels = Object.keys(catMap);
     const catData = catLabels.map(cat => catMap[cat]);
 
-    if (chartKategori) chartKategori.destroy();
     chartKategori = new Chart(document.getElementById('chartKategori'), {
         type: 'doughnut', 
         data: { labels: catLabels, datasets: [{ data: catData, backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6'], borderWidth: 0 }] },
@@ -2170,7 +2207,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
             document.getElementById('menu-dashboard').style.display = "block";
             document.getElementById('judul').innerText = "DASHBOARD";
             document.getElementById('btnLogout').style.display = "block"; // Munculkan hanya di Dashboard
-            renderCharts();   
+            setTimeout(() => { renderCharts(); }, 50);   
         } else if (index === 4) { 
             document.getElementById('menu-nabung').style.display = "block";
             document.getElementById('judul').innerText = "CATAT TABUNGAN";
@@ -2221,8 +2258,6 @@ window.addEventListener('click', function(event) {
     }
 });
 
-// INISIALISASI AWAL
-updateCategoryDropdown();
 </script>
 
 </body>
