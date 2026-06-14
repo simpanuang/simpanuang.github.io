@@ -49,7 +49,7 @@ body {
     max-width: 500px;
     margin: auto;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    position: relative; /* Penting untuk posisi absolut ikon logout */
+    position: relative;
 }
 
 h2 {
@@ -69,7 +69,7 @@ h2 {
     border: none;
     cursor: pointer;
     padding: 5px;
-    display: none; /* Default disembunyikan */
+    display: none; 
     transition: transform 0.2s;
 }
 
@@ -235,7 +235,7 @@ button:active {
 }
 
 /* TABLE UMUM */
-#tableData, #tableBudget, #tableViewBudget, #tableSaving, #tableLoan {
+table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
@@ -247,20 +247,22 @@ button:active {
     border: 1px solid #e5e7eb;
 }
 
-#tableData th, #tableBudget th, #tableViewBudget th, #tableSaving th, #tableLoan th {
+th {
     background: #198754;
     color: white;
     padding: 12px 4px; 
 }
 
-#tableData td, #tableBudget td, #tableViewBudget td, #tableSaving td, #tableLoan td {
+td {
     padding: 12px 4px; 
     border-bottom: 1px solid #e5e7eb;
     text-align: center;
     vertical-align: middle;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
-#tableData tbody tr:last-child td, #tableBudget tbody tr:last-child td, #tableViewBudget tbody tr:last-child td, #tableSaving tbody tr:last-child td, #tableLoan tbody tr:last-child td {
+tbody tr:last-child td {
     border-bottom: none;
 }
 
@@ -276,11 +278,6 @@ button:active {
 
 #tableData tbody tr.selected, #tableBudget tbody tr.selected, #tableSaving tbody tr.selected, #tableLoan tbody tr.selected {
     background-color: #d1e7dd !important;
-}
-
-td {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
 }
 
 /* UKURAN KOLOM TABEL KHUSUS */
@@ -301,6 +298,9 @@ td {
 #tableLoan th:nth-child(1), #tableLoan td:nth-child(1) { width: 22%; font-size: 11px; }
 #tableLoan th:nth-child(2), #tableLoan td:nth-child(2) { width: 40%; text-align: left; padding-left: 8px; }
 #tableLoan th:nth-child(3), #tableLoan td:nth-child(3) { width: 38%; text-align: right; padding-right: 8px; }
+
+#tableViewLoan { font-size: 12px; }
+#tableViewLoan tbody tr:nth-child(even) { background: #f9fafb; }
 
 /* GRAFIK / DASHBOARD */
 .canvas-container {
@@ -351,7 +351,7 @@ h4 {
     font-weight: bold;
 }
 
-/* GAYA POP-UP (MODAL) PROFESIONAL DI TENGAH */
+/* GAYA POP-UP (MODAL) */
 .modal {
     display: none; 
     position: fixed; 
@@ -569,8 +569,43 @@ h4 {
         </div>
     </div>
 
+    <div id="viewLoanModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 id="viewLoanTitle" style="margin-bottom: 10px;">Rincian Pinjaman</h3>
+            
+            <div class="summary" style="grid-template-columns: 1fr 1fr; margin-bottom: 15px;">
+                <div class="box" style="background: #f3f4f6; padding: 10px;">Total:<br><span id="viewLoanTotal" style="color: #374151;">Rp 0</span></div>
+                <div class="box" style="background: #d1fae5; padding: 10px;">Sisa:<br><span id="viewLoanRemaining" style="color: #047857;">Rp 0</span></div>
+            </div>
+
+            <div style="background: #f9fafb; padding: 12px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 15px;">
+                <h4 style="margin: 0 0 10px 0; font-size: 13px; color: #444; text-align: left;">Catat Cicilan Baru</h4>
+                <div style="display: flex; gap: 8px;">
+                    <input type="date" id="instDate" style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; height: 35px;">
+                    <input type="text" id="instAmount" placeholder="Jumlah (Rp)" inputmode="numeric" oninput="formatInputRupiah(this)" style="flex: 1.2; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; height: 35px; box-sizing: border-box;">
+                    <button style="background: #198754; color: white; border: none; border-radius: 8px; padding: 0 12px; font-weight: bold; font-size: 12px; cursor: pointer; height: 35px;" onclick="addInstallment()">Simpan</button>
+                </div>
+            </div>
+            
+            <div style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;">
+                <table id="tableViewLoan">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Tanggal</th>
+                            <th style="text-align: right; padding-right: 8px;">Jumlah Cicilan</th>
+                            <th style="width: 35px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <p id="viewLoanEmpty" style="text-align: center; font-size: 12px; color: #6b7280; display: none; margin-top: 15px;">Belum ada data cicilan dibayar.</p>
+            </div>
+            <button class="btn-secondary" onclick="closeViewLoanModal()" style="width: 100%;">Tutup</button>
+        </div>
+    </div>
+
+
     <div class="container" id="printArea">
-        
         <button id="btnLogout" onclick="logout()" title="Logout">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -778,8 +813,8 @@ h4 {
 
         <div id="menu-pinjaman" style="display:none;">
             <div class="summary" style="margin-bottom: 25px; grid-template-columns: 1fr 1fr;">
-                <div class="box" style="background: #cfe2f3;">Total Dipinjamkan:<div class="val" style="color: #0d6efd;">Rp <span id="totLent">0</span></div></div>
-                <div class="box" style="background: #f8d7da;">Total Utang Saya:<div class="val" style="color: #b91c1c;">Rp <span id="totBorrowed">0</span></div></div>
+                <div class="box" style="background: #cfe2f3;">Sisa Dipinjamkan:<div class="val" style="color: #0d6efd;">Rp <span id="totLent">0</span></div></div>
+                <div class="box" style="background: #f8d7da;">Sisa Utang Saya:<div class="val" style="color: #b91c1c;">Rp <span id="totBorrowed">0</span></div></div>
             </div>
 
             <div class="form-group">
@@ -808,6 +843,7 @@ h4 {
             <div class="btn-group">
                 <button class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addLoan()">Tambah</button>
                 <button style="background: #f59e0b; color: white; padding: 12px 5px; font-size: 12px;" onclick="editLoanSelected()">Edit</button>
+                <button style="background: #3b82f6; color: white; padding: 12px 5px; font-size: 12px;" onclick="viewLoanDetails()">Lihat</button>
                 <button class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteLoanSelected()">Hapus</button>
             </div>
 
@@ -817,7 +853,7 @@ h4 {
                     <tr>
                         <th>Tanggal</th>
                         <th style="text-align: left; padding-left: 8px;">Nama & Tipe</th>
-                        <th style="text-align: right; padding-right: 8px;">Jumlah</th>
+                        <th style="text-align: right; padding-right: 8px;">Jumlah & Sisa</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -950,11 +986,7 @@ h4 {
         <div class="nav-item" data-index="4">Nabung</div>
         <div class="nav-item" data-index="5">Pinjaman</div>
     </div>
-</div> <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<script>
+</div> <script>
 // ==========================================
 // 1. INISIALISASI FIREBASE
 // ==========================================
@@ -976,6 +1008,7 @@ let data = [];
 let budgets = [];
 let savings = [];
 let loans = [];
+let installments = []; // Data cicilan
 
 let chartHarian, chartBulanan, chartKategori;
 let selectedIds = []; 
@@ -997,38 +1030,24 @@ function login() {
     const email = document.getElementById('authEmail').value.trim();
     const pass = document.getElementById('authPassword').value;
     
-    if(!email || !pass) {
-        return showToast("Harap isi email dan password!");
-    }
+    if(!email || !pass) return showToast("Harap isi email dan password!");
     
     showToast("Mencoba login...");
     firebase.auth().signInWithEmailAndPassword(email, pass)
-        .then((userCredential) => {
-            showToast("Login berhasil!");
-        })
-        .catch((error) => {
-            console.error("Login Error:", error);
-            showToast("Gagal: " + error.message);
-        });
+        .then(() => showToast("Login berhasil!"))
+        .catch(error => showToast("Gagal: " + error.message));
 }
 
 function register() {
     const email = document.getElementById('authEmail').value.trim();
     const pass = document.getElementById('authPassword').value;
     
-    if(!email || !pass) {
-        return showToast("Harap isi email dan password!");
-    }
+    if(!email || !pass) return showToast("Harap isi email dan password!");
     
     showToast("Mendaftarkan akun...");
     firebase.auth().createUserWithEmailAndPassword(email, pass)
-        .then((userCredential) => {
-            showToast("Akun berhasil dibuat dan login!");
-        })
-        .catch((error) => {
-            console.error("Register Error:", error);
-            showToast("Gagal: " + error.message);
-        });
+        .then(() => showToast("Akun berhasil dibuat dan login!"))
+        .catch(error => showToast("Gagal: " + error.message));
 }
 
 function logout() {
@@ -1043,7 +1062,6 @@ function logout() {
 // Pantau status login
 firebase.auth().onAuthStateChanged(user => {
     if (user) {
-        // Jika sudah login
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'block';
         loadFirebaseData(); 
@@ -1051,7 +1069,6 @@ firebase.auth().onAuthStateChanged(user => {
         // Pindah ke Dashboard secara otomatis
         document.querySelector('.nav-item[data-index="3"]').click();
     } else {
-        // Jika belum login
         document.getElementById('login-screen').style.display = 'flex';
         document.getElementById('main-app').style.display = 'none';
     }
@@ -1063,9 +1080,7 @@ firebase.auth().onAuthStateChanged(user => {
 function loadFirebaseData() {
     database.ref('transactions').on('value', (snapshot) => {
         data = [];
-        snapshot.forEach((childSnapshot) => {
-            data.push(childSnapshot.val());
-        });
+        snapshot.forEach(child => data.push(child.val()));
         applyFilter();
         renderBudget();
         renderCharts();
@@ -1074,27 +1089,33 @@ function loadFirebaseData() {
 
     database.ref('budgets').on('value', (snapshot) => {
         budgets = [];
-        snapshot.forEach((childSnapshot) => {
-            budgets.push(childSnapshot.val());
-        });
+        snapshot.forEach(child => budgets.push(child.val()));
         renderBudget();
         updateCategoryDropdown();
     });
 
     database.ref('savings').on('value', (snapshot) => {
         savings = [];
-        snapshot.forEach((childSnapshot) => {
-            savings.push(childSnapshot.val());
-        });
+        snapshot.forEach(child => savings.push(child.val()));
         renderSavings();
     });
 
     database.ref('loans').on('value', (snapshot) => {
         loans = [];
-        snapshot.forEach((childSnapshot) => {
-            loans.push(childSnapshot.val());
-        });
+        snapshot.forEach(child => loans.push(child.val()));
         renderLoans();
+    });
+
+    // Load data cicilan
+    database.ref('installments').on('value', (snapshot) => {
+        installments = [];
+        snapshot.forEach(child => installments.push(child.val()));
+        renderLoans(); // update sisa di menu pinjaman
+        
+        // Perbarui isi modal cicilan jika sedang terbuka
+        if (document.getElementById('viewLoanModal').style.display === 'flex') {
+            viewLoanDetails();
+        }
     });
 }
 
@@ -1105,11 +1126,8 @@ function formatRupiah(angka) {
 
 function formatInputRupiah(input) {
     let value = input.value.replace(/\D/g, ''); 
-    if (value !== '') {
-        input.value = parseInt(value, 10).toLocaleString('id-ID');
-    } else {
-        input.value = '';
-    }
+    if (value !== '') input.value = parseInt(value, 10).toLocaleString('id-ID');
+    else input.value = '';
 }
 
 // NOTIFIKASI TOAST 
@@ -1151,11 +1169,7 @@ function openLoanTypePicker(target) {
     renderLoanTypePickerList();
     document.getElementById('loanTypeModal').style.display = 'flex';
 }
-
-function closeLoanTypePicker() {
-    document.getElementById('loanTypeModal').style.display = 'none';
-}
-
+function closeLoanTypePicker() { document.getElementById('loanTypeModal').style.display = 'none'; }
 function selectLoanType(val, label) {
     if (loanTypePickerTarget === 'add') {
         document.getElementById('loanType').value = val;
@@ -1167,26 +1181,13 @@ function selectLoanType(val, label) {
     }
     closeLoanTypePicker();
 }
-
 function renderLoanTypePickerList() {
-    let currentSelected = loanTypePickerTarget === 'add' 
-        ? document.getElementById('loanType').value 
-        : document.getElementById('editLoanType').value;
-    
-    const options = [
-        { val: 'lent', label: 'Saya Meminjamkan (Piutang)' },
-        { val: 'borrowed', label: 'Saya Meminjam (Utang)' }
-    ];
-
+    let currentSelected = loanTypePickerTarget === 'add' ? document.getElementById('loanType').value : document.getElementById('editLoanType').value;
+    const options = [{ val: 'lent', label: 'Saya Meminjamkan (Piutang)' }, { val: 'borrowed', label: 'Saya Meminjam (Utang)' }];
     let html = '';
     options.forEach(opt => {
         const isSelected = opt.val === currentSelected;
-        html += `
-            <div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectLoanType('${opt.val}', '${opt.label}')">
-                <span>${opt.label}</span>
-                ${isSelected ? '<span class="check">✓</span>' : ''}
-            </div>
-        `;
+        html += `<div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectLoanType('${opt.val}', '${opt.label}')"><span>${opt.label}</span>${isSelected ? '<span class="check">✓</span>' : ''}</div>`;
     });
     document.getElementById('loanTypeList').innerHTML = html;
 }
@@ -1199,11 +1200,7 @@ function openTypePicker(target) {
     renderTypePickerList();
     document.getElementById('typeModal').style.display = 'flex';
 }
-
-function closeTypePicker() {
-    document.getElementById('typeModal').style.display = 'none';
-}
-
+function closeTypePicker() { document.getElementById('typeModal').style.display = 'none'; }
 function selectType(val, label) {
     if (typePickerTarget === 'add') {
         document.getElementById('type').value = val;
@@ -1215,26 +1212,13 @@ function selectType(val, label) {
     }
     closeTypePicker();
 }
-
 function renderTypePickerList() {
-    let currentSelected = typePickerTarget === 'add' 
-        ? document.getElementById('type').value 
-        : document.getElementById('editType').value;
-    
-    const options = [
-        { val: 'income', label: 'Pemasukan' },
-        { val: 'expense', label: 'Pengeluaran' }
-    ];
-
+    let currentSelected = typePickerTarget === 'add' ? document.getElementById('type').value : document.getElementById('editType').value;
+    const options = [{ val: 'income', label: 'Pemasukan' }, { val: 'expense', label: 'Pengeluaran' }];
     let html = '';
     options.forEach(opt => {
         const isSelected = opt.val === currentSelected;
-        html += `
-            <div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectType('${opt.val}', '${opt.label}')">
-                <span>${opt.label}</span>
-                ${isSelected ? '<span class="check">✓</span>' : ''}
-            </div>
-        `;
+        html += `<div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectType('${opt.val}', '${opt.label}')"><span>${opt.label}</span>${isSelected ? '<span class="check">✓</span>' : ''}</div>`;
     });
     document.getElementById('typeList').innerHTML = html;
 }
@@ -1250,11 +1234,7 @@ function openDescPicker(target) {
     document.getElementById('descModal').style.display = 'flex';
     setTimeout(() => document.getElementById('customDescInput').focus(), 100);
 }
-
-function closeDescPicker() {
-    document.getElementById('descModal').style.display = 'none';
-}
-
+function closeDescPicker() { document.getElementById('descModal').style.display = 'none'; }
 function selectDesc(val) {
     if (descPickerTarget === 'add') {
         document.getElementById('desc').value = val;
@@ -1266,25 +1246,15 @@ function selectDesc(val) {
     }
     closeDescPicker();
 }
-
 function applyCustomDesc() {
     const val = document.getElementById('customDescInput').value.trim();
-    if (!val) {
-        showToast("Keterangan tidak boleh kosong!");
-        return;
-    }
+    if (!val) return showToast("Keterangan tidak boleh kosong!");
     selectDesc(val);
 }
-
 function renderDescPickerList() {
     const uniqueDescs = [...new Set(data.map(item => item.desc))];
     const list = document.getElementById('descList');
-    
-    if (uniqueDescs.length === 0) {
-        list.innerHTML = `<div style="text-align:center; padding: 20px; color: #6b7280; font-size: 13px;">Belum ada riwayat.</div>`;
-        return;
-    }
-
+    if (uniqueDescs.length === 0) return list.innerHTML = `<div style="text-align:center; padding: 20px; color: #6b7280; font-size: 13px;">Belum ada riwayat.</div>`;
     let currentSelected = descPickerTarget === 'add' ? document.getElementById('desc').value : document.getElementById('editDesc').value;
     let html = '';
     uniqueDescs.forEach(d => {
@@ -1293,10 +1263,7 @@ function renderDescPickerList() {
     });
     list.innerHTML = html;
 }
-
-function updateDescHistory() {
-    renderDescPickerList();
-}
+function updateDescHistory() { renderDescPickerList(); }
 
 // =====================
 // KONTROL MODAL KATEGORI
@@ -1315,17 +1282,12 @@ function updateCategoryDropdown() {
         document.getElementById('selectedEditCategoryText').innerText = "Tambah anggaran dulu";
     }
 }
-
 function openCategoryPicker(target) {
     categoryPickerTarget = target;
     renderCategoryPickerList();
     document.getElementById('categoryModal').style.display = 'flex';
 }
-
-function closeCategoryPicker() {
-    document.getElementById('categoryModal').style.display = 'none';
-}
-
+function closeCategoryPicker() { document.getElementById('categoryModal').style.display = 'none'; }
 function selectCategory(cat) {
     if (categoryPickerTarget === 'add') {
         document.getElementById('category').value = cat;
@@ -1337,14 +1299,9 @@ function selectCategory(cat) {
     }
     closeCategoryPicker();
 }
-
 function renderCategoryPickerList() {
     const list = document.getElementById('categoryList');
-    if (budgets.length === 0) {
-        list.innerHTML = `<div style="text-align:center; padding: 20px; color: #6b7280; font-size: 14px;">Silakan tambah anggaran terlebih dahulu di menu Anggaran.</div>`;
-        return;
-    }
-
+    if (budgets.length === 0) return list.innerHTML = `<div style="text-align:center; padding: 20px; color: #6b7280; font-size: 14px;">Silakan tambah anggaran terlebih dahulu.</div>`;
     let currentSelected = categoryPickerTarget === 'add' ? document.getElementById('category').value : document.getElementById('editCategory').value;
     let html = '';
     budgets.forEach(b => {
@@ -1354,13 +1311,11 @@ function renderCategoryPickerList() {
     list.innerHTML = html;
 }
 
-// FUNGSI MENU SIMPAN
 function toggleSaveMenu() {
     const menu = document.getElementById('saveMenu');
     menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
 }
 
-// SORTIR & FILTER
 function toggleFilter() {
     const container = document.getElementById('filterContainer');
     container.style.display = container.style.display === 'none' ? 'block' : 'none';
@@ -1377,13 +1332,11 @@ function handleFilterChange() {
 function getFilteredData() {
     const filterValue = document.getElementById('filterSelect').value;
     if (filterValue === 'all') return data;
-
     const t = new Date();
     const yyyy = t.getFullYear();
     const mm = String(t.getMonth() + 1).padStart(2, '0');
     const dd = String(t.getDate()).padStart(2, '0');
     const todayStr = `${yyyy}-${mm}-${dd}`;
-    
     const todayObj = new Date(t.setHours(0,0,0,0));
     const lastWeekObj = new Date(todayObj);
     lastWeekObj.setDate(lastWeekObj.getDate() - 7);
@@ -1423,7 +1376,6 @@ function updateSummary() {
     document.getElementById('balance').innerText = formatRupiah(income - expense);
 }
 
-// SELEKSI TRANSAKSI
 function toggleSelection(rowElement, id) {
     const index = selectedIds.indexOf(id);
     if (index > -1) {
@@ -1481,14 +1433,12 @@ function renderBudget() {
     tbody.innerHTML = "";
     let totalLimit = 0;
     let totalUsed = 0;
-
     budgets.forEach(b => {
         const used = data.filter(d => d.type === 'expense' && d.category === b.category).reduce((sum, d) => sum + d.amount, 0);
         const remaining = b.limit - used;
         totalLimit += b.limit;
         totalUsed += used;
         const isSelected = selectedBudgetCategory === b.category ? 'selected' : '';
-
         tbody.innerHTML += `
         <tr class="${isSelected}" onclick="toggleBudgetSelection(this, '${b.category}')">
             <td>${b.category}</td>
@@ -1497,7 +1447,6 @@ function renderBudget() {
             <td style="color:${remaining < 0 ? '#dc3545' : '#198754'}">Rp ${formatRupiah(remaining)}</td>
         </tr>`;
     });
-    
     document.getElementById('totBudgetLimit').innerText = formatRupiah(totalLimit);
     document.getElementById('totBudgetUsed').innerText = formatRupiah(totalUsed);
     document.getElementById('totBudgetRemaining').innerText = formatRupiah(totalLimit - totalUsed);
@@ -1522,7 +1471,6 @@ function renderSavings() {
     tbody.innerHTML = "";
     let total = 0;
     const sortedSavings = [...savings].sort((a,b) => new Date(b.date) - new Date(a.date));
-
     sortedSavings.forEach(s => {
         total += s.amount;
         const isSelected = selectedSavingId === s.id ? 'selected' : '';
@@ -1539,16 +1487,10 @@ function addSaving() {
     const date = document.getElementById('savingDate').value;
     const amountStr = document.getElementById('savingAmount').value.replace(/\./g, '');
     const amount = parseInt(amountStr, 10);
-
-    if (!date || isNaN(amount) || amount <= 0) {
-        showToast("Isi tanggal dan jumlah dengan benar!");
-        return;
-    }
+    if (!date || isNaN(amount) || amount <= 0) return showToast("Isi tanggal dan jumlah dengan benar!");
 
     const id = Date.now().toString();
-    database.ref('savings/' + id).set({
-        id: id, date: date, amount: amount
-    }).then(() => {
+    database.ref('savings/' + id).set({ id: id, date: date, amount: amount }).then(() => {
         document.getElementById('savingAmount').value = "";
         showToast("Tabungan berhasil ditambahkan!");
     });
@@ -1568,7 +1510,6 @@ function saveEditSaving() {
     const date = document.getElementById('editSavingDate').value;
     const amountStr = document.getElementById('editSavingAmount').value.replace(/\./g, '');
     const amount = parseInt(amountStr, 10);
-
     if (!date || isNaN(amount) || amount <= 0) return showToast("Isi tanggal dan jumlah dengan benar!");
 
     database.ref('savings/' + selectedSavingId).update({ date: date, amount: amount }).then(() => {
@@ -1593,7 +1534,7 @@ function deleteSavingSelected() {
 }
 
 // =====================
-// PINJAMAN
+// PINJAMAN & CICILAN
 // =====================
 function toggleLoanSelection(rowElement, id) {
     const rows = document.querySelectorAll("#tableLoan tbody tr");
@@ -1614,12 +1555,24 @@ function renderLoans() {
     const sortedLoans = [...loans].sort((a,b) => new Date(b.date) - new Date(a.date));
 
     sortedLoans.forEach(l => {
-        if(l.type === 'lent') totLent += l.amount;
-        else totBorrowed += l.amount;
+        // Hitung total cicilan yang sudah dibayar untuk pinjaman ini
+        const insts = installments.filter(i => i.loanId === l.id);
+        const totalPaid = insts.reduce((sum, i) => sum + i.amount, 0);
+        const remaining = l.amount - totalPaid;
+
+        if(l.type === 'lent') totLent += remaining;
+        else totBorrowed += remaining;
 
         const isSelected = selectedLoanId === l.id ? 'selected' : '';
         const typeLabel = l.type === 'lent' ? 'Meminjamkan' : 'Berutang';
         const color = l.type === 'lent' ? '#0d6efd' : '#dc3545';
+        
+        let statusHtml = "";
+        if (remaining <= 0) {
+            statusHtml = `<span style="font-size:10px; color: #198754; font-weight:bold;">(LUNAS)</span>`;
+        } else {
+            statusHtml = `<span style="font-size:10px; color: #666;">Sisa: Rp ${formatRupiah(remaining)}</span>`;
+        }
 
         tbody.innerHTML += `
         <tr class="${isSelected}" onclick="toggleLoanSelection(this, '${l.id}')">
@@ -1628,7 +1581,10 @@ function renderLoans() {
                 <b>${l.person}</b><br>
                 <span style="font-size: 10px; color: ${color};">${typeLabel}</span>
             </td>
-            <td style="text-align: right; padding-right: 8px; font-weight:bold;">Rp ${formatRupiah(l.amount)}</td>
+            <td style="text-align: right; padding-right: 8px; font-weight:bold;">
+                Rp ${formatRupiah(l.amount)}<br>
+                ${statusHtml}
+            </td>
         </tr>`;
     });
     
@@ -1643,10 +1599,7 @@ function addLoan() {
     const amountStr = document.getElementById('loanAmount').value.replace(/\./g, '');
     const amount = parseInt(amountStr, 10);
 
-    if (!date || !person || isNaN(amount) || amount <= 0) {
-        showToast("Isi semua data pinjaman dengan benar!");
-        return;
-    }
+    if (!date || !person || isNaN(amount) || amount <= 0) return showToast("Isi semua data pinjaman dengan benar!");
 
     const id = Date.now().toString();
     database.ref('loans/' + id).set({
@@ -1696,7 +1649,12 @@ function closeEditLoanModal() {
 
 function deleteLoanSelected() {
     if (!selectedLoanId) return showToast("Pilih satu baris pinjaman yang ingin dihapus.");
-    showConfirm("Hapus data pinjaman ini?", () => {
+    showConfirm("Hapus data pinjaman ini beserta riwayat cicilannya?", () => {
+        // Hapus cicilannya dulu
+        const instsToDelete = installments.filter(i => i.loanId === selectedLoanId);
+        instsToDelete.forEach(i => database.ref('installments/' + i.id).remove());
+        
+        // Hapus pinjaman utama
         database.ref('loans/' + selectedLoanId).remove().then(() => {
             selectedLoanId = null;
             showToast("Pinjaman berhasil dihapus!");
@@ -1704,8 +1662,86 @@ function deleteLoanSelected() {
     });
 }
 
+function viewLoanDetails() {
+    if (!selectedLoanId) return showToast("Pilih satu baris pinjaman terlebih dahulu.");
+    const loan = loans.find(l => l.id === selectedLoanId);
+    if (!loan) return;
+
+    document.getElementById('viewLoanTitle').innerText = "Rincian: " + loan.person;
+    document.getElementById('viewLoanTotal').innerText = "Rp " + formatRupiah(loan.amount);
+
+    if(!document.getElementById('instDate').value) {
+        document.getElementById('instDate').valueAsDate = new Date();
+    }
+    
+    const insts = installments.filter(i => i.loanId === selectedLoanId).sort((a,b) => new Date(b.date) - new Date(a.date));
+    const tbody = document.querySelector("#tableViewLoan tbody");
+    tbody.innerHTML = "";
+
+    let totalPaid = 0;
+    if (insts.length === 0) {
+        document.getElementById('viewLoanEmpty').style.display = 'block';
+        document.getElementById('tableViewLoan').style.display = 'none';
+    } else {
+        document.getElementById('viewLoanEmpty').style.display = 'none';
+        document.getElementById('tableViewLoan').style.display = 'table';
+        
+        insts.forEach(item => {
+            totalPaid += item.amount;
+            tbody.innerHTML += `
+            <tr>
+                <td style="text-align:center;">${item.date}</td>
+                <td style="text-align: right; padding-right: 8px;">Rp ${formatRupiah(item.amount)}</td>
+                <td style="text-align:center;"><button onclick="deleteInstallment('${item.id}')" style="background:#dc3545; color:white; padding:4px 8px; border:none; border-radius:4px; font-size:10px; cursor:pointer;">X</button></td>
+            </tr>`;
+        });
+    }
+    
+    const remaining = loan.amount - totalPaid;
+    document.getElementById('viewLoanRemaining').innerText = "Rp " + formatRupiah(remaining);
+    
+    document.getElementById('viewLoanModal').style.display = 'flex';
+}
+
+function closeViewLoanModal() {
+    document.getElementById('viewLoanModal').style.display = 'none';
+}
+
+function addInstallment() {
+    const date = document.getElementById('instDate').value;
+    const amountStr = document.getElementById('instAmount').value.replace(/\./g, '');
+    const amount = parseInt(amountStr, 10);
+
+    if (!date || isNaN(amount) || amount <= 0) return showToast("Isi tanggal dan jumlah cicilan dengan benar!");
+
+    const loan = loans.find(l => l.id === selectedLoanId);
+    const insts = installments.filter(i => i.loanId === selectedLoanId);
+    const totalPaid = insts.reduce((sum, i) => sum + i.amount, 0);
+    
+    if (totalPaid + amount > loan.amount) {
+        return showToast("Gagal: Jumlah cicilan melebihi sisa pinjaman!");
+    }
+
+    const id = Date.now().toString();
+    database.ref('installments/' + id).set({
+        id: id, loanId: selectedLoanId, date: date, amount: amount
+    }).then(() => {
+        document.getElementById('instAmount').value = "";
+        showToast("Cicilan berhasil ditambahkan!");
+    });
+}
+
+function deleteInstallment(id) {
+    showConfirm("Hapus riwayat cicilan ini?", () => {
+        database.ref('installments/' + id).remove().then(() => {
+            showToast("Cicilan berhasil dihapus!");
+        });
+    });
+}
+
+
 // =====================
-// TRANSAKSI & ANGGARAN KE FIREBASE
+// TRANSAKSI & ANGGARAN
 // =====================
 function addData() {
     const date = document.getElementById('date').value;
@@ -1715,10 +1751,7 @@ function addData() {
     const amountStr = document.getElementById('amount').value.replace(/\./g, '');
     const amount = parseInt(amountStr, 10);
 
-    if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) {
-        showToast("Mohon isi semua data dengan lengkap!");
-        return;
-    }
+    if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) return showToast("Mohon isi semua data dengan lengkap!");
 
     const id = Date.now().toString();
     database.ref('transactions/' + id).set({
@@ -2029,6 +2062,7 @@ window.addEventListener('click', function(event) {
     const viewBdgMod = document.getElementById('viewBudgetModal');
     const editSavMod = document.getElementById('editSavingModal');
     const editLoanMod = document.getElementById('editLoanModal');
+    const viewLoanMod = document.getElementById('viewLoanModal');
     const confMod = document.getElementById('confirmModal');
     
     const catMod = document.getElementById('categoryModal');
@@ -2044,6 +2078,7 @@ window.addEventListener('click', function(event) {
     if (event.target == viewBdgMod) closeViewBudgetModal();
     if (event.target == editSavMod) closeEditSavingModal();
     if (event.target == editLoanMod) closeEditLoanModal();
+    if (event.target == viewLoanMod) closeViewLoanModal();
     if (event.target == confMod) confMod.style.display = "none";
     
     if (event.target == catMod) closeCategoryPicker();
