@@ -3,118 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Dashboard</title>
+    <title>Aplikasi Saya</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 20px;
         }
 
+        /* --- Gaya CSS untuk Login --- */
+        .login-container {
+            background: #ffffff; padding: 30px 25px;
+            border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%; max-width: 350px;
+        }
+        .login-title {
+            text-align: center; color: #333333;
+            margin-bottom: 25px; font-size: 1.5rem;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label {
+            display: block; margin-bottom: 8px; color: #555;
+            font-weight: 600; font-size: 0.9rem;
+        }
+        .form-group input {
+            width: 100%; padding: 12px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 1rem; outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus { border-color: #4361ee; }
+        .btn-login {
+            width: 100%; background-color: #4361ee; color: white;
+            padding: 12px; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease; margin-top: 10px;
+        }
+        .btn-login:hover { background-color: #3f37c9; transform: translateY(-2px); }
+        .error-message {
+            color: #d63031; font-size: 0.85rem; text-align: center;
+            margin-top: 15px; display: none;
+        }
+
+        /* --- Gaya CSS untuk Dashboard --- */
         .menu-container {
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
+            background: #ffffff; padding: 25px; border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            width: 100%;
-            max-width: 400px; /* Lebar maksimal kontainer */
+            width: 100%; max-width: 400px;
+            display: none; /* Disembunyikan secara default sampai berhasil login */
         }
-
-        .menu-title {
-            text-align: center;
-            color: #333333;
+        .menu-header {
+            display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 25px;
-            font-size: 1.5rem;
         }
-
+        .menu-title-dash {
+            color: #333333; font-size: 1.5rem; font-weight: bold;
+        }
+        .btn-logout {
+            background-color: #ff4757; color: white; border: none;
+            padding: 8px 12px; border-radius: 6px; cursor: pointer;
+            font-weight: bold; transition: background 0.3s;
+        }
+        .btn-logout:hover { background-color: #ff6b81; }
         .menu-grid {
-            display: grid;
-            /* Membuat 2 kolom berjejer ke samping dengan ukuran yang sama */
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 15px; /* Jarak antar menu */
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; 
         }
-
         .menu-item {
-            background-color: #4361ee;
-            color: white;
-            padding: 20px 10px;
-            border-radius: 10px;
-            text-align: center;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
+            background-color: #4361ee; color: white; padding: 20px 10px;
+            border-radius: 10px; text-align: center; text-decoration: none;
+            font-weight: 600; transition: all 0.3s ease;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
             box-shadow: 0 2px 5px rgba(67, 97, 238, 0.3);
         }
-
         .menu-item:hover {
-            background-color: #3f37c9;
-            transform: translateY(-3px); /* Efek melayang saat kursor di atasnya */
+            background-color: #3f37c9; transform: translateY(-3px); 
         }
-
-        .menu-item .icon {
-            font-size: 28px;
-        }
-
-        /* Karena ada 5 menu (ganjil), menu ke-5 kita buat memanjang penuh ke samping di bawah */
-        .menu-item.full-width {
-            grid-column: span 2; 
-        }
-
-        /* Membuat tampilan tetap rapi di layar HP yang sangat kecil */
+        .menu-item .icon { font-size: 28px; }
+        
         @media (max-width: 320px) {
-            .menu-grid {
-                grid-template-columns: 1fr; /* Berubah jadi 1 ke bawah kalau layarnya sangat sempit */
-            }
-            .menu-item.full-width {
-                grid-column: span 1;
-            }
+            .menu-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <div class="menu-container">
-        <h2 class="menu-title">Menu Aplikasi</h2>
-        
+    <div class="login-container" id="loginSection">
+        <h2 class="login-title">Masuk ke Aplikasi</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="Masukkan email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="Masukkan password">
+            </div>
+            <button type="submit" class="btn-login" id="btnLoginSubmit">Login</button>
+            <p id="errorMessage" class="error-message">Email atau password salah.</p>
+        </form>
+    </div>
+
+    <div class="menu-container" id="dashboardSection">
+        <div class="menu-header">
+            <h2 class="menu-title-dash">Menu Aplikasi</h2>
+            <button class="btn-logout" id="btnLogout">Keluar</button>
+        </div>
         <div class="menu-grid">
-            <a href="#" class="menu-item">
-                <span class="icon">💰</span>
-                Catatan Keuangan
-            </a>
-            <a href="#" class="menu-item">
-                <span class="icon">🛒</span>
-                Penjualan
-            </a>
-
-            <a href="#" class="menu-item">
-                <span class="icon">🏦</span>
-                Nabung
-            </a>
-            <a href="#" class="menu-item">
-                <span class="icon">💳</span>
-                Pinjaman
-            </a>
-
-            <a href="#" class="menu-item full-width">
-                <span class="icon">📝</span>
-                Note / Catatan
-            </a>
+            <a href="#" class="menu-item"><span class="icon">💰</span> Catatan Keuangan</a>
+            <a href="#" class="menu-item"><span class="icon">🛒</span> Penjualan</a>
+            <a href="#" class="menu-item"><span class="icon">🏦</span> Nabung</a>
+            <a href="#" class="menu-item"><span class="icon">💳</span> Pinjaman</a>
         </div>
     </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+
+        // Konfigurasi Firebase milikmu
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJkcYFCW2aSGKoP0wFSXoLvxDtXHOF7XI",
+            authDomain: "login-3651c.firebaseapp.com",
+            projectId: "login-3651c",
+            storageBucket: "login-3651c.firebasestorage.app",
+            messagingSenderId: "899318509963",
+            appId: "1:899318509963:web:793158c5bda7407149ff8e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Deklarasi Elemen HTML
+        const loginSection = document.getElementById('loginSection');
+        const dashboardSection = document.getElementById('dashboardSection');
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const btnLoginSubmit = document.getElementById('btnLoginSubmit');
+        const btnLogout = document.getElementById('btnLogout');
+
+        // 1. Pantau Status Login (Cek otomatis saat web dibuka)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Jika SUDAH login: Sembunyikan form login, tampilkan dashboard
+                loginSection.style.display = 'none';
+                dashboardSection.style.display = 'block';
+            } else {
+                // Jika BELUM login: Tampilkan form login, sembunyikan dashboard
+                loginSection.style.display = 'block';
+                dashboardSection.style.display = 'none';
+                // Reset form login saat kembali ke halaman ini
+                loginForm.reset();
+                errorMessage.style.display = 'none';
+                btnLoginSubmit.textContent = "Login";
+            }
+        });
+
+        // 2. Logika Submit Tombol Login
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault(); 
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            btnLoginSubmit.textContent = "Memproses...";
+            errorMessage.style.display = 'none';
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    // Berhasil login! (onAuthStateChanged di atas akan otomatis mengubah tampilan)
+                    console.log("Berhasil masuk");
+                })
+                .catch((error) => {
+                    // Gagal login
+                    btnLoginSubmit.textContent = "Login";
+                    errorMessage.style.display = 'block';
+                    if(error.code === 'auth/invalid-credential') {
+                        errorMessage.innerText = "Email atau password salah.";
+                    } else {
+                        errorMessage.innerText = "Terjadi kesalahan: " + error.message;
+                    }
+                });
+        });
+
+        // 3. Logika Tombol Logout (Keluar)
+        btnLogout.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                console.log("Berhasil keluar");
+                // onAuthStateChanged akan otomatis mengubah tampilan kembali ke form login
+            }).catch((error) => {
+                console.error("Error saat logout:", error);
+            });
+        });
+    </script>
 
 </body>
 </html>
