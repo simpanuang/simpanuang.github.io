@@ -6,279 +6,100 @@
 <title>Aplikasi Keuangan Harian</title>
 
 <style>
+/* =========================================
+   1. GAYA CSS GLOBAL & UMUM
+   ========================================= */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f4f6f9;
     margin: 0;
-    padding: 0; 
-}
-
-/* LAYAR LOGIN */
-#login-screen {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: #f4f6f9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    box-sizing: border-box;
-    z-index: 9999;
-}
-
-.login-box {
-    background: white;
-    padding: 30px 20px;
-    border-radius: 20px;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    text-align: center;
-}
-
-#main-app {
-    display: none; 
-    padding: 20px 10px 80px 10px;
+    padding: 20px 10px 80px 10px; 
 }
 
 /* CONTAINER APLIKASI */
 .container {
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    max-width: 500px;
-    margin: auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background: white; padding: 20px; border-radius: 20px;
+    max-width: 500px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     position: relative;
 }
 
 h2 {
-    color: #198754;
-    margin-top: 0;
-    margin-bottom: 25px;
-    font-size: 1.4rem;
-    text-align: center;
+    color: #198754; margin-top: 0; margin-bottom: 25px;
+    font-size: 1.4rem; text-align: center;
 }
 
-/* LOGOUT ICON */
-#btnLogout {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    display: none; 
-    transition: transform 0.2s;
-}
-
-#btnLogout:active {
-    transform: scale(0.9);
-}
-
-/* SUMMARY */
 .summary {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-bottom: 20px;
 }
 
 .box {
-    background: #cfe2f3;
-    padding: 15px 10px;
-    border-radius: 16px;
-    text-align: center;
-    font-size: 13px;
+    background: #cfe2f3; padding: 15px 10px; border-radius: 16px;
+    text-align: center; font-size: 13px;
 }
 
 .box .val {
-    display: block;
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: 6px;
+    display: block; font-size: 16px; font-weight: bold; margin-top: 6px;
 }
 
-/* FORM */
-.form-group {
-    display: grid;
-    gap: 15px;
-}
-
-.form-item {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
-
-.form-item label {
-    margin-bottom: 6px;
-    font-weight: 600;
-    font-size: 14px;
-    color: #444;
-}
-
+.form-group { display: grid; gap: 15px; }
+.form-item { display: flex; flex-direction: column; text-align: left; }
+.form-item label { margin-bottom: 6px; font-weight: 600; font-size: 14px; color: #444; }
 .form-item input {
-    width: 100%;
-    padding: 12px 15px;
-    border-radius: 12px;
-    border: 1px solid #d1d5db;
-    font-size: 14px;
-    box-sizing: border-box;
-    height: 48px;
-    background-color: #fafafa;
-    transition: all 0.2s;
+    width: 100%; padding: 12px 15px; border-radius: 12px;
+    border: 1px solid #d1d5db; font-size: 14px; box-sizing: border-box;
+    height: 48px; background-color: #fafafa; transition: all 0.2s;
 }
+input:focus { outline: none; border: 2px solid #198754; background-color: #fff; }
 
-input:focus {
-    outline: none;
-    border: 2px solid #198754;
-    background-color: #fff;
-}
-
-/* KUSTOM DROPDOWN */
 .custom-select {
-    width: 100%;
-    padding: 12px 15px;
-    border-radius: 12px;
-    border: 1px solid #d1d5db;
-    font-size: 14px;
-    background: #fafafa;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    height: 48px;
-    box-sizing: border-box;
-    color: #333;
-    transition: all 0.2s;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    width: 100%; padding: 12px 15px; border-radius: 12px;
+    border: 1px solid #d1d5db; font-size: 14px; background: #fafafa;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; height: 48px; box-sizing: border-box; color: #333;
+    transition: all 0.2s; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
+.custom-select:active { background-color: #f1f1f1; }
+.custom-select .arrow { font-size: 12px; color: #888; margin-left: 10px; }
 
-.custom-select:active {
-    background-color: #f1f1f1;
-}
-
-.custom-select .arrow {
-    font-size: 12px;
-    color: #888;
-    margin-left: 10px;
-}
-
-/* BUTTON */
 button {
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-weight: bold;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
+    padding: 14px; border: none; border-radius: 12px; color: white;
+    font-weight: bold; font-size: 14px; cursor: pointer; transition: background-color 0.2s, transform 0.1s;
 }
-
-button:active {
-    transform: scale(0.98);
-}
-
+button:active { transform: scale(0.98); }
 .btn-add { background: #198754; }
 .btn-delete { background: #dc3545; }
 .btn-secondary { background: #f3f4f6; color: #374151; }
+.btn-group { display: flex; gap: 10px; margin-top: 15px; }
+.btn-group button { flex: 1; }
 
-.btn-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.btn-group button {
-    flex: 1;
-}
-
-/* ACTION ROW (Menu Tombol) */
 .action-row {
-    display: flex;
-    flex-wrap: nowrap; 
-    gap: 6px;
-    margin-bottom: 20px;
-    width: 100%;
+    display: flex; flex-wrap: nowrap; gap: 6px; margin-bottom: 20px; width: 100%;
 }
-
-.action-row > button, 
-.action-row > div {
-    flex: 1; 
-    min-width: 0; 
-}
-
+.action-row > button, .action-row > div { flex: 1; min-width: 0; }
 .action-row button {
-    width: 100%;
-    padding: 10px 0; 
-    border-radius: 10px;
-    font-size: 11px; 
-    font-weight: bold;
-    border: none;
-    color: white;
-    cursor: pointer;
-    box-sizing: border-box;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; 
+    width: 100%; padding: 10px 0; border-radius: 10px; font-size: 11px; 
+    font-weight: bold; border: none; color: white; cursor: pointer;
+    box-sizing: border-box; text-align: center; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; 
 }
+#saveMenu div:hover { background-color: #f1f1f1; border-radius: 8px; }
 
-#saveMenu div:hover {
-    background-color: #f1f1f1;
-    border-radius: 8px;
-}
-
-/* TABLE UMUM */
+/* TABLE STYLE */
 table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin-top: 15px;
-    font-size: 13px;
-    table-layout: fixed;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid #e5e7eb;
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    margin-top: 15px; font-size: 13px; table-layout: fixed;
+    border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb;
 }
-
-th {
-    background: #198754;
-    color: white;
-    padding: 12px 4px; 
-}
-
+th { background: #198754; color: white; padding: 12px 4px; }
 td {
-    padding: 12px 4px; 
-    border-bottom: 1px solid #e5e7eb;
-    text-align: center;
-    vertical-align: middle;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    padding: 12px 4px; border-bottom: 1px solid #e5e7eb;
+    text-align: center; vertical-align: middle; word-wrap: break-word; overflow-wrap: break-word;
 }
-
-tbody tr:last-child td {
-    border-bottom: none;
-}
-
-#tableData tbody tr, #tableBudget tbody tr, #tableSaving tbody tr, #tableLoan tbody tr {
-    cursor: pointer;
-    transition: background-color 0.2s;
-    background: white;
-}
-
-#tableData tbody tr:hover, #tableBudget tbody tr:hover, #tableSaving tbody tr:hover, #tableLoan tbody tr:hover {
-    background: #f9fafb;
-}
-
-#tableData tbody tr.selected, #tableBudget tbody tr.selected, #tableSaving tbody tr.selected, #tableLoan tbody tr.selected {
-    background-color: #d1e7dd !important;
-}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr { cursor: pointer; transition: background-color 0.2s; background: white; }
+tbody tr:hover { background: #f9fafb; }
+tbody tr.selected { background-color: #d1e7dd !important; }
 
 /* UKURAN KOLOM TABEL KHUSUS */
 #tableData th:nth-child(1), #tableData td:nth-child(1) { width: 22%; font-size: 12px; } 
@@ -292,733 +113,211 @@ tbody tr:last-child td {
 #tableViewBudget th:nth-child(3), #tableViewBudget td:nth-child(3) { width: 30%; text-align: right; padding-right: 8px; }
 #tableViewBudget tbody tr:nth-child(even) { background: #f9fafb; }
 
-#tableSaving th:nth-child(1), #tableSaving td:nth-child(1) { width: 50%; }
-#tableSaving th:nth-child(2), #tableSaving td:nth-child(2) { width: 50%; }
-
-#tableLoan th:nth-child(1), #tableLoan td:nth-child(1) { width: 22%; font-size: 11px; }
-#tableLoan th:nth-child(2), #tableLoan td:nth-child(2) { width: 40%; text-align: left; padding-left: 8px; }
-#tableLoan th:nth-child(3), #tableLoan td:nth-child(3) { width: 38%; text-align: right; padding-right: 8px; }
-
-#tableViewLoan { font-size: 12px; }
-#tableViewLoan tbody tr:nth-child(even) { background: #f9fafb; }
-
-/* GRAFIK / DASHBOARD FIX */
+/* GRAFIK / DASHBOARD */
 .canvas-container {
-    margin: 20px 0;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 16px;
-    border: 1px solid #e5e7eb;
-    position: relative;
-    width: 100%;
-    box-sizing: border-box;
+    margin: 20px 0; padding: 20px; background: #ffffff;
+    border-radius: 16px; border: 1px solid #e5e7eb; position: relative;
+    width: 100%; box-sizing: border-box;
 }
-
-.chart-wrapper {
-    position: relative;
-    height: 220px; /* Ukuran fixed agar grafik tidak blank saat di-render tersembunyi */
-    width: 100%;
-}
-
-h4 {
-    margin: 0 0 15px 0;
-    color: #198754;
-    text-align: center;
-}
+.chart-wrapper { position: relative; height: 220px; width: 100%; }
+h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
 
 /* NAVBAR */
 .navbar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #1f2937;
-    display: flex;
-    justify-content: space-around;
-    padding: 12px 0;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
-    z-index: 1000;
+    position: fixed; bottom: 0; left: 0; width: 100%; background: #1f2937;
+    display: flex; justify-content: space-around; padding: 15px 0;
+    border-top-left-radius: 20px; border-top-right-radius: 20px;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.1); z-index: 1000;
 }
-
 .nav-item {
-    text-align: center;
-    color: #9ca3af;
-    font-size: 11px; 
-    flex: 1;
-    cursor: pointer;
-    transition: color 0.2s;
-    white-space: nowrap;
+    text-align: center; color: #9ca3af; font-size: 13px; flex: 1;
+    cursor: pointer; transition: color 0.2s; white-space: nowrap;
 }
-
-.nav-item.active {
-    color: white;
-    font-weight: bold;
-}
+.nav-item.active { color: white; font-weight: bold; }
 
 /* GAYA POP-UP (MODAL) */
 .modal {
-    display: none; 
-    position: fixed; 
-    top: 0; left: 0; 
-    width: 100%; height: 100%; 
-    background: rgba(17, 24, 39, 0.6); 
-    backdrop-filter: blur(4px); 
-    z-index: 2000; 
-    justify-content: center; 
-    align-items: center;
-    padding: 20px;
-    box-sizing: border-box;
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(4px); z-index: 2000; 
+    justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
 }
-
 .modal-content {
-    background: #ffffff; 
-    padding: 25px 20px; 
-    border-radius: 20px; 
-    width: 100%; 
-    max-width: 400px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-    box-sizing: border-box;
-    max-height: 90vh;
-    overflow-y: auto;
+    background: #ffffff; padding: 25px 20px; border-radius: 20px; width: 100%; 
+    max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-sizing: border-box; max-height: 90vh; overflow-y: auto;
 }
+@keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.modal-content h3 { margin-top: 0; color: #111827; text-align: center; font-size: 1.25rem; margin-bottom: 20px; }
 
-@keyframes popIn {
-    0% { transform: scale(0.9); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.modal-content h3 {
-    margin-top: 0;
-    color: #111827;
-    text-align: center;
-    font-size: 1.25rem;
-    margin-bottom: 20px;
-}
-
-/* LIST ITEM DALAM MODAL */
-.custom-list {
-    max-height: 250px;
-    overflow-y: auto;
-    margin-top: 10px;
-    border: 1px solid #f3f4f6;
-    border-radius: 12px;
-}
-
+.custom-list { max-height: 250px; overflow-y: auto; margin-top: 10px; border: 1px solid #f3f4f6; border-radius: 12px; }
 .custom-item {
-    padding: 14px 15px;
-    border-bottom: 1px solid #f3f4f6;
-    font-size: 15px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: #374151;
-    transition: background 0.2s;
+    padding: 14px 15px; border-bottom: 1px solid #f3f4f6; font-size: 15px; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; color: #374151; transition: background 0.2s;
 }
-
-.custom-item:hover {
-    background-color: #f9fafb;
-}
-
-.custom-item:active {
-    background-color: #f3f4f6;
-}
-
-.custom-item:last-child {
-    border-bottom: none;
-}
-
-.custom-item.selected {
-    background-color: #f0fdf4;
-    color: #166534;
-    font-weight: 600;
-}
-
-.custom-item .check {
-    color: #16a34a;
-    font-weight: bold;
-    font-size: 1.1rem;
-}
+.custom-item:hover { background-color: #f9fafb; }
+.custom-item:active { background-color: #f3f4f6; }
+.custom-item:last-child { border-bottom: none; }
+.custom-item.selected { background-color: #f0fdf4; color: #166534; font-weight: 600; }
+.custom-item .check { color: #16a34a; font-weight: bold; font-size: 1.1rem; }
 
 /* NOTIFIKASI TOAST HALUS */
 #toast {
-    visibility: hidden;
-    min-width: 250px;
-    background-color: #1f2937;
-    color: #fff;
-    text-align: center;
-    border-radius: 10px;
-    padding: 14px;
-    position: fixed;
-    z-index: 3000;
-    left: 50%;
-    bottom: 90px;
-    transform: translateX(-50%);
-    font-size: 13px;
-    font-weight: 500;
-    opacity: 0;
-    transition: opacity 0.3s, visibility 0.3s;
+    visibility: hidden; min-width: 250px; background-color: #1f2937; color: #fff; text-align: center;
+    border-radius: 10px; padding: 14px; position: fixed; z-index: 3000; left: 50%; bottom: 90px;
+    transform: translateX(-50%); font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.3s, visibility 0.3s;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
-
-#toast.show {
-    visibility: visible;
-    opacity: 1;
-}
+#toast.show { visibility: visible; opacity: 1; }
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 </head>
-
 <body>
 
 <div id="toast">Notifikasi</div>
 
-<!-- LAYAR LOGIN -->
-<div id="login-screen">
-    <div class="login-box">
-        <h2 style="color: #198754; margin-bottom: 5px;">Aplikasi Keuangan</h2>
-        <p style="color: #6b7280; font-size: 13px; margin-bottom: 25px; margin-top: 0;">Silakan login untuk melanjutkan</p>
-        
-        <div class="form-group">
-            <div class="form-item">
-                <label>Email</label>
-                <input type="email" id="authEmail" placeholder="Masukkan email anda">
-            </div>
-            <div class="form-item">
-                <label>Password</label>
-                <input type="password" id="authPassword" placeholder="Masukkan password">
-            </div>
-        </div>
-        
-        <div class="btn-group" style="flex-direction: column; gap: 10px; margin-top: 25px;">
-            <button class="btn-add" onclick="login()">Masuk / Login</button>
-            <button class="btn-secondary" onclick="register()">Daftar Akun Baru</button>
-        </div>
+<div id="confirmModal" class="modal">
+    <div class="modal-content" style="text-align: center;">
+        <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
+        <p style="color: #6b7280; font-size: 14px; margin-top: 0; margin-bottom: 25px;">Tindakan ini tidak dapat dibatalkan.</p>
+        <div class="btn-group"><button class="btn-secondary" id="btnConfirmNo">Batal</button><button class="btn-delete" id="btnConfirmYes">Ya, Hapus</button></div>
     </div>
 </div>
 
-<!-- CONTAINER UTAMA APLIKASI -->
-<div id="main-app">
+<div id="categoryModal" class="modal"><div class="modal-content"><h3>Pilih Kategori</h3><div id="categoryList" class="custom-list"></div><button class="btn-secondary" onclick="closeCategoryPicker()" style="width: 100%; margin-top: 20px;">Batal</button></div></div>
+<div id="typeModal" class="modal"><div class="modal-content"><h3>Pilih Tipe</h3><div id="typeList" class="custom-list"></div><button class="btn-secondary" onclick="closeTypePicker()" style="width: 100%; margin-top: 20px;">Batal</button></div></div>
 
-    <!-- MODAL KONFIRMASI -->
-    <div id="confirmModal" class="modal">
-        <div class="modal-content" style="text-align: center;">
-            <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
-            <p style="color: #6b7280; font-size: 14px; margin-top: 0; margin-bottom: 25px;">Tindakan ini tidak dapat dibatalkan.</p>
-            <div class="btn-group">
-                <button class="btn-secondary" id="btnConfirmNo">Batal</button>
-                <button class="btn-delete" id="btnConfirmYes">Ya, Hapus</button>
-            </div>
-        </div>
+<div id="descModal" class="modal">
+    <div class="modal-content">
+        <h3>Keterangan Transaksi</h3>
+        <input type="text" id="customDescInput" placeholder="Ketik keterangan baru di sini..." style="margin-bottom: 10px; border-color: #198754; box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.1);">
+        <p style="font-size: 12px; color: #6b7280; font-weight: 600; margin: 15px 0 5px 0;">Atau pilih dari riwayat:</p>
+        <div id="descList" class="custom-list" style="margin-top: 0; max-height: 180px;"></div>
+        <div class="btn-group"><button class="btn-secondary" onclick="closeDescPicker()">Batal</button><button class="btn-add" onclick="applyCustomDesc()">Simpan</button></div>
+    </div>
+</div>
+
+<div class="container" id="printArea">
+    <h2 id="judul">DASHBOARD</h2>
+
+    <div id="menu-dashboard" style="display:block;"> 
+        <div class="canvas-container"><h4>Pengeluaran Harian</h4><div class="chart-wrapper" id="wrapperHarian"><canvas id="chartHarian"></canvas></div></div>
+        <div class="canvas-container"><h4>Pengeluaran Bulanan</h4><div class="chart-wrapper" id="wrapperBulanan"><canvas id="chartBulanan"></canvas></div></div>
+        <div class="canvas-container"><h4>Pengeluaran per Kategori</h4><div class="chart-wrapper" id="wrapperKategori"><canvas id="chartKategori"></canvas></div></div>
     </div>
 
-    <!-- MODAL PILIH KATEGORI -->
-    <div id="categoryModal" class="modal">
-        <div class="modal-content">
-            <h3>Pilih Kategori</h3>
-            <div id="categoryList" class="custom-list"></div>
-            <button class="btn-secondary" onclick="closeCategoryPicker()" style="width: 100%; margin-top: 20px;">Batal</button>
+    <div id="menu-ringkasan" style="display:none;">
+        <div class="summary">
+            <div class="box">Pemasukan:<div class="val">Rp <span id="income">0</span></div></div>
+            <div class="box">Pengeluaran:<div class="val">Rp <span id="expense">0</span></div></div>
+            <div class="box">Saldo Akhir:<div class="val">Rp <span id="balance">0</span></div></div>
         </div>
+        <h3 style="text-align: center; margin-top: 25px; margin-bottom: 15px; color: #374151;">Data Transaksi</h3>
+        <div class="action-row" id="actionRowContainer">
+            <button style="background: #6b7280;" onclick="toggleFilter()">Sortir ▾</button>
+            <button style="background: #0d6efd;" onclick="selectAllRows()">Pilih Semua</button>
+            <button style="background: #f59e0b; color: white;" onclick="editSelected()">Edit</button>
+            <div style="position: relative;">
+                <button id="btnSimpan" style="background: #10b981;" onclick="toggleSaveMenu()">Simpan ▾</button>
+                <div id="saveMenu" style="display:none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 5px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 100; text-align: center; margin-top: 8px;">
+                    <div onclick="savePDF()" style="padding: 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #374151; font-weight: 500;">Ke PDF</div>
+                    <div onclick="saveExcel()" style="padding: 12px; cursor: pointer; font-size: 13px; color: #374151; font-weight: 500;">Ke Excel</div>
+                </div>
+            </div>
+            <button style="background: #ef4444;" onclick="deleteSelected()">Hapus</button>
+        </div>
+        <div id="filterContainer" style="display: none; background: #f3f4f6; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: left;">
+            <label style="font-size: 13px; font-weight: 600; color: #4b5563;">Tampilkan Berdasarkan Waktu:</label>
+            <select id="filterSelect" onchange="handleFilterChange()" style="width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 13px; height: 40px; background: white;">
+                <option value="all">Semua Waktu</option><option value="daily">Harian (Hari Ini)</option><option value="weekly">Mingguan (7 Hari Terakhir)</option><option value="monthly">Bulanan (Bulan Ini)</option><option value="custom">Pilih Tanggal Sendiri</option>
+            </select>
+            <div id="customDateContainer" style="display: none; margin-top: 15px;">
+                <label style="font-size: 12px; font-weight: 600; color: #4b5563;">Rentang Tanggal:</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                    <input type="date" id="filterStartDate" onchange="applyFilter()" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 12px; height: 40px;">
+                    <input type="date" id="filterEndDate" onchange="applyFilter()" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 12px; height: 40px;">
+                </div>
+            </div>
+        </div>
+        <table id="tableData"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Tipe</th><th>Jumlah</th></tr></thead><tbody></tbody></table>
     </div>
 
-    <!-- MODAL PILIH TIPE (TRANSAKSI) -->
-    <div id="typeModal" class="modal">
-        <div class="modal-content">
-            <h3>Pilih Tipe</h3>
-            <div id="typeList" class="custom-list"></div>
-            <button class="btn-secondary" onclick="closeTypePicker()" style="width: 100%; margin-top: 20px;">Batal</button>
+    <div id="menu-transaksi" style="display:none;">
+        <div class="form-group">
+            <div class="form-item"><label>Tanggal</label><input type="date" id="date"></div>
+            <div class="form-item"><label>Keterangan</label><div class="custom-select" onclick="openDescPicker('add')"><span id="selectedDescText" style="color: #888;">Ketik atau pilih keterangan...</span><span class="arrow">▼</span></div><input type="hidden" id="desc"></div>
+            <div class="form-item"><label>Kategori</label><div class="custom-select" onclick="openCategoryPicker('add')"><span id="selectedCategoryText">Pilih Kategori</span><span class="arrow">▼</span></div><input type="hidden" id="category"></div>
+            <div class="form-item"><label>Tipe</label><div class="custom-select" onclick="openTypePicker('add')"><span id="selectedTypeText">Pengeluaran</span><span class="arrow">▼</span></div><input type="hidden" id="type" value="expense"></div>
+            <div class="form-item"><label>Jumlah (Rp)</label><input type="text" inputmode="numeric" id="amount" placeholder="0" oninput="formatInputRupiah(this)"></div>
         </div>
+        <div class="btn-group"><button class="btn-add" onclick="addData()">Tambah Transaksi</button></div>
     </div>
 
-    <!-- MODAL PILIH TIPE (PINJAMAN) -->
-    <div id="loanTypeModal" class="modal">
-        <div class="modal-content">
-            <h3>Tipe Pinjaman</h3>
-            <div id="loanTypeList" class="custom-list"></div>
-            <button class="btn-secondary" onclick="closeLoanTypePicker()" style="width: 100%; margin-top: 20px;">Batal</button>
+    <div id="menu-anggaran" style="display:none;">
+        <div class="summary" style="margin-bottom: 25px;">
+            <div class="box" style="background: #f3f4f6;">Total Limit:<div class="val" style="color: #374151;">Rp <span id="totBudgetLimit">0</span></div></div>
+            <div class="box" style="background: #fee2e2;">Terpakai:<div class="val" style="color: #b91c1c;">Rp <span id="totBudgetUsed">0</span></div></div>
+            <div class="box" style="background: #d1fae5;">Sisa:<div class="val" style="color: #047857;">Rp <span id="totBudgetRemaining">0</span></div></div>
         </div>
+        <div class="form-group">
+            <div class="form-item"><label>Kategori</label><input type="text" id="budgetCategory" placeholder="Misal: Makanan, Transport"></div>
+            <div class="form-item"><label>Limit Anggaran (Rp)</label><input type="text" inputmode="numeric" id="budgetAmount" placeholder="0" oninput="formatInputRupiah(this)"></div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addBudget()">Tambah</button>
+            <button style="background: #f59e0b; color: white; padding: 12px 5px; font-size: 12px;" onclick="editBudgetSelected()">Edit</button>
+            <button style="background: #3b82f6; color: white; padding: 12px 5px; font-size: 12px;" onclick="viewBudgetDetails()">Lihat</button>
+            <button class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteBudgetSelected()">Hapus</button>
+        </div>
+        <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Anggaran</h3>
+        <table id="tableBudget"><thead><tr><th>Kategori</th><th>Limit</th><th>Terpakai</th><th>Sisa</th></tr></thead><tbody></tbody></table>
     </div>
 
-    <!-- MODAL KETERANGAN -->
-    <div id="descModal" class="modal">
-        <div class="modal-content">
-            <h3>Keterangan Transaksi</h3>
-            <input type="text" id="customDescInput" placeholder="Ketik keterangan baru di sini..." style="margin-bottom: 10px; border-color: #198754; box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.1);">
-            <p style="font-size: 12px; color: #6b7280; font-weight: 600; margin: 15px 0 5px 0;">Atau pilih dari riwayat:</p>
-            <div id="descList" class="custom-list" style="margin-top: 0; max-height: 180px;"></div>
-            <div class="btn-group">
-                <button class="btn-secondary" onclick="closeDescPicker()">Batal</button>
-                <button class="btn-add" onclick="applyCustomDesc()">Simpan</button>
-            </div>
+</div> <div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3>Edit Transaksi</h3>
+        <div class="form-group">
+            <div class="form-item"><label>Tanggal</label><input type="date" id="editDate"></div>
+            <div class="form-item"><label>Keterangan</label><div class="custom-select" onclick="openDescPicker('edit')"><span id="selectedEditDescText"></span><span class="arrow">▼</span></div><input type="hidden" id="editDesc"></div>
+            <div class="form-item"><label>Kategori</label><div class="custom-select" onclick="openCategoryPicker('edit')"><span id="selectedEditCategoryText">Pilih Kategori</span><span class="arrow">▼</span></div><input type="hidden" id="editCategory"></div>
+            <div class="form-item"><label>Tipe</label><div class="custom-select" onclick="openTypePicker('edit')"><span id="selectedEditTypeText">Pengeluaran</span><span class="arrow">▼</span></div><input type="hidden" id="editType"></div>
+            <div class="form-item"><label>Jumlah (Rp)</label><input type="text" inputmode="numeric" id="editAmount" oninput="formatInputRupiah(this)"></div>
         </div>
+        <div class="btn-group"><button class="btn-secondary" onclick="closeEditModal()">Batal</button><button class="btn-add" onclick="saveEdit()">Simpan</button></div>
     </div>
+</div>
 
-    <!-- MODAL LIHAT RINCIAN ANGGARAN -->
-    <div id="viewBudgetModal" class="modal">
-        <div class="modal-content" style="max-width: 450px;">
-            <h3 id="viewBudgetTitle" style="margin-bottom: 10px;">Rincian Anggaran</h3>
-            <p id="viewBudgetTotal" style="text-align: center; color: #b91c1c; font-weight: bold; margin-top: 0; margin-bottom: 15px;">Total: Rp 0</p>
-            
-            <div style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
-                <table id="tableViewBudget">
-                    <thead>
-                        <tr>
-                            <th>Tanggal</th>
-                            <th style="text-align: left; padding-left: 8px;">Keterangan</th>
-                            <th style="text-align: right; padding-right: 8px;">Jumlah</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <p id="viewBudgetEmpty" style="text-align: center; font-size: 13px; color: #6b7280; display: none; margin-top: 20px;">Belum ada pengeluaran untuk kategori ini.</p>
-            </div>
-            <button class="btn-secondary" onclick="closeViewBudgetModal()" style="width: 100%;">Tutup</button>
+<div id="editBudgetModal" class="modal">
+    <div class="modal-content">
+        <h3>Edit Anggaran</h3>
+        <div class="form-group">
+            <div class="form-item"><label>Kategori</label><input type="text" id="editBudgetCategoryInput"></div>
+            <div class="form-item"><label>Limit Anggaran (Rp)</label><input type="text" inputmode="numeric" id="editBudgetAmount" oninput="formatInputRupiah(this)"></div>
         </div>
+        <div class="btn-group"><button class="btn-secondary" onclick="closeEditBudgetModal()">Batal</button><button class="btn-add" onclick="saveEditBudget()">Simpan</button></div>
     </div>
+</div>
 
-    <!-- MODAL LIHAT RINCIAN PINJAMAN & CICILAN -->
-    <div id="viewLoanModal" class="modal">
-        <div class="modal-content" style="max-width: 450px;">
-            <h3 id="viewLoanTitle" style="margin-bottom: 10px;">Rincian Pinjaman</h3>
-            
-            <div class="summary" style="grid-template-columns: 1fr 1fr; margin-bottom: 15px;">
-                <div class="box" style="background: #f3f4f6; padding: 10px;">Total:<br><span id="viewLoanTotal" style="color: #374151;">Rp 0</span></div>
-                <div class="box" style="background: #d1fae5; padding: 10px;">Sisa:<br><span id="viewLoanRemaining" style="color: #047857;">Rp 0</span></div>
-            </div>
-
-            <!-- FORM TAMBAH CICILAN -->
-            <div style="background: #f9fafb; padding: 12px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 13px; color: #444; text-align: left;">Catat Cicilan Baru</h4>
-                <div style="display: flex; gap: 8px;">
-                    <input type="date" id="instDate" style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; height: 35px;">
-                    <input type="text" id="instAmount" placeholder="Jumlah (Rp)" inputmode="numeric" oninput="formatInputRupiah(this)" style="flex: 1.2; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; height: 35px; box-sizing: border-box;">
-                    <button style="background: #198754; color: white; border: none; border-radius: 8px; padding: 0 12px; font-weight: bold; font-size: 12px; cursor: pointer; height: 35px;" onclick="addInstallment()">Simpan</button>
-                </div>
-            </div>
-            
-            <div style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;">
-                <table id="tableViewLoan">
-                    <thead>
-                        <tr>
-                            <th style="width: 30%;">Tanggal</th>
-                            <th style="text-align: right; padding-right: 8px;">Jumlah Cicilan</th>
-                            <th style="width: 35px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <p id="viewLoanEmpty" style="text-align: center; font-size: 12px; color: #6b7280; display: none; margin-top: 15px;">Belum ada data cicilan dibayar.</p>
-            </div>
-            <button class="btn-secondary" onclick="closeViewLoanModal()" style="width: 100%;">Tutup</button>
+<div id="viewBudgetModal" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+        <h3 id="viewBudgetTitle" style="margin-bottom: 10px;">Rincian Anggaran</h3>
+        <p id="viewBudgetTotal" style="text-align: center; color: #b91c1c; font-weight: bold; margin-top: 0; margin-bottom: 15px;">Total: Rp 0</p>
+        <div style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
+            <table id="tableViewBudget"><thead><tr><th>Tanggal</th><th style="text-align: left; padding-left: 8px;">Keterangan</th><th style="text-align: right; padding-right: 8px;">Jumlah</th></tr></thead><tbody></tbody></table>
+            <p id="viewBudgetEmpty" style="text-align: center; font-size: 13px; color: #6b7280; display: none; margin-top: 20px;">Belum ada pengeluaran.</p>
         </div>
+        <button class="btn-secondary" onclick="closeViewBudgetModal()" style="width: 100%;">Tutup</button>
     </div>
+</div>
 
-
-    <div class="container" id="printArea">
-        
-        <!-- IKON LOGOUT (Khusus Dashboard) -->
-        <button id="btnLogout" onclick="logout()" title="Logout">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-        </button>
-
-        <!-- JUDUL UTAMA TENGAH -->
-        <h2 id="judul">DASHBOARD</h2>
-
-        <!-- MENU RINGKASAN -->
-        <div id="menu-ringkasan" style="display:none;">
-            <div class="summary">
-                <div class="box">Pemasukan:<div class="val">Rp <span id="income">0</span></div></div>
-                <div class="box">Pengeluaran:<div class="val">Rp <span id="expense">0</span></div></div>
-                <div class="box">Saldo Akhir:<div class="val">Rp <span id="balance">0</span></div></div>
-            </div>
-
-            <h3 style="text-align: center; margin-top: 25px; margin-bottom: 15px; color: #374151;">Data Transaksi</h3>
-            
-            <div class="action-row" id="actionRowContainer">
-                <button style="background: #6b7280;" onclick="toggleFilter()">Sortir ▾</button>
-                <button style="background: #0d6efd;" onclick="selectAllRows()">Pilih Semua</button>
-                <button style="background: #f59e0b; color: white;" onclick="editSelected()">Edit</button>
-                
-                <div style="position: relative;">
-                    <button id="btnSimpan" style="background: #10b981;" onclick="toggleSaveMenu()">Simpan ▾</button>
-                    <div id="saveMenu" style="display:none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 5px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 100; text-align: center; margin-top: 8px;">
-                        <div onclick="savePDF()" style="padding: 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #374151; font-weight: 500;">Ke PDF</div>
-                        <div onclick="saveExcel()" style="padding: 12px; cursor: pointer; font-size: 13px; color: #374151; font-weight: 500;">Ke Excel</div>
-                    </div>
-                </div>
-
-                <button style="background: #ef4444;" onclick="deleteSelected()">Hapus</button>
-            </div>
-                
-            <div id="filterContainer" style="display: none; background: #f3f4f6; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: left;">
-                <label style="font-size: 13px; font-weight: 600; color: #4b5563;">Tampilkan Berdasarkan Waktu:</label>
-                <select id="filterSelect" onchange="handleFilterChange()" style="width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 13px; height: 40px; background: white;">
-                    <option value="all">Semua Waktu</option>
-                    <option value="daily">Harian (Hari Ini)</option>
-                    <option value="weekly">Mingguan (7 Hari Terakhir)</option>
-                    <option value="monthly">Bulanan (Bulan Ini)</option>
-                    <option value="custom">Pilih Tanggal Sendiri</option>
-                </select>
-
-                <div id="customDateContainer" style="display: none; margin-top: 15px;">
-                    <label style="font-size: 12px; font-weight: 600; color: #4b5563;">Rentang Tanggal:</label>
-                    <div style="display: flex; gap: 10px; margin-top: 8px;">
-                        <input type="date" id="filterStartDate" onchange="applyFilter()" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 12px; height: 40px;">
-                        <input type="date" id="filterEndDate" onchange="applyFilter()" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 12px; height: 40px;">
-                    </div>
-                </div>
-            </div>
-
-            <table id="tableData">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Keterangan</th>
-                        <th>Tipe</th>
-                        <th>Jumlah</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih transaksi</p>
-        </div>
-
-        <!-- MENU TRANSAKSI -->
-        <div id="menu-transaksi" style="display:none;">
-            <div class="form-group">
-                <div class="form-item">
-                    <label>Tanggal</label>
-                    <input type="date" id="date">
-                </div>
-                
-                <div class="form-item">
-                    <label>Keterangan</label>
-                    <div class="custom-select" onclick="openDescPicker('add')">
-                        <span id="selectedDescText" style="color: #888;">Ketik atau pilih keterangan...</span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <input type="hidden" id="desc">
-                </div>
-
-                <div class="form-item">
-                    <label>Kategori</label>
-                    <div class="custom-select" onclick="openCategoryPicker('add')">
-                        <span id="selectedCategoryText">Pilih Kategori</span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <input type="hidden" id="category">
-                </div>
-                
-                <div class="form-item">
-                    <label>Tipe</label>
-                    <div class="custom-select" onclick="openTypePicker('add')">
-                        <span id="selectedTypeText">Pengeluaran</span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <input type="hidden" id="type" value="expense">
-                </div>
-
-                <div class="form-item">
-                    <label>Jumlah (Rp)</label>
-                    <input type="text" inputmode="numeric" id="amount" placeholder="0" oninput="formatInputRupiah(this)">
-                </div>
-            </div>
-
-            <div class="btn-group">
-                <button class="btn-add" onclick="addData()">Tambah Transaksi</button>
-            </div>
-        </div>
-
-        <!-- MENU ANGGARAN -->
-        <div id="menu-anggaran" style="display:none;">
-            <div class="summary" style="margin-bottom: 25px;">
-                <div class="box" style="background: #f3f4f6;">Total Limit:<div class="val" style="color: #374151;">Rp <span id="totBudgetLimit">0</span></div></div>
-                <div class="box" style="background: #fee2e2;">Terpakai:<div class="val" style="color: #b91c1c;">Rp <span id="totBudgetUsed">0</span></div></div>
-                <div class="box" style="background: #d1fae5;">Sisa:<div class="val" style="color: #047857;">Rp <span id="totBudgetRemaining">0</span></div></div>
-            </div>
-
-            <div class="form-group">
-                <div class="form-item">
-                    <label>Kategori</label>
-                    <input type="text" id="budgetCategory" placeholder="Misal: Makanan, Transport">
-                </div>
-                <div class="form-item">
-                    <label>Limit Anggaran (Rp)</label>
-                    <input type="text" inputmode="numeric" id="budgetAmount" placeholder="0" oninput="formatInputRupiah(this)">
-                </div>
-            </div>
-
-            <div class="btn-group">
-                <button class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addBudget()">Tambah</button>
-                <button style="background: #f59e0b; color: white; padding: 12px 5px; font-size: 12px;" onclick="editBudgetSelected()">Edit</button>
-                <button style="background: #3b82f6; color: white; padding: 12px 5px; font-size: 12px;" onclick="viewBudgetDetails()">Lihat</button>
-                <button class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteBudgetSelected()">Hapus</button>
-            </div>
-
-            <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Anggaran</h3>
-            <table id="tableBudget">
-                <thead>
-                    <tr>
-                        <th>Kategori</th>
-                        <th>Limit</th>
-                        <th>Terpakai</th>
-                        <th>Sisa</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih anggaran</p>
-        </div>
-
-        <!-- MENU DASHBOARD -->
-        <div id="menu-dashboard" style="display:block;"> <!-- Tampil default setelah login -->
-            
-            <div class="canvas-container">
-                <h4>Pengeluaran Harian</h4>
-                <!-- Wrapper id digunakan untuk reset canvas agar tidak blank/0px saat load di background -->
-                <div class="chart-wrapper" id="wrapperHarian"><canvas id="chartHarian"></canvas></div>
-            </div>
-
-            <div class="canvas-container">
-                <h4>Pengeluaran Bulanan</h4>
-                <div class="chart-wrapper" id="wrapperBulanan"><canvas id="chartBulanan"></canvas></div>
-            </div>
-
-            <div class="canvas-container">
-                <h4>Pengeluaran per Kategori</h4>
-                <div class="chart-wrapper" id="wrapperKategori"><canvas id="chartKategori"></canvas></div>
-            </div>
-            
-        </div>
-
-        <!-- MENU NABUNG -->
-        <div id="menu-nabung" style="display:none;">
-            <div class="summary" style="margin-bottom: 25px; grid-template-columns: 1fr;">
-                <div class="box" style="background: #d1e7dd;">Total Tabungan:<div class="val" style="color: #0f5132;">Rp <span id="totSavings">0</span></div></div>
-            </div>
-
-            <div class="form-group">
-                <div class="form-item">
-                    <label>Tanggal Masuk</label>
-                    <input type="date" id="savingDate">
-                </div>
-                <div class="form-item">
-                    <label>Jumlah Uang (Rp)</label>
-                    <input type="text" inputmode="numeric" id="savingAmount" placeholder="0" oninput="formatInputRupiah(this)">
-                </div>
-            </div>
-
-            <div class="btn-group">
-                <button class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addSaving()">Tambah</button>
-                <button style="background: #f59e0b; color: white; padding: 12px 5px; font-size: 12px;" onclick="editSavingSelected()">Edit</button>
-                <button class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteSavingSelected()">Hapus</button>
-            </div>
-
-            <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Tabungan</h3>
-            <table id="tableSaving">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Jumlah (Rp)</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih tabungan</p>
-        </div>
-
-        <!-- MENU PINJAMAN -->
-        <div id="menu-pinjaman" style="display:none;">
-            <div class="summary" style="margin-bottom: 25px; grid-template-columns: 1fr 1fr;">
-                <div class="box" style="background: #cfe2f3;">Sisa Dipinjamkan:<div class="val" style="color: #0d6efd;">Rp <span id="totLent">0</span></div></div>
-                <div class="box" style="background: #f8d7da;">Sisa Utang Saya:<div class="val" style="color: #b91c1c;">Rp <span id="totBorrowed">0</span></div></div>
-            </div>
-
-            <div class="form-group">
-                <div class="form-item">
-                    <label>Tanggal</label>
-                    <input type="date" id="loanDate">
-                </div>
-                <div class="form-item">
-                    <label>Nama Orang / Pihak</label>
-                    <input type="text" id="loanPerson" placeholder="Contoh: Budi, Bank, dll">
-                </div>
-                <div class="form-item">
-                    <label>Tipe Pinjaman</label>
-                    <div class="custom-select" onclick="openLoanTypePicker('add')">
-                        <span id="selectedLoanTypeText" style="color: #333;">Saya Meminjamkan (Piutang)</span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <input type="hidden" id="loanType" value="lent">
-                </div>
-                <div class="form-item">
-                    <label>Jumlah Uang (Rp)</label>
-                    <input type="text" inputmode="numeric" id="loanAmount" placeholder="0" oninput="formatInputRupiah(this)">
-                </div>
-            </div>
-
-            <div class="btn-group">
-                <button class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addLoan()">Tambah</button>
-                <button style="background: #f59e0b; color: white; padding: 12px 5px; font-size: 12px;" onclick="editLoanSelected()">Edit</button>
-                <button style="background: #3b82f6; color: white; padding: 12px 5px; font-size: 12px;" onclick="viewLoanDetails()">Lihat</button>
-                <button class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteLoanSelected()">Hapus</button>
-            </div>
-
-            <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Pinjaman</h3>
-            <table id="tableLoan">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th style="text-align: left; padding-left: 8px;">Nama & Tipe</th>
-                        <th style="text-align: right; padding-right: 8px;">Jumlah & Sisa</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 10px;">*Ketuk baris untuk memilih pinjaman</p>
-        </div>
-    </div> 
-
-    <!-- Modal Edit Transaksi -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <h3>Edit Transaksi</h3>
-            <div class="form-group">
-                <div class="form-item">
-                    <label>Tanggal</label>
-                    <input type="date" id="editDate">
-                </div>
-                <div class="form-item">
-                    <label>Keterangan</label>
-                    <div class="custom-select" onclick="openDescPicker('edit')">
-                        <span id="selectedEditDescText"></span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <input type="hidden" id="editDesc">
-                </div>
-                <div class="form-item">
-                    <label>Kategori</label>
-                    <div class="custom-select" onclick="openCategoryPicker('edit')">
-                        <span id="selectedEditCategoryText">Pilih Kategori</span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <input type="hidden" id="editCategory">
-                </div>
-                <div class="form-item">
-                    <label>Tipe</label>
-                    <div class="custom-select" onclick="openTypePicker('edit')">
-                        <span id="selectedEditTypeText">Pengeluaran</span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <input type="hidden" id="editType">
-                </div>
-                <div class="form-item">
-                    <label>Jumlah (Rp)</label>
-                    <input type="text" inputmode="numeric" id="editAmount" oninput="formatInputRupiah(this)">
-                </div>
-            </div>
-            <div class="btn-group">
-                <button class="btn-secondary" onclick="closeEditModal()">Batal</button>
-                <button class="btn-add" onclick="saveEdit()">Simpan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit Anggaran -->
-    <div id="editBudgetModal" class="modal">
-        <div class="modal-content">
-            <h3>Edit Anggaran</h3>
-            <div class="form-group">
-                <div class="form-item">
-                    <label>Kategori</label>
-                    <input type="text" id="editBudgetCategoryInput">
-                </div>
-                <div class="form-item">
-                    <label>Limit Anggaran (Rp)</label>
-                    <input type="text" inputmode="numeric" id="editBudgetAmount" oninput="formatInputRupiah(this)">
-                </div>
-            </div>
-            <div class="btn-group">
-                <button class="btn-secondary" onclick="closeEditBudgetModal()">Batal</button>
-                <button class="btn-add" onclick="saveEditBudget()">Simpan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit Tabungan -->
-    <div id="editSavingModal" class="modal">
-        <div class="modal-content">
-            <h3>Edit Tabungan</h3>
-            <div class="form-group">
-                <div class="form-item">
-                    <label>Tanggal</label>
-                    <input type="date" id="editSavingDate">
-                </div>
-                <div class="form-item">
-                    <label>Jumlah Uang (Rp)</label>
-                    <input type="text" inputmode="numeric" id="editSavingAmount" oninput="formatInputRupiah(this)">
-                </div>
-            </div>
-            <div class="btn-group">
-                <button class="btn-secondary" onclick="closeEditSavingModal()">Batal</button>
-                <button class="btn-add" onclick="saveEditSaving()">Simpan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit Pinjaman -->
-    <div id="editLoanModal" class="modal">
-        <div class="modal-content">
-            <h3>Edit Pinjaman</h3>
-            <div class="form-group">
-                <div class="form-item">
-                    <label>Tanggal</label>
-                    <input type="date" id="editLoanDate">
-                </div>
-                <div class="form-item">
-                    <label>Nama Orang / Pihak</label>
-                    <input type="text" id="editLoanPerson">
-                </div>
-                <div class="form-item">
-                    <label>Tipe Pinjaman</label>
-                    <div class="custom-select" onclick="openLoanTypePicker('edit')">
-                        <span id="selectedEditLoanTypeText"></span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <input type="hidden" id="editLoanType">
-                </div>
-                <div class="form-item">
-                    <label>Jumlah Uang (Rp)</label>
-                    <input type="text" inputmode="numeric" id="editLoanAmount" oninput="formatInputRupiah(this)">
-                </div>
-            </div>
-            <div class="btn-group">
-                <button class="btn-secondary" onclick="closeEditLoanModal()">Batal</button>
-                <button class="btn-add" onclick="saveEditLoan()">Simpan</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="navbar">
-        <div class="nav-item" data-index="0">Transaksi</div>
-        <div class="nav-item" data-index="1">Ringkasan</div>
-        <div class="nav-item" data-index="2">Anggaran</div>
-        <div class="nav-item active" data-index="3">Dashboard</div>
-        <div class="nav-item" data-index="4">Nabung</div>
-        <div class="nav-item" data-index="5">Pinjaman</div>
-    </div>
-</div> <!-- End of main-app -->
+<div class="navbar">
+    <div class="nav-item" data-index="0">Transaksi</div>
+    <div class="nav-item" data-index="1">Ringkasan</div>
+    <div class="nav-item" data-index="2">Anggaran</div>
+    <div class="nav-item active" data-index="3">Dashboard</div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1041,1221 +340,289 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Data utama
 let data = [];
 let budgets = [];
-let savings = [];
-let loans = [];
-let installments = [];
-
 let chartHarian, chartBulanan, chartKategori;
 let selectedIds = []; 
 let editTargetId = null; 
 let selectedBudgetCategory = null; 
 let editBudgetOldCategory = null; 
-let selectedSavingId = null; 
-let selectedLoanId = null;
 
 let categoryPickerTarget = 'add'; 
 let typePickerTarget = 'add';
 let descPickerTarget = 'add';
-let loanTypePickerTarget = 'add';
 
-// =====================
-// AUTENTIKASI FIREBASE (LOGIN/REGISTER)
-// =====================
-function login() {
-    const email = document.getElementById('authEmail').value.trim();
-    const pass = document.getElementById('authPassword').value;
-    
-    if(!email || !pass) {
-        return showToast("Harap isi email dan password!");
-    }
-    
-    showToast("Mencoba login...");
-    firebase.auth().signInWithEmailAndPassword(email, pass)
-        .then((userCredential) => {
-            showToast("Login berhasil!");
-        })
-        .catch((error) => {
-            console.error("Login Error:", error);
-            showToast("Gagal: " + error.message);
-        });
-}
-
-function register() {
-    const email = document.getElementById('authEmail').value.trim();
-    const pass = document.getElementById('authPassword').value;
-    
-    if(!email || !pass) {
-        return showToast("Harap isi email dan password!");
-    }
-    
-    showToast("Mendaftarkan akun...");
-    firebase.auth().createUserWithEmailAndPassword(email, pass)
-        .then((userCredential) => {
-            showToast("Akun berhasil dibuat dan login!");
-        })
-        .catch((error) => {
-            console.error("Register Error:", error);
-            showToast("Gagal: " + error.message);
-        });
-}
-
-function logout() {
-    showConfirm("Yakin ingin logout?", () => {
-        firebase.auth().signOut().then(() => {
-            showToast("Berhasil logout.");
-            setTimeout(() => window.location.reload(), 1000); 
-        });
-    });
-}
-
-// Pantau status login
-firebase.auth().onAuthStateChanged(user => {
-    if (user) {
-        // Jika sudah login
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
-        loadFirebaseData(); 
-        
-        // Pindah ke Dashboard secara otomatis
-        document.querySelector('.nav-item[data-index="3"]').click();
-    } else {
-        // Jika belum login
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('main-app').style.display = 'none';
-    }
-});
-
-// =====================
-// SINKRONISASI REAL-TIME DARI FIREBASE
-// =====================
+// ==========================================
+// 2. LOAD DATA DARI FIREBASE (Real-Time)
+// ==========================================
 function loadFirebaseData() {
-    database.ref('transactions').on('value', (snapshot) => {
-        data = [];
-        snapshot.forEach((childSnapshot) => {
-            data.push(childSnapshot.val());
-        });
-        applyFilter();
-        renderBudget();
-        renderCharts();
-        updateDescHistory();
+    database.ref('transactions').on('value', (snapshot) => { 
+        data = []; 
+        snapshot.forEach((child) => { data.push(child.val()); }); 
+        applyFilter(); renderBudget(); renderCharts(); updateDescHistory(); 
     });
-
-    database.ref('budgets').on('value', (snapshot) => {
-        budgets = [];
-        snapshot.forEach((childSnapshot) => {
-            budgets.push(childSnapshot.val());
-        });
-        renderBudget();
-        updateCategoryDropdown();
-    });
-
-    database.ref('savings').on('value', (snapshot) => {
-        savings = [];
-        snapshot.forEach((childSnapshot) => {
-            savings.push(childSnapshot.val());
-        });
-        renderSavings();
-    });
-
-    database.ref('loans').on('value', (snapshot) => {
-        loans = [];
-        snapshot.forEach((childSnapshot) => {
-            loans.push(childSnapshot.val());
-        });
-        renderLoans();
-    });
-
-    database.ref('installments').on('value', (snapshot) => {
-        installments = [];
-        snapshot.forEach((childSnapshot) => {
-            installments.push(childSnapshot.val());
-        });
-        renderLoans(); 
-        if (document.getElementById('viewLoanModal').style.display === 'flex') {
-            viewLoanDetails();
-        }
+    database.ref('budgets').on('value', (snapshot) => { 
+        budgets = []; 
+        snapshot.forEach((child) => { budgets.push(child.val()); }); 
+        renderBudget(); updateCategoryDropdown(); 
     });
 }
+// Jalankan langsung saat aplikasi dibuka
+loadFirebaseData();
+setTimeout(() => { document.querySelector('.nav-item[data-index="3"]').click(); }, 100);
 
-// FUNGSI FORMAT RUPIAH
-function formatRupiah(angka) {
-    return angka ? angka.toLocaleString('id-ID') : "0";
-}
+// ==========================================
+// 3. FUNGSI UTILITAS UMUM
+// ==========================================
+function formatRupiah(angka) { return angka ? angka.toLocaleString('id-ID') : "0"; }
+function formatInputRupiah(input) { let value = input.value.replace(/\D/g, ''); if (value !== '') { input.value = parseInt(value, 10).toLocaleString('id-ID'); } else { input.value = ''; } }
 
-function formatInputRupiah(input) {
-    let value = input.value.replace(/\D/g, ''); 
-    if (value !== '') {
-        input.value = parseInt(value, 10).toLocaleString('id-ID');
-    } else {
-        input.value = '';
-    }
-}
-
-// NOTIFIKASI TOAST 
 let toastTimeout;
 function showToast(message) {
-    const toast = document.getElementById("toast");
-    toast.innerText = message;
-    toast.classList.add("show");
-    
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => {
-        toast.classList.remove("show");
-    }, 3000);
+    const toast = document.getElementById("toast"); toast.innerText = message; toast.classList.add("show");
+    clearTimeout(toastTimeout); toastTimeout = setTimeout(() => { toast.classList.remove("show"); }, 3000);
 }
 
-// MODAL KONFIRMASI KUSTOM
 let confirmCallback = null;
-function showConfirm(message, callback) {
-    document.getElementById("confirmMessage").innerText = message;
-    document.getElementById("confirmModal").style.display = "flex";
-    confirmCallback = callback;
-}
+function showConfirm(message, callback) { document.getElementById("confirmMessage").innerText = message; document.getElementById("confirmModal").style.display = "flex"; confirmCallback = callback; }
+document.getElementById("btnConfirmYes").onclick = function() { document.getElementById("confirmModal").style.display = "none"; if(confirmCallback) confirmCallback(); };
+document.getElementById("btnConfirmNo").onclick = function() { document.getElementById("confirmModal").style.display = "none"; confirmCallback = null; };
 
-document.getElementById("btnConfirmYes").onclick = function() {
-    document.getElementById("confirmModal").style.display = "none";
-    if(confirmCallback) confirmCallback();
-};
-
-document.getElementById("btnConfirmNo").onclick = function() {
-    document.getElementById("confirmModal").style.display = "none";
-    confirmCallback = null;
-};
-
-// =====================
-// KONTROL MODAL TIPE PINJAMAN
-// =====================
-function openLoanTypePicker(target) {
-    loanTypePickerTarget = target;
-    renderLoanTypePickerList();
-    document.getElementById('loanTypeModal').style.display = 'flex';
-}
-
-function closeLoanTypePicker() {
-    document.getElementById('loanTypeModal').style.display = 'none';
-}
-
-function selectLoanType(val, label) {
-    if (loanTypePickerTarget === 'add') {
-        document.getElementById('loanType').value = val;
-        document.getElementById('selectedLoanTypeText').innerText = label;
-        document.getElementById('selectedLoanTypeText').style.color = "#333";
-    } else {
-        document.getElementById('editLoanType').value = val;
-        document.getElementById('selectedEditLoanTypeText').innerText = label;
-    }
-    closeLoanTypePicker();
-}
-
-function renderLoanTypePickerList() {
-    let currentSelected = loanTypePickerTarget === 'add' 
-        ? document.getElementById('loanType').value 
-        : document.getElementById('editLoanType').value;
-    
-    const options = [
-        { val: 'lent', label: 'Saya Meminjamkan (Piutang)' },
-        { val: 'borrowed', label: 'Saya Meminjam (Utang)' }
-    ];
-
-    let html = '';
-    options.forEach(opt => {
-        const isSelected = opt.val === currentSelected;
-        html += `
-            <div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectLoanType('${opt.val}', '${opt.label}')">
-                <span>${opt.label}</span>
-                ${isSelected ? '<span class="check">✓</span>' : ''}
-            </div>
-        `;
-    });
-    document.getElementById('loanTypeList').innerHTML = html;
-}
-
-// =====================
-// KONTROL MODAL TIPE TRANSAKSI
-// =====================
-function openTypePicker(target) {
-    typePickerTarget = target;
-    renderTypePickerList();
-    document.getElementById('typeModal').style.display = 'flex';
-}
-
-function closeTypePicker() {
-    document.getElementById('typeModal').style.display = 'none';
-}
-
+// ==========================================
+// 4. KONTROL POP-UP (PICKER)
+// ==========================================
+function openTypePicker(target) { typePickerTarget = target; renderTypePickerList(); document.getElementById('typeModal').style.display = 'flex'; }
+function closeTypePicker() { document.getElementById('typeModal').style.display = 'none'; }
 function selectType(val, label) {
-    if (typePickerTarget === 'add') {
-        document.getElementById('type').value = val;
-        document.getElementById('selectedTypeText').innerText = label;
-        document.getElementById('selectedTypeText').style.color = "#333";
-    } else {
-        document.getElementById('editType').value = val;
-        document.getElementById('selectedEditTypeText').innerText = label;
-    }
+    if (typePickerTarget === 'add') { document.getElementById('type').value = val; document.getElementById('selectedTypeText').innerText = label; document.getElementById('selectedTypeText').style.color = "#333"; } else { document.getElementById('editType').value = val; document.getElementById('selectedEditTypeText').innerText = label; }
     closeTypePicker();
 }
-
 function renderTypePickerList() {
-    let currentSelected = typePickerTarget === 'add' 
-        ? document.getElementById('type').value 
-        : document.getElementById('editType').value;
-    
-    const options = [
-        { val: 'income', label: 'Pemasukan' },
-        { val: 'expense', label: 'Pengeluaran' }
-    ];
-
-    let html = '';
-    options.forEach(opt => {
-        const isSelected = opt.val === currentSelected;
-        html += `
-            <div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectType('${opt.val}', '${opt.label}')">
-                <span>${opt.label}</span>
-                ${isSelected ? '<span class="check">✓</span>' : ''}
-            </div>
-        `;
-    });
+    let currentSelected = typePickerTarget === 'add' ? document.getElementById('type').value : document.getElementById('editType').value;
+    const options = [{ val: 'income', label: 'Pemasukan' }, { val: 'expense', label: 'Pengeluaran' }];
+    let html = ''; options.forEach(opt => { const isSelected = opt.val === currentSelected; html += `<div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectType('${opt.val}', '${opt.label}')"><span>${opt.label}</span>${isSelected ? '<span class="check">✓</span>' : ''}</div>`; });
     document.getElementById('typeList').innerHTML = html;
 }
 
-// =====================
-// KONTROL MODAL KETERANGAN
-// =====================
-function openDescPicker(target) {
-    descPickerTarget = target;
-    let currentVal = descPickerTarget === 'add' ? document.getElementById('desc').value : document.getElementById('editDesc').value;
-    document.getElementById('customDescInput').value = currentVal;
-    renderDescPickerList();
-    document.getElementById('descModal').style.display = 'flex';
-    setTimeout(() => document.getElementById('customDescInput').focus(), 100);
-}
-
-function closeDescPicker() {
-    document.getElementById('descModal').style.display = 'none';
-}
-
+function openDescPicker(target) { descPickerTarget = target; let currentVal = descPickerTarget === 'add' ? document.getElementById('desc').value : document.getElementById('editDesc').value; document.getElementById('customDescInput').value = currentVal; renderDescPickerList(); document.getElementById('descModal').style.display = 'flex'; setTimeout(() => document.getElementById('customDescInput').focus(), 100); }
+function closeDescPicker() { document.getElementById('descModal').style.display = 'none'; }
 function selectDesc(val) {
-    if (descPickerTarget === 'add') {
-        document.getElementById('desc').value = val;
-        document.getElementById('selectedDescText').innerText = val;
-        document.getElementById('selectedDescText').style.color = "#333";
-    } else {
-        document.getElementById('editDesc').value = val;
-        document.getElementById('selectedEditDescText').innerText = val;
-    }
+    if (descPickerTarget === 'add') { document.getElementById('desc').value = val; document.getElementById('selectedDescText').innerText = val; document.getElementById('selectedDescText').style.color = "#333"; } else { document.getElementById('editDesc').value = val; document.getElementById('selectedEditDescText').innerText = val; }
     closeDescPicker();
 }
-
-function applyCustomDesc() {
-    const val = document.getElementById('customDescInput').value.trim();
-    if (!val) {
-        showToast("Keterangan tidak boleh kosong!");
-        return;
-    }
-    selectDesc(val);
-}
-
+function applyCustomDesc() { const val = document.getElementById('customDescInput').value.trim(); if (!val) { showToast("Keterangan tidak boleh kosong!"); return; } selectDesc(val); }
 function renderDescPickerList() {
-    const uniqueDescs = [...new Set(data.map(item => item.desc))];
-    const list = document.getElementById('descList');
-    
-    if (uniqueDescs.length === 0) {
-        list.innerHTML = `<div style="text-align:center; padding: 20px; color: #6b7280; font-size: 13px;">Belum ada riwayat.</div>`;
-        return;
-    }
-
-    let currentSelected = descPickerTarget === 'add' ? document.getElementById('desc').value : document.getElementById('editDesc').value;
-    let html = '';
-    uniqueDescs.forEach(d => {
-        const isSelected = d === currentSelected;
-        html += `<div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectDesc('${d}')"><span>${d}</span>${isSelected ? '<span class="check">✓</span>' : ''}</div>`;
-    });
+    const uniqueDescs = [...new Set(data.map(item => item.desc))]; const list = document.getElementById('descList');
+    if (uniqueDescs.length === 0) { list.innerHTML = `<div style="text-align:center; padding: 20px; color: #6b7280; font-size: 13px;">Belum ada riwayat.</div>`; return; }
+    let currentSelected = descPickerTarget === 'add' ? document.getElementById('desc').value : document.getElementById('editDesc').value; let html = '';
+    uniqueDescs.forEach(d => { const isSelected = d === currentSelected; html += `<div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectDesc('${d}')"><span>${d}</span>${isSelected ? '<span class="check">✓</span>' : ''}</div>`; });
     list.innerHTML = html;
 }
+function updateDescHistory() { renderDescPickerList(); }
 
-function updateDescHistory() {
-    renderDescPickerList();
-}
-
-// =====================
-// KONTROL MODAL KATEGORI
-// =====================
 function updateCategoryDropdown() {
     if (budgets.length > 0) {
         const firstCat = budgets[0].category;
-        if (!document.getElementById('category').value) {
-            document.getElementById('category').value = firstCat;
-            document.getElementById('selectedCategoryText').innerText = firstCat;
-        }
+        if (!document.getElementById('category').value) { document.getElementById('category').value = firstCat; document.getElementById('selectedCategoryText').innerText = firstCat; }
     } else {
-        document.getElementById('category').value = "";
-        document.getElementById('selectedCategoryText').innerText = "Tambah anggaran dulu";
-        document.getElementById('editCategory').value = "";
-        document.getElementById('selectedEditCategoryText').innerText = "Tambah anggaran dulu";
+        document.getElementById('category').value = ""; document.getElementById('selectedCategoryText').innerText = "Tambah anggaran dulu"; document.getElementById('editCategory').value = ""; document.getElementById('selectedEditCategoryText').innerText = "Tambah anggaran dulu";
     }
 }
-
-function openCategoryPicker(target) {
-    categoryPickerTarget = target;
-    renderCategoryPickerList();
-    document.getElementById('categoryModal').style.display = 'flex';
-}
-
-function closeCategoryPicker() {
-    document.getElementById('categoryModal').style.display = 'none';
-}
-
+function openCategoryPicker(target) { categoryPickerTarget = target; renderCategoryPickerList(); document.getElementById('categoryModal').style.display = 'flex'; }
+function closeCategoryPicker() { document.getElementById('categoryModal').style.display = 'none'; }
 function selectCategory(cat) {
-    if (categoryPickerTarget === 'add') {
-        document.getElementById('category').value = cat;
-        document.getElementById('selectedCategoryText').innerText = cat;
-        document.getElementById('selectedCategoryText').style.color = "#333";
-    } else {
-        document.getElementById('editCategory').value = cat;
-        document.getElementById('selectedEditCategoryText').innerText = cat;
-    }
+    if (categoryPickerTarget === 'add') { document.getElementById('category').value = cat; document.getElementById('selectedCategoryText').innerText = cat; document.getElementById('selectedCategoryText').style.color = "#333"; } else { document.getElementById('editCategory').value = cat; document.getElementById('selectedEditCategoryText').innerText = cat; }
     closeCategoryPicker();
 }
-
 function renderCategoryPickerList() {
     const list = document.getElementById('categoryList');
-    if (budgets.length === 0) {
-        list.innerHTML = `<div style="text-align:center; padding: 20px; color: #6b7280; font-size: 14px;">Silakan tambah anggaran terlebih dahulu di menu Anggaran.</div>`;
-        return;
-    }
-
-    let currentSelected = categoryPickerTarget === 'add' ? document.getElementById('category').value : document.getElementById('editCategory').value;
-    let html = '';
-    budgets.forEach(b => {
-        const isSelected = b.category === currentSelected;
-        html += `<div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectCategory('${b.category}')"><span>${b.category}</span>${isSelected ? '<span class="check">✓</span>' : ''}</div>`;
-    });
+    if (budgets.length === 0) { list.innerHTML = `<div style="text-align:center; padding: 20px; color: #6b7280; font-size: 14px;">Silakan tambah anggaran terlebih dahulu di menu Anggaran.</div>`; return; }
+    let currentSelected = categoryPickerTarget === 'add' ? document.getElementById('category').value : document.getElementById('editCategory').value; let html = '';
+    budgets.forEach(b => { const isSelected = b.category === currentSelected; html += `<div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectCategory('${b.category}')"><span>${b.category}</span>${isSelected ? '<span class="check">✓</span>' : ''}</div>`; });
     list.innerHTML = html;
 }
 
-// FUNGSI MENU SIMPAN
-function toggleSaveMenu() {
-    const menu = document.getElementById('saveMenu');
-    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-}
-
-// SORTIR & FILTER
-function toggleFilter() {
-    const container = document.getElementById('filterContainer');
-    container.style.display = container.style.display === 'none' ? 'block' : 'none';
-}
-
-function handleFilterChange() {
-    const filterValue = document.getElementById('filterSelect').value;
-    const customDateContainer = document.getElementById('customDateContainer');
-    if (filterValue === 'custom') {
-        customDateContainer.style.display = 'block';
-    } else {
-        customDateContainer.style.display = 'none';
-    }
-    applyFilter();
-}
-
+// ==========================================
+// 5. TRANSAKSI & ANGGARAN (CRUD)
+// ==========================================
+function toggleSaveMenu() { const menu = document.getElementById('saveMenu'); menu.style.display = menu.style.display === 'none' ? 'block' : 'none'; }
+function toggleFilter() { const container = document.getElementById('filterContainer'); container.style.display = container.style.display === 'none' ? 'block' : 'none'; }
+function handleFilterChange() { const filterValue = document.getElementById('filterSelect').value; const customDateContainer = document.getElementById('customDateContainer'); if (filterValue === 'custom') { customDateContainer.style.display = 'block'; } else { customDateContainer.style.display = 'none'; } applyFilter(); }
 function getFilteredData() {
     const filterValue = document.getElementById('filterSelect').value;
     if (filterValue === 'all') return data;
-
-    const t = new Date();
-    const yyyy = t.getFullYear();
-    const mm = String(t.getMonth() + 1).padStart(2, '0');
-    const dd = String(t.getDate()).padStart(2, '0');
-    const todayStr = `${yyyy}-${mm}-${dd}`;
-    
-    const todayObj = new Date(t.setHours(0,0,0,0));
-    const lastWeekObj = new Date(todayObj);
-    lastWeekObj.setDate(lastWeekObj.getDate() - 7);
-
+    const t = new Date(); const yyyy = t.getFullYear(); const mm = String(t.getMonth() + 1).padStart(2, '0'); const dd = String(t.getDate()).padStart(2, '0'); const todayStr = `${yyyy}-${mm}-${dd}`;
+    const todayObj = new Date(t.setHours(0,0,0,0)); const lastWeekObj = new Date(todayObj); lastWeekObj.setDate(lastWeekObj.getDate() - 7);
     return data.filter(item => {
         if (filterValue === 'daily') return item.date === todayStr;
-        if (filterValue === 'weekly') {
-            const itemDateObj = new Date(item.date);
-            itemDateObj.setHours(0,0,0,0);
-            return itemDateObj >= lastWeekObj && itemDateObj <= todayObj;
-        }
+        if (filterValue === 'weekly') { const itemDateObj = new Date(item.date); itemDateObj.setHours(0,0,0,0); return itemDateObj >= lastWeekObj && itemDateObj <= todayObj; }
         if (filterValue === 'monthly') return item.date.substring(0, 7) === todayStr.substring(0, 7);
-        if (filterValue === 'custom') {
-            const startVal = document.getElementById('filterStartDate').value;
-            const endVal = document.getElementById('filterEndDate').value;
-            if (startVal && endVal) return item.date >= startVal && item.date <= endVal;
-        }
+        if (filterValue === 'custom') { const startVal = document.getElementById('filterStartDate').value; const endVal = document.getElementById('filterEndDate').value; if (startVal && endVal) return item.date >= startVal && item.date <= endVal; }
         return true;
     });
 }
-
-function applyFilter() {
-    selectedIds = [];
-    updateSummary();
-    renderTable();
-}
-
+function applyFilter() { selectedIds = []; updateSummary(); renderTable(); }
 function updateSummary() {
-    let income = 0, expense = 0;
-    const currentData = getFilteredData();
-    currentData.forEach(item => {
-        if (item.type === 'income') income += item.amount;
-        else expense += item.amount;
-    });
-    document.getElementById('income').innerText = formatRupiah(income);
-    document.getElementById('expense').innerText = formatRupiah(expense);
-    document.getElementById('balance').innerText = formatRupiah(income - expense);
+    let income = 0, expense = 0; const currentData = getFilteredData();
+    currentData.forEach(item => { if (item.type === 'income') income += item.amount; else expense += item.amount; });
+    document.getElementById('income').innerText = formatRupiah(income); document.getElementById('expense').innerText = formatRupiah(expense); document.getElementById('balance').innerText = formatRupiah(income - expense);
 }
-
-// SELEKSI TRANSAKSI
-function toggleSelection(rowElement, id) {
-    const index = selectedIds.indexOf(id);
-    if (index > -1) {
-        selectedIds.splice(index, 1);
-        rowElement.classList.remove('selected');
-    } else {
-        selectedIds.push(id);
-        rowElement.classList.add('selected');
-    }
-}
-
+function toggleSelection(rowElement, id) { const index = selectedIds.indexOf(id); if (index > -1) { selectedIds.splice(index, 1); rowElement.classList.remove('selected'); } else { selectedIds.push(id); rowElement.classList.add('selected'); } }
 function selectAllRows() {
-    const rows = document.querySelectorAll("#tableData tbody tr");
-    const currentData = getFilteredData();
-    const isAllSelected = selectedIds.length === currentData.length && currentData.length > 0;
-    if (isAllSelected) {
-        selectedIds = [];
-        rows.forEach(row => row.classList.remove('selected'));
-    } else {
-        selectedIds = currentData.map(item => item.id.toString());
-        rows.forEach(row => row.classList.add('selected'));
-    }
+    const rows = document.querySelectorAll("#tableData tbody tr"); const currentData = getFilteredData(); const isAllSelected = selectedIds.length === currentData.length && currentData.length > 0;
+    if (isAllSelected) { selectedIds = []; rows.forEach(row => row.classList.remove('selected')); } else { selectedIds = currentData.map(item => item.id.toString()); rows.forEach(row => row.classList.add('selected')); }
 }
-
 function renderTable() {
-    const tbody = document.querySelector("#tableData tbody");
-    tbody.innerHTML = "";
-    const currentData = getFilteredData();
-    currentData.forEach(item => {
-        const isSelected = selectedIds.includes(item.id.toString()) ? 'selected' : '';
-        tbody.innerHTML += `
-        <tr class="${isSelected}" onclick="toggleSelection(this, '${item.id}')">
-            <td>${item.date}</td>
-            <td style="text-align:left">${item.desc}</td>
-            <td>${item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</td>
-            <td style="text-align:right">Rp ${formatRupiah(item.amount)}</td>
-        </tr>`;
-    });
+    const tbody = document.querySelector("#tableData tbody"); tbody.innerHTML = ""; const currentData = getFilteredData();
+    currentData.forEach(item => { const isSelected = selectedIds.includes(item.id.toString()) ? 'selected' : ''; tbody.innerHTML += `<tr class="${isSelected}" onclick="toggleSelection(this, '${item.id}')"><td>${item.date}</td><td style="text-align:left">${item.desc}</td><td>${item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</td><td style="text-align:right">Rp ${formatRupiah(item.amount)}</td></tr>`; });
 }
-
-// SELEKSI ANGGARAN
 function toggleBudgetSelection(rowElement, category) {
-    const rows = document.querySelectorAll("#tableBudget tbody tr");
-    rows.forEach(r => r.classList.remove('selected'));
-    if (selectedBudgetCategory === category) {
-        selectedBudgetCategory = null;
-    } else {
-        selectedBudgetCategory = category;
-        rowElement.classList.add('selected');
-    }
+    const rows = document.querySelectorAll("#tableBudget tbody tr"); rows.forEach(r => r.classList.remove('selected'));
+    if (selectedBudgetCategory === category) { selectedBudgetCategory = null; } else { selectedBudgetCategory = category; rowElement.classList.add('selected'); }
 }
-
 function renderBudget() {
-    const tbody = document.querySelector("#tableBudget tbody");
-    tbody.innerHTML = "";
-    let totalLimit = 0;
-    let totalUsed = 0;
-
+    const tbody = document.querySelector("#tableBudget tbody"); tbody.innerHTML = ""; let totalLimit = 0; let totalUsed = 0;
     budgets.forEach(b => {
-        const used = data.filter(d => d.type === 'expense' && d.category === b.category).reduce((sum, d) => sum + d.amount, 0);
-        const remaining = b.limit - used;
-        totalLimit += b.limit;
-        totalUsed += used;
-        const isSelected = selectedBudgetCategory === b.category ? 'selected' : '';
-
-        tbody.innerHTML += `
-        <tr class="${isSelected}" onclick="toggleBudgetSelection(this, '${b.category}')">
-            <td>${b.category}</td>
-            <td>Rp ${formatRupiah(b.limit)}</td>
-            <td>Rp ${formatRupiah(used)}</td>
-            <td style="color:${remaining < 0 ? '#dc3545' : '#198754'}">Rp ${formatRupiah(remaining)}</td>
-        </tr>`;
+        const used = data.filter(d => d.type === 'expense' && d.category === b.category).reduce((sum, d) => sum + d.amount, 0); const remaining = b.limit - used; totalLimit += b.limit; totalUsed += used; const isSelected = selectedBudgetCategory === b.category ? 'selected' : '';
+        tbody.innerHTML += `<tr class="${isSelected}" onclick="toggleBudgetSelection(this, '${b.category}')"><td>${b.category}</td><td>Rp ${formatRupiah(b.limit)}</td><td>Rp ${formatRupiah(used)}</td><td style="color:${remaining < 0 ? '#dc3545' : '#198754'}">Rp ${formatRupiah(remaining)}</td></tr>`;
     });
-    
-    document.getElementById('totBudgetLimit').innerText = formatRupiah(totalLimit);
-    document.getElementById('totBudgetUsed').innerText = formatRupiah(totalUsed);
-    document.getElementById('totBudgetRemaining').innerText = formatRupiah(totalLimit - totalUsed);
+    document.getElementById('totBudgetLimit').innerText = formatRupiah(totalLimit); document.getElementById('totBudgetUsed').innerText = formatRupiah(totalUsed); document.getElementById('totBudgetRemaining').innerText = formatRupiah(totalLimit - totalUsed);
 }
 
-// =====================
-// NABUNG (TABUNGAN)
-// =====================
-function toggleSavingSelection(rowElement, id) {
-    const rows = document.querySelectorAll("#tableSaving tbody tr");
-    rows.forEach(r => r.classList.remove('selected'));
-    if (selectedSavingId === id) {
-        selectedSavingId = null;
-    } else {
-        selectedSavingId = id;
-        rowElement.classList.add('selected');
-    }
-}
-
-function renderSavings() {
-    const tbody = document.querySelector("#tableSaving tbody");
-    tbody.innerHTML = "";
-    let total = 0;
-    const sortedSavings = [...savings].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-    sortedSavings.forEach(s => {
-        total += s.amount;
-        const isSelected = selectedSavingId === s.id ? 'selected' : '';
-        tbody.innerHTML += `
-        <tr class="${isSelected}" onclick="toggleSavingSelection(this, '${s.id}')">
-            <td>${s.date}</td>
-            <td style="color:#198754; font-weight:bold;">Rp ${formatRupiah(s.amount)}</td>
-        </tr>`;
-    });
-    document.getElementById('totSavings').innerText = formatRupiah(total);
-}
-
-function addSaving() {
-    const date = document.getElementById('savingDate').value;
-    const amountStr = document.getElementById('savingAmount').value.replace(/\./g, '');
-    const amount = parseInt(amountStr, 10);
-
-    if (!date || isNaN(amount) || amount <= 0) {
-        showToast("Isi tanggal dan jumlah dengan benar!");
-        return;
-    }
-
-    const id = Date.now().toString();
-    database.ref('savings/' + id).set({
-        id: id, date: date, amount: amount
-    }).then(() => {
-        document.getElementById('savingAmount').value = "";
-        showToast("Tabungan berhasil ditambahkan!");
-    });
-}
-
-function editSavingSelected() {
-    if (!selectedSavingId) return showToast("Pilih satu baris tabungan terlebih dahulu.");
-    const target = savings.find(s => s.id === selectedSavingId);
-    if (target) {
-        document.getElementById('editSavingDate').value = target.date;
-        document.getElementById('editSavingAmount').value = target.amount.toLocaleString('id-ID');
-        document.getElementById('editSavingModal').style.display = 'flex';
-    }
-}
-
-function saveEditSaving() {
-    const date = document.getElementById('editSavingDate').value;
-    const amountStr = document.getElementById('editSavingAmount').value.replace(/\./g, '');
-    const amount = parseInt(amountStr, 10);
-
-    if (!date || isNaN(amount) || amount <= 0) return showToast("Isi tanggal dan jumlah dengan benar!");
-
-    database.ref('savings/' + selectedSavingId).update({ date: date, amount: amount }).then(() => {
-        closeEditSavingModal();
-        selectedSavingId = null; 
-        showToast("Tabungan berhasil diperbarui!");
-    });
-}
-
-function closeEditSavingModal() {
-    document.getElementById('editSavingModal').style.display = 'none';
-}
-
-function deleteSavingSelected() {
-    if (!selectedSavingId) return showToast("Pilih satu baris tabungan yang ingin dihapus.");
-    showConfirm("Hapus data tabungan ini?", () => {
-        database.ref('savings/' + selectedSavingId).remove().then(() => {
-            selectedSavingId = null;
-            showToast("Tabungan berhasil dihapus!");
-        });
-    });
-}
-
-// =====================
-// PINJAMAN & CICILAN
-// =====================
-function toggleLoanSelection(rowElement, id) {
-    const rows = document.querySelectorAll("#tableLoan tbody tr");
-    rows.forEach(r => r.classList.remove('selected'));
-    if (selectedLoanId === id) {
-        selectedLoanId = null;
-    } else {
-        selectedLoanId = id;
-        rowElement.classList.add('selected');
-    }
-}
-
-function renderLoans() {
-    const tbody = document.querySelector("#tableLoan tbody");
-    tbody.innerHTML = "";
-    let totLent = 0;
-    let totBorrowed = 0;
-    const sortedLoans = [...loans].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-    sortedLoans.forEach(l => {
-        // Hitung total cicilan yang sudah dibayar untuk pinjaman ini
-        const insts = installments.filter(i => i.loanId === l.id);
-        const totalPaid = insts.reduce((sum, i) => sum + i.amount, 0);
-        const remaining = l.amount - totalPaid;
-
-        if(l.type === 'lent') totLent += remaining;
-        else totBorrowed += remaining;
-
-        const isSelected = selectedLoanId === l.id ? 'selected' : '';
-        const typeLabel = l.type === 'lent' ? 'Meminjamkan' : 'Berutang';
-        const color = l.type === 'lent' ? '#0d6efd' : '#dc3545';
-        
-        let statusHtml = "";
-        if (remaining <= 0) {
-            statusHtml = `<span style="font-size:10px; color: #198754; font-weight:bold;">(LUNAS)</span>`;
-        } else {
-            statusHtml = `<span style="font-size:10px; color: #666;">Sisa: Rp ${formatRupiah(remaining)}</span>`;
-        }
-
-        tbody.innerHTML += `
-        <tr class="${isSelected}" onclick="toggleLoanSelection(this, '${l.id}')">
-            <td style="font-size: 11px;">${l.date}</td>
-            <td style="text-align: left; padding-left: 8px;">
-                <b>${l.person}</b><br>
-                <span style="font-size: 10px; color: ${color};">${typeLabel}</span>
-            </td>
-            <td style="text-align: right; padding-right: 8px; font-weight:bold;">
-                Rp ${formatRupiah(l.amount)}<br>
-                ${statusHtml}
-            </td>
-        </tr>`;
-    });
-    
-    document.getElementById('totLent').innerText = formatRupiah(totLent);
-    document.getElementById('totBorrowed').innerText = formatRupiah(totBorrowed);
-}
-
-function addLoan() {
-    const date = document.getElementById('loanDate').value;
-    const person = document.getElementById('loanPerson').value.trim();
-    const type = document.getElementById('loanType').value;
-    const amountStr = document.getElementById('loanAmount').value.replace(/\./g, '');
-    const amount = parseInt(amountStr, 10);
-
-    if (!date || !person || isNaN(amount) || amount <= 0) {
-        showToast("Isi semua data pinjaman dengan benar!");
-        return;
-    }
-
-    const id = Date.now().toString();
-    database.ref('loans/' + id).set({
-        id: id, date: date, person: person, type: type, amount: amount
-    }).then(() => {
-        document.getElementById('loanPerson').value = "";
-        document.getElementById('loanAmount').value = "";
-        showToast("Pinjaman berhasil ditambahkan!");
-    });
-}
-
-function editLoanSelected() {
-    if (!selectedLoanId) return showToast("Pilih satu baris pinjaman terlebih dahulu.");
-    const target = loans.find(l => l.id === selectedLoanId);
-    if (target) {
-        document.getElementById('editLoanDate').value = target.date;
-        document.getElementById('editLoanPerson').value = target.person;
-        document.getElementById('editLoanType').value = target.type;
-        const label = target.type === 'lent' ? 'Saya Meminjamkan (Piutang)' : 'Saya Meminjam (Utang)';
-        document.getElementById('selectedEditLoanTypeText').innerText = label;
-        document.getElementById('editLoanAmount').value = target.amount.toLocaleString('id-ID');
-        document.getElementById('editLoanModal').style.display = 'flex';
-    }
-}
-
-function saveEditLoan() {
-    const date = document.getElementById('editLoanDate').value;
-    const person = document.getElementById('editLoanPerson').value.trim();
-    const type = document.getElementById('editLoanType').value;
-    const amountStr = document.getElementById('editLoanAmount').value.replace(/\./g, '');
-    const amount = parseInt(amountStr, 10);
-
-    if (!date || !person || isNaN(amount) || amount <= 0) return showToast("Isi semua data pinjaman dengan benar!");
-
-    database.ref('loans/' + selectedLoanId).update({
-        date: date, person: person, type: type, amount: amount
-    }).then(() => {
-        closeEditLoanModal();
-        selectedLoanId = null; 
-        showToast("Pinjaman berhasil diperbarui!");
-    });
-}
-
-function closeEditLoanModal() {
-    document.getElementById('editLoanModal').style.display = 'none';
-}
-
-function deleteLoanSelected() {
-    if (!selectedLoanId) return showToast("Pilih satu baris pinjaman yang ingin dihapus.");
-    showConfirm("Hapus data pinjaman ini beserta riwayat cicilannya?", () => {
-        // Hapus cicilannya dulu
-        const instsToDelete = installments.filter(i => i.loanId === selectedLoanId);
-        instsToDelete.forEach(i => database.ref('installments/' + i.id).remove());
-        
-        // Hapus pinjaman utama
-        database.ref('loans/' + selectedLoanId).remove().then(() => {
-            selectedLoanId = null;
-            showToast("Pinjaman berhasil dihapus!");
-        });
-    });
-}
-
-function viewLoanDetails() {
-    if (!selectedLoanId) return showToast("Pilih satu baris pinjaman terlebih dahulu.");
-    const loan = loans.find(l => l.id === selectedLoanId);
-    if (!loan) return;
-
-    document.getElementById('viewLoanTitle').innerText = "Rincian: " + loan.person;
-    document.getElementById('viewLoanTotal').innerText = "Rp " + formatRupiah(loan.amount);
-
-    if(!document.getElementById('instDate').value) {
-        document.getElementById('instDate').valueAsDate = new Date();
-    }
-    
-    const insts = installments.filter(i => i.loanId === selectedLoanId).sort((a,b) => new Date(b.date) - new Date(a.date));
-    const tbody = document.querySelector("#tableViewLoan tbody");
-    tbody.innerHTML = "";
-
-    let totalPaid = 0;
-    if (insts.length === 0) {
-        document.getElementById('viewLoanEmpty').style.display = 'block';
-        document.getElementById('tableViewLoan').style.display = 'none';
-    } else {
-        document.getElementById('viewLoanEmpty').style.display = 'none';
-        document.getElementById('tableViewLoan').style.display = 'table';
-        
-        insts.forEach(item => {
-            totalPaid += item.amount;
-            tbody.innerHTML += `
-            <tr>
-                <td style="text-align:center;">${item.date}</td>
-                <td style="text-align: right; padding-right: 8px;">Rp ${formatRupiah(item.amount)}</td>
-                <td style="text-align:center;"><button onclick="deleteInstallment('${item.id}')" style="background:#dc3545; color:white; padding:4px 8px; border:none; border-radius:4px; font-size:10px; cursor:pointer;">X</button></td>
-            </tr>`;
-        });
-    }
-    
-    const remaining = loan.amount - totalPaid;
-    document.getElementById('viewLoanRemaining').innerText = "Rp " + formatRupiah(remaining);
-    
-    document.getElementById('viewLoanModal').style.display = 'flex';
-}
-
-function closeViewLoanModal() {
-    document.getElementById('viewLoanModal').style.display = 'none';
-}
-
-function addInstallment() {
-    const date = document.getElementById('instDate').value;
-    const amountStr = document.getElementById('instAmount').value.replace(/\./g, '');
-    const amount = parseInt(amountStr, 10);
-
-    if (!date || isNaN(amount) || amount <= 0) return showToast("Isi tanggal dan jumlah cicilan dengan benar!");
-
-    const loan = loans.find(l => l.id === selectedLoanId);
-    const insts = installments.filter(i => i.loanId === selectedLoanId);
-    const totalPaid = insts.reduce((sum, i) => sum + i.amount, 0);
-    
-    if (totalPaid + amount > loan.amount) {
-        return showToast("Gagal: Jumlah cicilan melebihi sisa pinjaman!");
-    }
-
-    const id = Date.now().toString();
-    database.ref('installments/' + id).set({
-        id: id, loanId: selectedLoanId, date: date, amount: amount
-    }).then(() => {
-        document.getElementById('instAmount').value = "";
-        showToast("Cicilan berhasil ditambahkan!");
-    });
-}
-
-function deleteInstallment(id) {
-    showConfirm("Hapus riwayat cicilan ini?", () => {
-        database.ref('installments/' + id).remove().then(() => {
-            showToast("Cicilan berhasil dihapus!");
-        });
-    });
-}
-
-
-// =====================
-// TRANSAKSI & ANGGARAN
-// =====================
 function addData() {
-    const date = document.getElementById('date').value;
-    const desc = document.getElementById('desc').value.trim();
-    const type = document.getElementById('type').value;
-    const category = document.getElementById('category').value;
-    const amountStr = document.getElementById('amount').value.replace(/\./g, '');
-    const amount = parseInt(amountStr, 10);
-
-    if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) {
-        showToast("Mohon isi semua data dengan lengkap!");
-        return;
-    }
-
+    const date = document.getElementById('date').value; const desc = document.getElementById('desc').value.trim(); const type = document.getElementById('type').value; const category = document.getElementById('category').value; const amountStr = document.getElementById('amount').value.replace(/\./g, ''); const amount = parseInt(amountStr, 10);
+    if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) { showToast("Mohon isi semua data dengan lengkap!"); return; }
     const id = Date.now().toString();
-    database.ref('transactions/' + id).set({
-        id: id, date: date, desc: desc, type: type, category: category, amount: amount
-    }).then(() => {
-        document.getElementById('desc').value = "";
-        document.getElementById('selectedDescText').innerText = "Ketik atau pilih keterangan...";
-        document.getElementById('selectedDescText').style.color = "#888";
-        document.getElementById('amount').value = "";
-        showToast("Transaksi berhasil ditambahkan!");
-    });
+    database.ref('transactions/' + id).set({ id: id, date: date, desc: desc, type: type, category: category, amount: amount }).then(() => { document.getElementById('desc').value = ""; document.getElementById('selectedDescText').innerText = "Ketik atau pilih keterangan..."; document.getElementById('selectedDescText').style.color = "#888"; document.getElementById('amount').value = ""; showToast("Transaksi berhasil ditambahkan!"); });
 }
-
 function addBudget() {
-    const category = document.getElementById('budgetCategory').value.trim();
-    const amountStr = document.getElementById('budgetAmount').value.replace(/\./g, '');
-    const amount = parseInt(amountStr, 10);
-
+    const category = document.getElementById('budgetCategory').value.trim(); const amountStr = document.getElementById('budgetAmount').value.replace(/\./g, ''); const amount = parseInt(amountStr, 10);
     if (!category || isNaN(amount) || amount <= 0) return showToast("Isi kategori dan limit anggaran dengan benar!");
     if (budgets.some(b => b.category.toLowerCase() === category.toLowerCase())) return showToast("Kategori anggaran ini sudah ada!");
-
     const id = Date.now().toString();
-    database.ref('budgets/' + id).set({ id: id, category: category, limit: amount }).then(() => {
-        document.getElementById('budgetCategory').value = "";
-        document.getElementById('budgetAmount').value = "";
-        showToast("Anggaran berhasil ditambahkan!");
-    });
+    database.ref('budgets/' + id).set({ id: id, category: category, limit: amount }).then(() => { document.getElementById('budgetCategory').value = ""; document.getElementById('budgetAmount').value = ""; showToast("Anggaran berhasil ditambahkan!"); });
 }
-
 function editBudgetSelected() {
     if (!selectedBudgetCategory) return showToast("Pilih satu baris anggaran terlebih dahulu.");
     const targetBudget = budgets.find(b => b.category === selectedBudgetCategory);
-    if (targetBudget) {
-        editBudgetOldCategory = targetBudget.category;
-        document.getElementById('editBudgetCategoryInput').value = targetBudget.category;
-        document.getElementById('editBudgetAmount').value = targetBudget.limit.toLocaleString('id-ID');
-        document.getElementById('editBudgetModal').style.display = 'flex';
-    }
+    if (targetBudget) { editBudgetOldCategory = targetBudget.category; document.getElementById('editBudgetCategoryInput').value = targetBudget.category; document.getElementById('editBudgetAmount').value = targetBudget.limit.toLocaleString('id-ID'); document.getElementById('editBudgetModal').style.display = 'flex'; }
 }
-
 function saveEditBudget() {
-    const newCategory = document.getElementById('editBudgetCategoryInput').value.trim();
-    const amountStr = document.getElementById('editBudgetAmount').value.replace(/\./g, '');
-    const newLimit = parseInt(amountStr, 10);
-
+    const newCategory = document.getElementById('editBudgetCategoryInput').value.trim(); const amountStr = document.getElementById('editBudgetAmount').value.replace(/\./g, ''); const newLimit = parseInt(amountStr, 10);
     if (!newCategory || isNaN(newLimit) || newLimit <= 0) return showToast("Isi kategori dan limit anggaran dengan benar!");
     if (newCategory !== editBudgetOldCategory && budgets.some(b => b.category.toLowerCase() === newCategory.toLowerCase())) return showToast("Nama kategori ini sudah dipakai!");
-
     const targetBudget = budgets.find(b => b.category === editBudgetOldCategory);
     if (targetBudget) {
         database.ref('budgets/' + targetBudget.id).update({ category: newCategory, limit: newLimit }).then(() => {
-            if (newCategory !== editBudgetOldCategory) {
-                data.forEach(d => {
-                    if (d.category === editBudgetOldCategory) database.ref('transactions/' + d.id).update({ category: newCategory });
-                });
-            }
-            closeEditBudgetModal();
-            selectedBudgetCategory = null; 
-            showToast("Anggaran berhasil diperbarui!");
+            if (newCategory !== editBudgetOldCategory) { data.forEach(d => { if (d.category === editBudgetOldCategory) { database.ref('transactions/' + d.id).update({ category: newCategory }); } }); }
+            closeEditBudgetModal(); selectedBudgetCategory = null; showToast("Anggaran berhasil diperbarui!");
         });
     }
 }
-
-function closeEditBudgetModal() {
-    document.getElementById('editBudgetModal').style.display = 'none';
-    editBudgetOldCategory = null;
-}
-
+function closeEditBudgetModal() { document.getElementById('editBudgetModal').style.display = 'none'; editBudgetOldCategory = null; }
 function deleteBudgetSelected() {
     if (!selectedBudgetCategory) return showToast("Pilih satu baris anggaran yang ingin dihapus.");
-    showConfirm(`Hapus anggaran '${selectedBudgetCategory}'?`, () => {
+    showConfirm(`Hapus anggaran '${selectedBudgetCategory}'? (Riwayat transaksi tidak ikut terhapus)`, () => {
         const targetBudget = budgets.find(b => b.category === selectedBudgetCategory);
-        if (targetBudget) {
-            database.ref('budgets/' + targetBudget.id).remove().then(() => {
-                selectedBudgetCategory = null;
-                showToast("Anggaran berhasil dihapus!");
-            });
-        }
+        if (targetBudget) { database.ref('budgets/' + targetBudget.id).remove().then(() => { selectedBudgetCategory = null; showToast("Anggaran berhasil dihapus!"); }); }
     });
 }
-
 function viewBudgetDetails() {
     if (!selectedBudgetCategory) return showToast("Pilih satu baris anggaran terlebih dahulu.");
     document.getElementById('viewBudgetTitle').innerText = "Rincian: " + selectedBudgetCategory;
-    const tbody = document.querySelector("#tableViewBudget tbody");
-    tbody.innerHTML = "";
-    
+    const tbody = document.querySelector("#tableViewBudget tbody"); tbody.innerHTML = "";
     const expenses = data.filter(d => d.type === 'expense' && d.category === selectedBudgetCategory);
     if (expenses.length === 0) {
-        document.getElementById('viewBudgetEmpty').style.display = 'block';
-        document.getElementById('tableViewBudget').style.display = 'none';
-        document.getElementById('viewBudgetTotal').innerText = "Total: Rp 0";
+        document.getElementById('viewBudgetEmpty').style.display = 'block'; document.getElementById('tableViewBudget').style.display = 'none'; document.getElementById('viewBudgetTotal').innerText = "Total: Rp 0";
     } else {
-        document.getElementById('viewBudgetEmpty').style.display = 'none';
-        document.getElementById('tableViewBudget').style.display = 'table';
-        let total = 0;
-        expenses.forEach(item => {
-            total += item.amount;
-            tbody.innerHTML += `<tr><td>${item.date}</td><td>${item.desc}</td><td>Rp ${formatRupiah(item.amount)}</td></tr>`;
-        });
+        document.getElementById('viewBudgetEmpty').style.display = 'none'; document.getElementById('tableViewBudget').style.display = 'table'; let total = 0;
+        expenses.forEach(item => { total += item.amount; tbody.innerHTML += `<tr><td>${item.date}</td><td>${item.desc}</td><td>Rp ${formatRupiah(item.amount)}</td></tr>`; });
         document.getElementById('viewBudgetTotal').innerText = "Total: Rp " + formatRupiah(total);
     }
     document.getElementById('viewBudgetModal').style.display = 'flex';
 }
-
-function closeViewBudgetModal() {
-    document.getElementById('viewBudgetModal').style.display = 'none';
-}
+function closeViewBudgetModal() { document.getElementById('viewBudgetModal').style.display = 'none'; }
 
 function editSelected() {
     if (selectedIds.length === 0) return showToast("Pilih SATU transaksi yang ingin diedit.");
     if (selectedIds.length > 1) return showToast("Hanya bisa edit satu transaksi sekaligus.");
-    editTargetId = selectedIds[0];
-    const item = data.find(d => d.id.toString() === editTargetId);
+    editTargetId = selectedIds[0]; const item = data.find(d => d.id.toString() === editTargetId);
     if (item) {
-        document.getElementById('editDate').value = item.date;
-        document.getElementById('editDesc').value = item.desc;
-        document.getElementById('selectedEditDescText').innerText = item.desc || "Pilih Keterangan";
-        document.getElementById('editType').value = item.type;
-        document.getElementById('selectedEditTypeText').innerText = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
-        document.getElementById('editCategory').value = item.category || "";
-        document.getElementById('selectedEditCategoryText').innerText = item.category || "Pilih Kategori";
-        document.getElementById('editAmount').value = item.amount.toLocaleString('id-ID');
+        document.getElementById('editDate').value = item.date; document.getElementById('editDesc').value = item.desc; document.getElementById('selectedEditDescText').innerText = item.desc || "Pilih Keterangan";
+        document.getElementById('editType').value = item.type; document.getElementById('selectedEditTypeText').innerText = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
+        document.getElementById('editCategory').value = item.category || ""; document.getElementById('selectedEditCategoryText').innerText = item.category || "Pilih Kategori"; document.getElementById('editAmount').value = item.amount.toLocaleString('id-ID');
         document.getElementById('editModal').style.display = 'flex';
     }
 }
-
-function closeEditModal() {
-    document.getElementById('editModal').style.display = 'none';
-    editTargetId = null;
-}
-
+function closeEditModal() { document.getElementById('editModal').style.display = 'none'; editTargetId = null; }
 function saveEdit() {
-    const date = document.getElementById('editDate').value;
-    const desc = document.getElementById('editDesc').value.trim();
-    const type = document.getElementById('editType').value;
-    const category = document.getElementById('editCategory').value;
-    const amountStr = document.getElementById('editAmount').value.replace(/\./g, '');
-    const amount = parseInt(amountStr, 10);
-
+    const date = document.getElementById('editDate').value; const desc = document.getElementById('editDesc').value.trim(); const type = document.getElementById('editType').value; const category = document.getElementById('editCategory').value; const amountStr = document.getElementById('editAmount').value.replace(/\./g, ''); const amount = parseInt(amountStr, 10);
     if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) return showToast("Mohon isi semua data dengan benar!");
-
-    database.ref('transactions/' + editTargetId).update({
-        date: date, desc: desc, type: type, category: category, amount: amount
-    }).then(() => {
-        closeEditModal();
-        selectedIds = []; 
-        showToast("Data berhasil diperbarui!");
-    });
+    database.ref('transactions/' + editTargetId).update({ date: date, desc: desc, type: type, category: category, amount: amount }).then(() => { closeEditModal(); selectedIds = []; showToast("Data berhasil diperbarui!"); });
 }
-
 function deleteSelected() {
     if (selectedIds.length === 0) return showToast("Pilih transaksi yang ingin dihapus.");
-    showConfirm(`Hapus ${selectedIds.length} transaksi terpilih?`, () => {
-        selectedIds.forEach(id => database.ref('transactions/' + id).remove());
-        selectedIds = [];
-        showToast("Transaksi berhasil dihapus!");
-    });
+    showConfirm(`Hapus ${selectedIds.length} transaksi terpilih?`, () => { selectedIds.forEach(id => { database.ref('transactions/' + id).remove(); }); selectedIds = []; showToast("Transaksi berhasil dihapus!"); });
 }
 
-// EKSPOR EXCEL & PDF
 function saveExcel() {
     let tableHtml = `<table border="1"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Tipe</th><th>Jumlah (Rp)</th></tr></thead><tbody>`;
-    const currentData = getFilteredData();
-    if (currentData.length === 0) return showToast("Tidak ada data untuk diekspor.");
-
-    currentData.forEach(item => {
-        let tipe = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
-        let kategori = item.category ? item.category : "-";
-        tableHtml += `<tr><td>${item.date}</td><td>${item.desc}</td><td>${kategori}</td><td>${tipe}</td><td>${item.amount}</td></tr>`;
-    });
+    const currentData = getFilteredData(); if (currentData.length === 0) return showToast("Tidak ada data untuk diekspor.");
+    currentData.forEach(item => { let tipe = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'; let kategori = item.category ? item.category : "-"; tableHtml += `<tr><td>${item.date}</td><td>${item.desc}</td><td>${kategori}</td><td>${tipe}</td><td>${item.amount}</td></tr>`; });
     tableHtml += "</tbody></table>";
-
-    const blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "Laporan_Keuangan_Harian.xls";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast("Berhasil disimpan ke Excel!");
-    document.getElementById('saveMenu').style.display = 'none';
+    const blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Laporan_Keuangan_Harian.xls"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    showToast("Berhasil disimpan ke Excel!"); document.getElementById('saveMenu').style.display = 'none';
 }
-
 function savePDF() {
-    const { jsPDF } = window.jspdf;
-    
-    // Matikan tampilan ikon logout sementara agar tidak ikut di-print
-    document.getElementById('btnLogout').style.display = 'none';
-    
-    const rows = document.querySelectorAll("#tableData tbody tr");
-    rows.forEach(row => row.classList.remove('selected'));
-    document.getElementById('actionRowContainer').style.display = 'none';
-    document.getElementById('filterContainer').style.display = 'none';
+    const { jsPDF } = window.jspdf; 
+    const rows = document.querySelectorAll("#tableData tbody tr"); rows.forEach(row => row.classList.remove('selected')); document.getElementById('actionRowContainer').style.display = 'none'; document.getElementById('filterContainer').style.display = 'none';
     showToast("Menyiapkan PDF...");
-
     html2canvas(document.getElementById("printArea"), { scale: 2 }).then(canvas => {
-        let pdf = new jsPDF('p', 'mm', 'a4');
-        let width = pdf.internal.pageSize.getWidth();
-        let height = (canvas.height * width) / canvas.width;
-        pdf.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0, width, height);
-        pdf.save("Laporan_Keuangan_Harian.pdf");
-        
-        // Kembalikan tampilan
-        document.getElementById('actionRowContainer').style.display = 'flex';
-        renderTable(); 
-        document.getElementById('saveMenu').style.display = 'none';
+        let pdf = new jsPDF('p', 'mm', 'a4'); let width = pdf.internal.pageSize.getWidth(); let height = (canvas.height * width) / canvas.width;
+        pdf.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0, width, height); pdf.save("Laporan_Keuangan_Harian.pdf");
+        document.getElementById('actionRowContainer').style.display = 'flex'; renderTable(); document.getElementById('saveMenu').style.display = 'none';
     });
 }
 
-// =====================
-// GRAFIK DASHBOARD
-// =====================
 function renderCharts() {
-    const dashboard = document.getElementById('menu-dashboard');
-    if (!dashboard || dashboard.style.display === 'none') return; // Wajib! Cegah render saat disembunyikan
-
-    if (typeof Chart === 'undefined') {
-        setTimeout(renderCharts, 200);
-        return;
-    }
-
-    // Reset isi wrapper canvas untuk menghindari bug "blank/0px" saat tab disembunyikan
-    document.getElementById('wrapperHarian').innerHTML = '<canvas id="chartHarian"></canvas>';
-    document.getElementById('wrapperBulanan').innerHTML = '<canvas id="chartBulanan"></canvas>';
-    document.getElementById('wrapperKategori').innerHTML = '<canvas id="chartKategori"></canvas>';
-
-    const expenses = data.filter(item => item.type === 'expense');
+    const dashboard = document.getElementById('menu-dashboard'); if (!dashboard || dashboard.style.display === 'none') return; 
+    if (typeof Chart === 'undefined') { setTimeout(renderCharts, 200); return; }
     
-    const dailyMap = {};
-    expenses.forEach(item => {
-        if (!dailyMap[item.date]) dailyMap[item.date] = 0;
-        dailyMap[item.date] += item.amount;
-    });
-    const dailyLabels = Object.keys(dailyMap).sort();
-    const dailyData = dailyLabels.map(date => dailyMap[date]);
-
-    chartHarian = new Chart(document.getElementById('chartHarian'), {
-        type: 'bar', 
-        data: { labels: dailyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: dailyData, backgroundColor: '#ef4444', borderRadius: 4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }}
-    });
-
-    const monthlyMap = {};
-    expenses.forEach(item => {
-        const month = item.date.substring(0, 7);
-        if (!monthlyMap[month]) monthlyMap[month] = 0;
-        monthlyMap[month] += item.amount;
-    });
-    const monthlyLabels = Object.keys(monthlyMap).sort();
-    const monthlyData = monthlyLabels.map(m => monthlyMap[m]);
-
-    chartBulanan = new Chart(document.getElementById('chartBulanan'), {
-        type: 'bar', 
-        data: { labels: monthlyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: monthlyData, backgroundColor: '#3b82f6', borderRadius: 4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }}
-    });
-
-    const catMap = {};
-    expenses.forEach(item => {
-        if (!catMap[item.category]) catMap[item.category] = 0;
-        catMap[item.category] += item.amount;
-    });
-    const catLabels = Object.keys(catMap);
-    const catData = catLabels.map(cat => catMap[cat]);
-
-    chartKategori = new Chart(document.getElementById('chartKategori'), {
-        type: 'doughnut', 
-        data: { labels: catLabels, datasets: [{ data: catData, backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6'], borderWidth: 0 }] },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
+    document.getElementById('wrapperHarian').innerHTML = '<canvas id="chartHarian"></canvas>'; document.getElementById('wrapperBulanan').innerHTML = '<canvas id="chartBulanan"></canvas>'; document.getElementById('wrapperKategori').innerHTML = '<canvas id="chartKategori"></canvas>';
+    const expenses = data.filter(item => item.type === 'expense'); const dailyMap = {}; expenses.forEach(item => { if (!dailyMap[item.date]) dailyMap[item.date] = 0; dailyMap[item.date] += item.amount; }); const dailyLabels = Object.keys(dailyMap).sort(); const dailyData = dailyLabels.map(date => dailyMap[date]);
+    chartHarian = new Chart(document.getElementById('chartHarian'), { type: 'bar', data: { labels: dailyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: dailyData, backgroundColor: '#ef4444', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }} });
+    
+    const monthlyMap = {}; expenses.forEach(item => { const month = item.date.substring(0, 7); if (!monthlyMap[month]) monthlyMap[month] = 0; monthlyMap[month] += item.amount; }); const monthlyLabels = Object.keys(monthlyMap).sort(); const monthlyData = monthlyLabels.map(m => monthlyMap[m]);
+    chartBulanan = new Chart(document.getElementById('chartBulanan'), { type: 'bar', data: { labels: monthlyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: monthlyData, backgroundColor: '#3b82f6', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }} });
+    
+    const catMap = {}; expenses.forEach(item => { if (!catMap[item.category]) catMap[item.category] = 0; catMap[item.category] += item.amount; }); const catLabels = Object.keys(catMap); const catData = catLabels.map(cat => catMap[cat]);
+    chartKategori = new Chart(document.getElementById('chartKategori'), { type: 'doughnut', data: { labels: catLabels, datasets: [{ data: catData, backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false } });
 }
 
-// NAVIGASI
+// ==========================================
+// 6. KONTROL NAVBAR MENU (KLIK LUAR DLL)
+// ==========================================
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-
-        document.getElementById('menu-ringkasan').style.display = "none";
-        document.getElementById('menu-transaksi').style.display = "none";
-        document.getElementById('menu-anggaran').style.display = "none";
-        document.getElementById('menu-dashboard').style.display = "none";
-        document.getElementById('menu-nabung').style.display = "none"; 
-        document.getElementById('menu-pinjaman').style.display = "none"; 
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); item.classList.add('active');
+        document.getElementById('menu-ringkasan').style.display = "none"; document.getElementById('menu-transaksi').style.display = "none"; document.getElementById('menu-anggaran').style.display = "none"; document.getElementById('menu-dashboard').style.display = "none"; 
         
-        // Sembunyikan tombol logout secara default
-        document.getElementById('btnLogout').style.display = "none";
-
         const index = parseInt(item.getAttribute('data-index'));
-
-        if (index === 0) {
-            document.getElementById('menu-transaksi').style.display = "block";
-            document.getElementById('judul').innerText = "TAMBAH TRANSAKSI";
-            if(!document.getElementById('date').value) document.getElementById('date').valueAsDate = new Date();
-        } else if (index === 1) {
-            document.getElementById('menu-ringkasan').style.display = "block";
-            document.getElementById('judul').innerText = "LAPORAN KEUANGAN HARIAN";
-        } else if (index === 2) {
-            document.getElementById('menu-anggaran').style.display = "block";
-            document.getElementById('judul').innerText = "KELOLA ANGGARAN";
-        } else if (index === 3) {
-            document.getElementById('menu-dashboard').style.display = "block";
-            document.getElementById('judul').innerText = "DASHBOARD";
-            document.getElementById('btnLogout').style.display = "block"; // Munculkan hanya di Dashboard
-            setTimeout(() => { renderCharts(); }, 50);   
-        } else if (index === 4) { 
-            document.getElementById('menu-nabung').style.display = "block";
-            document.getElementById('judul').innerText = "CATAT TABUNGAN";
-            if(!document.getElementById('savingDate').value) document.getElementById('savingDate').valueAsDate = new Date();
-        } else if (index === 5) { 
-            document.getElementById('menu-pinjaman').style.display = "block";
-            document.getElementById('judul').innerText = "CATAT PINJAMAN";
-            if(!document.getElementById('loanDate').value) document.getElementById('loanDate').valueAsDate = new Date();
-        }
+        if (index === 0) { document.getElementById('menu-transaksi').style.display = "block"; document.getElementById('judul').innerText = "TAMBAH TRANSAKSI"; if(!document.getElementById('date').value) document.getElementById('date').valueAsDate = new Date(); } 
+        else if (index === 1) { document.getElementById('menu-ringkasan').style.display = "block"; document.getElementById('judul').innerText = "LAPORAN KEUANGAN HARIAN"; } 
+        else if (index === 2) { document.getElementById('menu-anggaran').style.display = "block"; document.getElementById('judul').innerText = "KELOLA ANGGARAN"; } 
+        else if (index === 3) { document.getElementById('menu-dashboard').style.display = "block"; document.getElementById('judul').innerText = "DASHBOARD"; setTimeout(() => { renderCharts(); }, 50); } 
     });
 });
 
-// TUTUP MODAL JIKA KLIK DI LUAR
 window.addEventListener('click', function(event) {
-    const editMod = document.getElementById('editModal');
-    const editBdgMod = document.getElementById('editBudgetModal');
-    const viewBdgMod = document.getElementById('viewBudgetModal');
-    const editSavMod = document.getElementById('editSavingModal');
-    const editLoanMod = document.getElementById('editLoanModal');
-    const viewLoanMod = document.getElementById('viewLoanModal');
-    const confMod = document.getElementById('confirmModal');
+    const editMod = document.getElementById('editModal'); const editBdgMod = document.getElementById('editBudgetModal'); const viewBdgMod = document.getElementById('viewBudgetModal'); const confMod = document.getElementById('confirmModal');
+    const catMod = document.getElementById('categoryModal'); const typeMod = document.getElementById('typeModal'); const descMod = document.getElementById('descModal'); 
+    const btnSimpan = document.getElementById('btnSimpan'); const saveMenu = document.getElementById('saveMenu');
     
-    const catMod = document.getElementById('categoryModal');
-    const typeMod = document.getElementById('typeModal');
-    const descMod = document.getElementById('descModal');
-    const loanTypeMod = document.getElementById('loanTypeModal');
-    
-    const btnSimpan = document.getElementById('btnSimpan');
-    const saveMenu = document.getElementById('saveMenu');
-    
-    if (event.target == editMod) closeEditModal();
-    if (event.target == editBdgMod) closeEditBudgetModal();
-    if (event.target == viewBdgMod) closeViewBudgetModal();
-    if (event.target == editSavMod) closeEditSavingModal();
-    if (event.target == editLoanMod) closeEditLoanModal();
-    if (event.target == viewLoanMod) closeViewLoanModal();
-    if (event.target == confMod) confMod.style.display = "none";
-    
-    if (event.target == catMod) closeCategoryPicker();
-    if (event.target == typeMod) closeTypePicker();
-    if (event.target == descMod) closeDescPicker();
-    if (event.target == loanTypeMod) closeLoanTypePicker();
-
-    if (btnSimpan && saveMenu) {
-        if (!btnSimpan.contains(event.target) && !saveMenu.contains(event.target)) {
-            saveMenu.style.display = 'none';
-        }
-    }
+    if (event.target == editMod) closeEditModal(); if (event.target == editBdgMod) closeEditBudgetModal(); if (event.target == viewBdgMod) closeViewBudgetModal(); if (event.target == confMod) confMod.style.display = "none";
+    if (event.target == catMod) closeCategoryPicker(); if (event.target == typeMod) closeTypePicker(); if (event.target == descMod) closeDescPicker(); 
+    if (btnSimpan && saveMenu) { if (!btnSimpan.contains(event.target) && !saveMenu.contains(event.target)) { saveMenu.style.display = 'none'; } }
 });
 
 </script>
