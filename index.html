@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .menu-container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 400px; /* Lebar maksimal kontainer */
+        }
+
+        .menu-title {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+        }
+
+        .menu-grid {
+            display: grid;
+            /* Membuat 2 kolom berjejer ke samping dengan ukuran yang sama */
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px; /* Jarak antar menu */
+        }
+
+        .menu-item {
+            background-color: #4361ee;
+            color: white;
+            padding: 20px 10px;
+            border-radius: 10px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(67, 97, 238, 0.3);
+        }
+
+        .menu-item:hover {
+            background-color: #3f37c9;
+            transform: translateY(-3px); /* Efek melayang saat kursor di atasnya */
+        }
+
+        .menu-item .icon {
+            font-size: 28px;
+        }
+
+        /* Karena ada 5 menu (ganjil), menu ke-5 kita buat memanjang penuh ke samping di bawah */
+        .menu-item.full-width {
+            grid-column: span 2; 
+        }
+
+        /* Membuat tampilan tetap rapi di layar HP yang sangat kecil */
+        @media (max-width: 320px) {
+            .menu-grid {
+                grid-template-columns: 1fr; /* Berubah jadi 1 ke bawah kalau layarnya sangat sempit */
+            }
+            .menu-item.full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-container">
+        <h2 class="menu-title">Menu Aplikasi</h2>
+        
+        <div class="menu-grid">
+            <a href="#" class="menu-item">
+                <span class="icon">💰</span>
+                Catatan Keuangan
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">🛒</span>
+                Penjualan
+            </a>
+
+            <a href="#" class="menu-item">
+                <span class="icon">🏦</span>
+                Nabung
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">💳</span>
+                Pinjaman
+            </a>
+
+            <a href="#" class="menu-item full-width">
+                <span class="icon">📝</span>
+                Note / Catatan
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
