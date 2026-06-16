@@ -83,14 +83,13 @@
         }
         .menu-item .icon { font-size: 28px; }
         
-        /* Tambahan class agar menu memanjang ke samping */
         .menu-item.full-width { 
             grid-column: span 2; 
         }
         
         @media (max-width: 320px) {
             .menu-grid { grid-template-columns: 1fr; }
-            .menu-item.full-width { grid-column: span 1; } /* Reset ukuran di layar sangat kecil */
+            .menu-item.full-width { grid-column: span 1; }
         }
     </style>
 </head>
@@ -122,14 +121,14 @@
             <a href="#" class="menu-item"><span class="icon">🛒</span> Penjualan</a>
             <a href="#" class="menu-item"><span class="icon">🏦</span> Nabung</a>
             <a href="#" class="menu-item"><span class="icon">💳</span> Pinjaman</a>
-            
             <a href="#" class="menu-item full-width"><span class="icon">📝</span> Note / Catatan</a>
         </div>
     </div>
 
     <script type="module">
+        // Import ditambahkan setPersistence dan browserSessionPersistence
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAJkcYFCW2aSGKoP0wFSXoLvxDtXHOF7XI",
@@ -150,6 +149,7 @@
         const btnLoginSubmit = document.getElementById('btnLoginSubmit');
         const btnLogout = document.getElementById('btnLogout');
 
+        // 1. Cek Status Login
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 loginSection.style.display = 'none';
@@ -163,6 +163,7 @@
             }
         });
 
+        // 2. Logika Submit Login dengan Sesi Sementara (Opsi 1)
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault(); 
             const email = document.getElementById('email').value;
@@ -171,9 +172,14 @@
             btnLoginSubmit.textContent = "Memproses...";
             errorMessage.style.display = 'none';
 
-            signInWithEmailAndPassword(auth, email, password)
+            // Atur sesi agar hanya berlaku saat browser/tab dibuka
+            setPersistence(auth, browserSessionPersistence)
                 .then(() => {
-                    console.log("Berhasil masuk");
+                    // Lanjutkan proses login
+                    return signInWithEmailAndPassword(auth, email, password);
+                })
+                .then(() => {
+                    console.log("Berhasil masuk dengan sesi sementara");
                 })
                 .catch((error) => {
                     btnLoginSubmit.textContent = "Login";
@@ -186,6 +192,7 @@
                 });
         });
 
+        // 3. Logika Tombol Keluar (Logout manual)
         btnLogout.addEventListener('click', () => {
             signOut(auth).then(() => {
                 console.log("Berhasil keluar");
