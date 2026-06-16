@@ -54,19 +54,20 @@
             width: 100%; max-width: 400px;
             display: none; /* Disembunyikan secara default sampai berhasil login */
         }
+        
+        /* Modifikasi Header & Judul */
         .menu-header {
-            display: flex; justify-content: space-between; align-items: center;
+            text-align: center; /* Judul di tengah */
             margin-bottom: 25px;
         }
         .menu-title-dash {
-            color: #333333; font-size: 1.5rem; font-weight: bold;
+            font-family: 'Univers', 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Menggunakan font Univers */
+            color: #333333; 
+            font-size: 1.6rem; 
+            font-weight: bold;
+            text-transform: uppercase; /* Huruf besar semua */
+            letter-spacing: 1.5px; /* Jarak antar huruf agar lebih rapi */
         }
-        .btn-logout {
-            background-color: #ff4757; color: white; border: none;
-            padding: 8px 12px; border-radius: 6px; cursor: pointer;
-            font-weight: bold; transition: background 0.3s;
-        }
-        .btn-logout:hover { background-color: #ff6b81; }
         
         .menu-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; 
@@ -114,8 +115,7 @@
     <div class="menu-container" id="dashboardSection">
         <div class="menu-header">
             <h2 class="menu-title-dash">Menu Aplikasi</h2>
-            <button class="btn-logout" id="btnLogout">Keluar</button>
-        </div>
+            </div>
         <div class="menu-grid">
             <a href="#" class="menu-item"><span class="icon">💰</span> Catatan Keuangan</a>
             <a href="#" class="menu-item"><span class="icon">🛒</span> Penjualan</a>
@@ -126,9 +126,9 @@
     </div>
 
     <script type="module">
-        // Import ditambahkan setPersistence dan browserSessionPersistence
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        // Tidak perlu lagi meng-import signOut karena tombol keluar dihapus
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAJkcYFCW2aSGKoP0wFSXoLvxDtXHOF7XI",
@@ -147,7 +147,6 @@
         const loginForm = document.getElementById('loginForm');
         const errorMessage = document.getElementById('errorMessage');
         const btnLoginSubmit = document.getElementById('btnLoginSubmit');
-        const btnLogout = document.getElementById('btnLogout');
 
         // 1. Cek Status Login
         onAuthStateChanged(auth, (user) => {
@@ -190,15 +189,6 @@
                         errorMessage.innerText = "Terjadi kesalahan: " + error.message;
                     }
                 });
-        });
-
-        // 3. Logika Tombol Keluar (Logout manual)
-        btnLogout.addEventListener('click', () => {
-            signOut(auth).then(() => {
-                console.log("Berhasil keluar");
-            }).catch((error) => {
-                console.error("Error saat logout:", error);
-            });
         });
     </script>
 
