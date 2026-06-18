@@ -6,8 +6,10 @@
   <title>Kasir Warung Klontongan</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
   
+  <!-- Library HTML2Canvas untuk foto struk -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -93,7 +95,7 @@
       background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color);
       padding: 12px 16px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; text-transform: uppercase;
       text-align: left; display: flex; justify-content: space-between; align-items: center;
-      cursor: pointer; transition: all 0.2s;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .custom-select-btn:hover, .custom-select-btn:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
 
@@ -113,8 +115,23 @@
     .btn-scan-big { width: 100%; margin-bottom: 16px; background: #f1f5f9; color: var(--text-main); border: 1px dashed #cbd5e1; }
     .btn-scan-big:hover { background: #e2e8f0; }
 
+    /* TOMBOL AKSI MANAJEMEN PRODUK */
     .aksi-manajemen { display: flex; flex-direction: row; gap: 8px; margin-bottom: 20px; width: 100%; }
-    .btn-text { flex: 1; white-space: nowrap; padding: 10px 8px; font-size: 0.9rem; text-transform: uppercase; }
+    
+    /* Perbaikan teks agar bisa wrap (menyusun ke bawah) jika layar kekecilan */
+    .btn-text { 
+      flex: 1; 
+      padding: 10px 8px; 
+      font-size: 0.9rem; 
+      text-transform: uppercase; 
+      white-space: normal; /* Izinkan teks melipat ke bawah */
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    
     .icon-btn { flex: 0 0 44px; padding: 10px 0; text-align: center; display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; }
 
     .produk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; max-height: 600px; overflow-y: auto; padding-right: 4px; }
@@ -175,7 +192,6 @@
     .struk-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px); padding: 16px; box-sizing: border-box; }
     .struk { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 360px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); font-size: 14px; font-family: monospace; animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 
-    /* Loading Overlay untuk Firebase */
     #loading-overlay { display: flex; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.9); z-index: 10000; align-items: center; justify-content: center; flex-direction: column; }
     .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -186,10 +202,13 @@
       .main { flex-direction: column; gap: 16px; }
       .search-container { flex-direction: column; gap: 8px; }
       .search-container input, .search-container button { width: 100%; min-width: 100%; }
-      .btn-text { font-size: 0.8rem; padding: 10px 4px; }
-      .icon-btn { flex: 0 0 40px; width: 40px; }
+      
+      /* Perbaikan Ukuran Tombol & Teks di HP Agar Tidak Menumpuk */
+      .btn-text { font-size: 0.75rem; padding: 8px 4px; }
+      .icon-btn { flex: 0 0 38px; width: 38px; font-size: 1rem; }
+      
       .filter-scan-container { display: flex; flex-direction: row; gap: 8px; width: 100%; }
-      .filter-scan-container .custom-select-btn { flex: 1; min-width: 0; }
+      .filter-scan-container .custom-select-btn { flex: 1; min-width: 0; font-size: 0.85rem;}
       .filter-scan-container span { display: none; }
       .produk-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); max-height: 450px; }
       .keranjang-section { min-width: 100%; max-width: 100%; padding: 12px; box-sizing: border-box; overflow: hidden; }
@@ -200,6 +219,7 @@
 </head>
 <body>
 
+  <!-- LOADING OVERLAY -->
   <div id="loading-overlay">
     <div class="loader"></div>
     <h3 style="color: var(--text-muted);">MENGHUBUNGKAN KE DATABASE...</h3>
@@ -364,17 +384,10 @@
   </div>
 
   <script>
-    // ==========================================
-    // INTEGRASI FIREBASE DATABASE
-    // ==========================================
     const firebaseConfig = {
       databaseURL: "https://transaksi-bd4cb-default-rtdb.asia-southeast1.firebasedatabase.app/"
     };
-    
-    // Inisialisasi Firebase
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const database = firebase.database();
 
     let produkList = [];
@@ -382,11 +395,8 @@
     let transaksiHarian = [];
     let scannerKasir = null;
     let scannerManajemen = null;
-    
-    // Default Kategori (Jika di database kosong)
     let kategoriList = ["Makanan", "Minuman", "Sabun & Kebersihan", "Rokok", "Lainnya", "Ewalet"];
 
-    // Default Pengaturan Warung
     let pengaturan = {
       nama: "WARUNG KLONTONGAN",
       alamat: "Jl. Contoh No. 123 - Jakarta",
@@ -466,37 +476,22 @@
       });
     }
 
-    // ==========================================
-    // FUNGSI LOAD & SAVE KE FIREBASE
-    // ==========================================
     async function loadData() {
       try {
         const snapProduk = await database.ref('produkList').once('value');
-        if (snapProduk.exists()) {
-          produkList = snapProduk.val();
-        }
+        if (snapProduk.exists()) produkList = snapProduk.val();
 
         const snapTrans = await database.ref('transaksiHarian').once('value');
-        if (snapTrans.exists()) {
-          transaksiHarian = snapTrans.val();
-        }
+        if (snapTrans.exists()) transaksiHarian = snapTrans.val();
 
         const snapPengaturan = await database.ref('pengaturanWarung').once('value');
-        if (snapPengaturan.exists()) {
-          pengaturan = snapPengaturan.val();
-        }
+        if (snapPengaturan.exists()) pengaturan = snapPengaturan.val();
 
         const snapKategori = await database.ref('kategoriList').once('value');
-        if (snapKategori.exists()) {
-          kategoriList = snapKategori.val();
-        }
+        if (snapKategori.exists()) kategoriList = snapKategori.val();
 
-      } catch (error) {
-        console.error("Gagal memuat data dari Firebase:", error);
-      } finally {
-        // Hilangkan layar loading saat selesai (berhasil atau gagal)
-        document.getElementById('loading-overlay').style.display = 'none';
-      }
+      } catch (error) { console.error("Gagal memuat data dari Firebase:", error); } 
+      finally { document.getElementById('loading-overlay').style.display = 'none'; }
     }
 
     function saveData() {
@@ -606,7 +601,7 @@
         const trimmed = namaBaru.trim();
         if (!kategoriList.includes(trimmed)) {
           kategoriList.push(trimmed);
-          saveData(); // Simpan ke Firebase
+          saveData(); 
           filterProduk();
           showModal({ title: 'BERHASIL', message: `Kategori <b>${trimmed}</b> berhasil ditambahkan.` });
         } else { showModal({ title: 'PERINGATAN', message: 'Kategori tersebut sudah ada!' }); }
@@ -620,7 +615,7 @@
       const namaBaru = await showModal({ type: 'prompt', title: 'NAMA BARU', message: 'Masukkan nama kategori yang baru:', defaultValue: kategoriList[index] });
       if (namaBaru !== false && namaBaru.trim() !== "" && namaBaru.trim() !== kategoriList[index]) {
         kategoriList[index] = namaBaru.trim();
-        saveData(); // Simpan ke Firebase
+        saveData(); 
         filterProduk();
         showModal({ title: 'BERHASIL', message: 'Kategori berhasil diperbarui.' });
       }
@@ -634,7 +629,7 @@
       if (konfirmasi) {
         produkList.forEach(p => { if (p.kategori === kategoriList[index]) p.kategori = "Lainnya"; });
         kategoriList.splice(index, 1);
-        saveData(); // Simpan ke Firebase
+        saveData(); 
         resetFilterKategori(); filterProduk(); renderTabelProduk();
         showModal({ title: 'BERHASIL', message: 'Kategori berhasil dihapus.' });
       }
@@ -704,10 +699,7 @@
       };
       
       transaksiHarian.push(transaksi);
-      
-      // Simpan pembaruan stok produk dan transaksi ke Firebase
       saveData();
-
       cetakStruk(totalJual, bayar);
       resetTransaksi(); filterProduk(); renderTabelProduk(); tampilLaporan();
     }
@@ -738,7 +730,7 @@
       const strukKertas = document.getElementById('struk-kertas');
       const actionArea = document.getElementById('struk-action-area');
       
-      actionArea.style.display = 'none'; // Sembunyikan tombol saat difoto
+      actionArea.style.display = 'none'; 
 
       try {
         const canvas = await html2canvas(strukKertas, { scale: 2, backgroundColor: '#ffffff' });
@@ -772,10 +764,10 @@
       document.querySelectorAll('.produk-item').forEach(el => el.classList.remove('terpilih')); renderKeranjang();
     }
 
-    function mulaiScanKasir() { /* Scanner Logic Tetap Sama */ }
-    function stopScanKasir() { /* Scanner Logic Tetap Sama */ }
-    function mulaiScanManajemen() { /* Scanner Logic Tetap Sama */ }
-    function stopScanManajemen() { /* Scanner Logic Tetap Sama */ }
+    function mulaiScanKasir() { /* Sama persis */ }
+    function stopScanKasir() { /* Sama persis */ }
+    function mulaiScanManajemen() { /* Sama persis */ }
+    function stopScanManajemen() { /* Sama persis */ }
 
     function renderTabelProduk() {
       const filterKat = document.getElementById('filter-kategori-manajemen').value;
@@ -913,14 +905,8 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ==========================================
-    // INITIALIZATION AWAL SAAT HALAMAN DIBUKA
-    // ==========================================
     window.onload = async function() {
-      // Tunggu data ditarik dari Firebase dulu
       await loadData();
-      
-      // Setelah data berhasil ditarik, baru tampilkan ke layar
       renderPengaturan();
       formatTanggal();
       filterProduk();
