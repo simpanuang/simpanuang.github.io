@@ -6,10 +6,8 @@
   <title>Kasir Warung Klontongan</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
   
-  <!-- Library HTML2Canvas untuk foto struk -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -59,7 +57,6 @@
     header h1 { font-size: 1.5rem; margin-bottom: 4px; color: var(--text-main); }
     header p { color: var(--text-muted); font-size: 0.9rem; }
 
-    /* MENU BAWAH (BOTTOM NAVIGATION) */
     .tabs {
       display: flex; flex-direction: row; justify-content: center; gap: 8px;
       position: fixed; bottom: 0; left: 0; width: 100%;
@@ -71,7 +68,7 @@
       padding: 12px 24px; background: var(--bg-surface); color: var(--text-muted);
       border: 1px solid var(--border-color); cursor: pointer; flex: 1;
       max-width: 300px; text-align: center; border-radius: var(--radius); font-weight: 600; transition: all 0.2s ease;
-      white-space: nowrap; /* Mencegah teks menumpuk */
+      white-space: nowrap; 
     }
     .tab:hover { background: #f8fafc; }
     .tab.active { background: var(--text-main); color: var(--bg-surface); border-color: var(--text-main); }
@@ -97,7 +94,7 @@
       background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color);
       padding: 12px 16px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; text-transform: uppercase;
       text-align: left; display: flex; justify-content: space-between; align-items: center;
-      cursor: pointer; transition: all 0.2s;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .custom-select-btn:hover, .custom-select-btn:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
 
@@ -118,7 +115,7 @@
     .btn-scan-big:hover { background: #e2e8f0; }
 
     .aksi-manajemen { display: flex; flex-direction: row; gap: 8px; margin-bottom: 20px; width: 100%; }
-    .btn-text { flex: 1; white-space: nowrap; padding: 10px 8px; font-size: 0.9rem; text-transform: uppercase; }
+    .btn-text { flex: 1; padding: 10px 8px; font-size: 0.9rem; text-transform: uppercase; white-space: normal; line-height: 1.2; display: flex; align-items: center; justify-content: center; text-align: center;}
     .icon-btn { flex: 0 0 44px; padding: 10px 0; text-align: center; display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; }
 
     .produk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; max-height: 600px; overflow-y: auto; padding-right: 4px; }
@@ -189,34 +186,22 @@
       .main { flex-direction: column; gap: 16px; }
       .search-container { flex-direction: column; gap: 8px; }
       .search-container input, .search-container button { width: 100%; min-width: 100%; }
-      .btn-text { font-size: 0.8rem; padding: 10px 4px; }
-      .icon-btn { flex: 0 0 40px; width: 40px; }
+      .btn-text { font-size: 0.75rem; padding: 8px 4px; }
+      .icon-btn { flex: 0 0 38px; width: 38px; font-size: 1rem; }
       .filter-scan-container { display: flex; flex-direction: row; gap: 8px; width: 100%; }
-      .filter-scan-container .custom-select-btn { flex: 1; min-width: 0; }
+      .filter-scan-container .custom-select-btn { flex: 1; min-width: 0; font-size: 0.85rem;}
       .filter-scan-container span { display: none; }
       .produk-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); max-height: 450px; }
       .keranjang-section { min-width: 100%; max-width: 100%; padding: 12px; box-sizing: border-box; overflow: hidden; }
       
-      /* PERBAIKAN MENU BAWAH AGAR TIDAK MENUMPUK */
-      .tabs { 
-        padding: 10px 8px; 
-        gap: 6px; 
-        flex-wrap: nowrap; 
-        overflow-x: auto; /* Mengizinkan scroll menyamping jika layar terlalu kecil */
-      }
-      .tabs::-webkit-scrollbar { display: none; } /* Sembunyikan scrollbar di menu */
-      
-      .tab { 
-        padding: 10px 6px; 
-        font-size: 0.72rem; 
-        white-space: nowrap; /* Mencegah teks menjadi 2 baris */
-      }
+      .tabs { padding: 10px 8px; gap: 6px; flex-wrap: nowrap; overflow-x: auto; }
+      .tabs::-webkit-scrollbar { display: none; }
+      .tab { padding: 10px 6px; font-size: 0.72rem; white-space: nowrap; }
     }
   </style>
 </head>
 <body>
 
-  <!-- LOADING OVERLAY -->
   <div id="loading-overlay">
     <div class="loader"></div>
     <h3 style="color: var(--text-muted);">MENGHUBUNGKAN KE DATABASE...</h3>
@@ -347,7 +332,15 @@
       </div>
       <div class="table-container">
         <table>
-          <thead><tr><th>Waktu</th><th>Total Jual</th><th>Total Untung</th><th>Detail Item</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>Total Jual</th>
+              <th>Total Untung</th>
+              <th>Detail Item</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
           <tbody id="tabel-laporan"></tbody>
         </table>
       </div>
@@ -940,20 +933,77 @@
       }
 
       const listTrans = transaksiHarian || [];
-      listTrans.forEach((trans) => {
+      listTrans.forEach((trans, index) => {
         const tanggalTrans = trans.tanggal || tglFilter;
         if (tanggalTrans === tglFilter) {
           totalJualHari += trans.totalJual; totalUntungHari += trans.totalUntung;
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td style="color: var(--text-muted);">${trans.waktu}</td><td style="font-weight: 600;">Rp&nbsp;${trans.totalJual.toLocaleString('id-ID')}</td>
-            <td class="untung">Rp&nbsp;${trans.totalUntung.toLocaleString('id-ID')}</td><td><span style="background: #f8fafc; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">${trans.items.join(', ')}</span></td>
+            <td style="color: var(--text-muted);">${trans.waktu}</td>
+            <td style="font-weight: 600;">Rp&nbsp;${trans.totalJual.toLocaleString('id-ID')}</td>
+            <td class="untung">Rp&nbsp;${trans.totalUntung.toLocaleString('id-ID')}</td>
+            <td><span style="background: #f8fafc; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">${trans.items.join(', ')}</span></td>
+            <td>
+              <div class="aksi-btn-tabel">
+                <button onclick="editLaporan(${index})" class="btn-warning">Edit</button>
+                <button onclick="hapusLaporan(${index})" class="btn-danger">Hapus</button>
+              </div>
+            </td>
           `;
           tbody.appendChild(row);
         }
       });
       document.getElementById('total-hari-ini').textContent = totalJualHari.toLocaleString('id-ID');
       document.getElementById('total-untung-hari').textContent = totalUntungHari.toLocaleString('id-ID');
+    }
+
+    /* =========================================
+       FUNGSI EDIT & HAPUS LAPORAN PENJUALAN
+       ========================================= */
+    async function hapusLaporan(index) {
+      const konfirmasi = await showModal({ 
+        type: 'confirm', 
+        title: 'HAPUS LAPORAN', 
+        message: 'Apakah Anda yakin ingin menghapus data transaksi ini?' 
+      });
+
+      if (konfirmasi) {
+        transaksiHarian.splice(index, 1);
+        saveData();
+        tampilLaporan();
+        showModal({ title: 'DIHAPUS', message: 'Data laporan berhasil dihapus.' });
+      }
+    }
+
+    async function editLaporan(index) {
+      const trans = transaksiHarian[index];
+      
+      const inputs = [
+        { id: 'edit_laporan_waktu', label: 'WAKTU TRANSAKSI', value: trans.waktu },
+        { id: 'edit_laporan_jual', label: 'TOTAL JUAL (RP)', type: 'number', value: trans.totalJual },
+        { id: 'edit_laporan_untung', label: 'TOTAL UNTUNG (RP)', type: 'number', value: trans.totalUntung },
+        { id: 'edit_laporan_detail', label: 'DETAIL ITEM (PISAHKAN DENGAN KOMA)', value: trans.items.join(', ') }
+      ];
+
+      const res = await showModal({
+        type: 'form',
+        title: 'EDIT LAPORAN',
+        message: 'Silakan perbarui detail transaksi di bawah ini:',
+        inputs: inputs
+      });
+
+      if (res) {
+        transaksiHarian[index].waktu = res.edit_laporan_waktu;
+        transaksiHarian[index].totalJual = parseInt(res.edit_laporan_jual) || 0;
+        transaksiHarian[index].totalUntung = parseInt(res.edit_laporan_untung) || 0;
+        
+        // Memecah kembali string menjadi array berdasarkan koma
+        transaksiHarian[index].items = res.edit_laporan_detail.split(',').map(s => s.trim()).filter(s => s !== "");
+        
+        saveData();
+        tampilLaporan();
+        showModal({ title: 'BERHASIL', message: 'Laporan transaksi berhasil diperbarui.' });
+      }
     }
 
     function showTab(n) {
