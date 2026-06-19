@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Dashboard</title>
+    <title>Aplikasi Keuangan</title>
     <style>
         * {
             box-sizing: border-box;
@@ -21,27 +21,69 @@
             padding: 20px;
         }
 
-        .menu-container {
+        .container {
             background: #ffffff;
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             width: 100%;
-            max-width: 400px; /* Lebar maksimal kontainer */
+            max-width: 400px;
         }
 
-        .menu-title {
+        .title {
             text-align: center;
             color: #333333;
             margin-bottom: 25px;
             font-size: 1.5rem;
         }
 
+        /* Class untuk menyembunyikan elemen */
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- STYLING UNTUK LOGIN --- */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #4361ee;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background-color: #4361ee;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            background-color: #3f37c9;
+        }
+
+        /* --- STYLING UNTUK MENU DASHBOARD --- */
         .menu-grid {
             display: grid;
-            /* Membuat 2 kolom berjejer ke samping dengan ukuran yang sama */
             grid-template-columns: repeat(2, 1fr); 
-            gap: 15px; /* Jarak antar menu */
+            gap: 15px; 
         }
 
         .menu-item {
@@ -62,22 +104,20 @@
 
         .menu-item:hover {
             background-color: #3f37c9;
-            transform: translateY(-3px); /* Efek melayang saat kursor di atasnya */
+            transform: translateY(-3px); 
         }
 
         .menu-item .icon {
             font-size: 28px;
         }
 
-        /* Karena ada 5 menu (ganjil), menu ke-5 kita buat memanjang penuh ke samping di bawah */
         .menu-item.full-width {
             grid-column: span 2; 
         }
 
-        /* Membuat tampilan tetap rapi di layar HP yang sangat kecil */
         @media (max-width: 320px) {
             .menu-grid {
-                grid-template-columns: 1fr; /* Berubah jadi 1 ke bawah kalau layarnya sangat sempit */
+                grid-template-columns: 1fr; 
             }
             .menu-item.full-width {
                 grid-column: span 1;
@@ -87,11 +127,23 @@
 </head>
 <body>
 
-    <div class="menu-container">
-        <h2 class="menu-title">Menu Aplikasi</h2>
+    <div id="login-section" class="container">
+        <h2 class="title">Silakan Login</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <input type="text" id="username" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn-login">Masuk</button>
+        </form>
+    </div>
+
+    <div id="dashboard-section" class="container hidden">
+        <h2 class="title">Menu Aplikasi</h2>
         
         <div class="menu-grid">
-            <!-- Baris 1: 2 Menu berjejer -->
             <a href="https://simpanuang.github.io/keuangan.html" class="menu-item">
                 <span class="icon">💰</span>
                 Catatan Keuangan
@@ -100,8 +152,6 @@
                 <span class="icon">🛒</span>
                 Penjualan
             </a>
-
-            <!-- Baris 2: Lanjut ke bawah, 2 Menu berjejer -->
             <a href="https://simpanuang.github.io/nabung.html" class="menu-item">
                 <span class="icon">🏦</span>
                 Nabung
@@ -110,15 +160,46 @@
                 <span class="icon">💳</span>
                 Pinjaman
             </a>
-
-            <!-- Baris 3: Menu ke-5 (Catatan) -->
-            <!-- Link masih "#" karena belum ada link yang diberikan -->
             <a href="#" class="menu-item full-width">
                 <span class="icon">📝</span>
                 Note / Catatan
             </a>
         </div>
     </div>
+
+    <script>
+        // Mengambil elemen HTML untuk diatur oleh JavaScript
+        const loginSection = document.getElementById('login-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const loginForm = document.getElementById('login-form');
+
+        // 1. Cek apakah user sudah login di sesi (tab) ini saat halaman dibuka
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            // Jika sudah login di sesi ini, sembunyikan login, tampilkan dashboard
+            loginSection.classList.add('hidden');
+            dashboardSection.classList.remove('hidden');
+        }
+
+        // 2. Logika ketika tombol "Masuk" ditekan
+        loginForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah browser me-reload halaman
+
+            // Ambil nilai input (bisa ditambahkan validasi username/password spesifik di sini jika mau)
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            // Simpan status login ke sessionStorage
+            // Data ini otomatis musnah saat tab/aplikasi dikeluarkan (otomatis logout)
+            sessionStorage.setItem('isLoggedIn', 'true');
+
+            // Sembunyikan form login, tampilkan menu
+            loginSection.classList.add('hidden');
+            dashboardSection.classList.remove('hidden');
+            
+            // Kosongkan form setelah login berhasil
+            loginForm.reset();
+        });
+    </script>
 
 </body>
 </html>
