@@ -195,7 +195,7 @@ tbody tr.selected { background-color: #d1e7dd !important; }
 <script>
 /* ===================== JAVASCRIPT ===================== */
 
-// Variabel Global & Konfigurasi Firebase URL (Menggunakan REST API)
+// Variabel Global & Konfigurasi Firebase URL
 const FIREBASE_DB_URL = "https://nabung-597ed-default-rtdb.asia-southeast1.firebasedatabase.app/dataTabungan.json";
 let savings = [];
 let selectedSavingId = null;
@@ -211,8 +211,13 @@ async function loadFromFirebase() {
     try {
         const response = await fetch(FIREBASE_DB_URL);
         const data = await response.json();
-        // Karena kita menyimpan array, data yang kembali bisa berupa array atau null
-        savings = data ? data : [];
+        
+        // Memastikan data selalu menjadi Array meskipun Firebase merubahnya menjadi Object
+        let parsedData = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+        
+        // Menghapus slot kosong (null) jika ada
+        savings = parsedData.filter(s => s !== null);
+        
         renderSavings();
         showToast("Data dimuat dari server!");
     } catch (error) {
@@ -223,11 +228,12 @@ async function loadFromFirebase() {
 
 async function saveToFirebase() {
     try {
-        // Menggunakan method PUT untuk menimpa seluruh node dengan array terbaru (sama seperti prinsip localStorage)
+        // Karena array akan menimpa seluruh data, kita bersihkan dulu dari null
+        const cleanSavings = savings.filter(s => s !== null);
         await fetch(FIREBASE_DB_URL, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(savings)
+            body: JSON.stringify(cleanSavings)
         });
     } catch (error) {
         console.error("Gagal menyimpan data:", error);
@@ -269,7 +275,7 @@ function renderSavings() {
     const sortedSavings = [...savings].sort((a,b) => new Date(b.date) - new Date(a.date));
 
     sortedSavings.forEach(s => {
-        if (!s) return; // Mencegah error jika ada index array yang kosong (null) di firebase
+        if (!s) return; 
         total += s.amount;
         const isSelected = selectedSavingId === s.id ? 'selected' : '';
         tbody.innerHTML += `
@@ -314,7 +320,6 @@ async function addSaving() {
     document.getElementById('savingAmount').value = "";
     renderSavings();
     
-    // Simpan ke Firebase setiap ada perubahan
     await saveToFirebase();
     showToast("Tabungan berhasil ditambahkan!");
 }
@@ -345,7 +350,6 @@ async function saveEditSaving() {
         selectedSavingId = null;
         renderSavings();
         
-        // Simpan ke Firebase setiap ada perubahan
         await saveToFirebase();
         showToast("Tabungan berhasil diperbarui!");
     }
@@ -368,9 +372,11 @@ function closeConfirm() {
     confirmCallback = null;
 }
 
+// Menyimpan callback sementara sebelum modal ditutup
 document.getElementById("btnConfirmYes").onclick = function() {
-    closeConfirm();
-    if(confirmCallback) confirmCallback();
+    let eksekusiHapus = confirmCallback; // Simpan perintah hapusnya dulu
+    closeConfirm(); // Tutup modal (ini akan mereset confirmCallback jadi null)
+    if(eksekusiHapus) eksekusiHapus(); // Baru jalankan penghapusan
 };
 
 function deleteSavingSelected() {
@@ -380,7 +386,6 @@ function deleteSavingSelected() {
         selectedSavingId = null;
         renderSavings();
         
-        // Simpan ke Firebase setiap ada perubahan
         await saveToFirebase();
         showToast("Tabungan berhasil dihapus!");
     });
