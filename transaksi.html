@@ -6,8 +6,10 @@
   <title>Kasir Warung Klontongan</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
   
+  <!-- Library HTML2Canvas untuk foto struk -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -29,6 +31,7 @@
       --radius: 8px;
     }
 
+    /* KUNCI LAYAR AGAR TIDAK BISA DIGESER KE SAMPING */
     html, body { 
       background: var(--bg-body); 
       color: var(--text-main); 
@@ -156,19 +159,21 @@
       backdrop-filter: blur(5px); padding: 16px; box-sizing: border-box;
     }
     .modal-box {
-      background: var(--bg-surface); padding: 32px 28px; border-radius: 20px; width: 100%; max-width: 420px; text-align: center;
+      background: var(--bg-surface); padding: 32px 28px; border-radius: 20px; width: 100%; max-width: 420px; text-align: left;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); border: 1px solid rgba(0,0,0,0.05);
       animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     @keyframes modalPop { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    .modal-title { font-size: 1.3rem; margin-bottom: 12px; color: var(--text-main); }
-    .modal-message { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+    .modal-title { font-size: 1.3rem; margin-bottom: 12px; color: var(--text-main); text-align: center; }
+    .modal-message { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; text-align: center;}
     .modal-input { width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 24px; font-size: 1rem; color: var(--text-main); text-align: center; }
-    .modal-options-container { display: none; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; margin-bottom: 24px; padding-right: 4px; }
+    .modal-options-container { display: none; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; margin-bottom: 24px; padding-right: 4px; }
     .modal-options-container::-webkit-scrollbar { width: 6px; }
     .modal-options-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
-    .modal-option-btn { background: var(--bg-surface); border: 1px solid var(--border-color); padding: 14px 16px; border-radius: 8px; font-size: 0.95rem; color: var(--text-main); cursor: pointer; text-align: left; font-weight: 600; transition: all 0.2s; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+    
+    .modal-option-btn { background: var(--bg-surface); border: 1px solid var(--border-color); padding: 14px 16px; border-radius: 8px; font-size: 0.95rem; color: var(--text-main); cursor: pointer; text-align: left; font-weight: 600; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
     .modal-option-btn:hover { border-color: var(--primary); background: rgba(37, 99, 235, 0.05); color: var(--primary); }
+    
     .modal-form-container { display: none; flex-direction: column; width: 100%; margin-bottom: 12px; }
     .modal-actions { display: flex; gap: 12px; justify-content: center; }
     .modal-actions button { flex: 1; padding: 12px; font-weight: 800; border-radius: 8px; font-size: 0.95rem; }
@@ -193,7 +198,6 @@
       .filter-scan-container span { display: none; }
       .produk-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); max-height: 450px; }
       .keranjang-section { min-width: 100%; max-width: 100%; padding: 12px; box-sizing: border-box; overflow: hidden; }
-      
       .tabs { padding: 10px 8px; gap: 6px; flex-wrap: nowrap; overflow-x: auto; }
       .tabs::-webkit-scrollbar { display: none; }
       .tab { padding: 10px 6px; font-size: 0.72rem; white-space: nowrap; }
@@ -202,6 +206,7 @@
 </head>
 <body>
 
+  <!-- LOADING OVERLAY -->
   <div id="loading-overlay">
     <div class="loader"></div>
     <h3 style="color: var(--text-muted);">MENGHUBUNGKAN KE DATABASE...</h3>
@@ -316,10 +321,16 @@
       <div style="text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 24px;">
         <h2 style="font-size: 1.5rem; margin: 0;">LAPORAN PENJUALAN</h2>
       </div>
+      
+      <!-- TOMBOL SORTIR CUSTOM MENGGANTIKAN INPUT DATE -->
       <div style="text-align: center; margin-bottom: 24px; background: #f8fafc; padding: 12px; border-radius: var(--radius); border: 1px solid var(--border-color);">
-        <label for="input-sortir-tanggal" style="font-weight: 800; margin-right: 10px; text-transform: uppercase;">SORTIR TANGGAL:</label>
-        <input type="date" id="input-sortir-tanggal" onchange="tampilLaporan()" style="padding: 8px; width: auto; min-width: 150px; font-weight: 600;">
+        <input type="hidden" id="filter-mode-laporan" value="harian">
+        <input type="hidden" id="filter-date-laporan" value="">
+        <button id="btn-sortir-laporan" class="custom-select-btn" style="margin: 0 auto; min-width: 250px; max-width: 100%; justify-content: space-between;" onclick="bukaSortirLaporan()">
+          HARIAN (HARI INI) <span style="font-size: 1.2rem;">▾</span>
+        </button>
       </div>
+      
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 24px;">
         <div style="background: var(--bg-surface); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border-color);">
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px; font-weight: 800; text-transform: uppercase;">OMSET PENJUALAN</p>
@@ -431,7 +442,10 @@
             const btn = document.createElement('button');
             btn.className = 'modal-option-btn';
             const isObj = typeof opt === 'object' && opt !== null;
-            btn.innerHTML = `${isObj ? opt.label : opt} <span style="font-size:1.2rem; color:#ccc;">›</span>`;
+            
+            // Format List Pilihan Modal (Elegan)
+            btn.innerHTML = `${isObj ? opt.label : opt} <span style="font-size:1.4rem; color:var(--primary);">○</span>`;
+            
             btn.onclick = () => { cleanup(); resolve(isObj ? opt.value : idx); };
             optionsContainer.appendChild(btn);
           });
@@ -554,11 +568,39 @@
       }
     }
 
-    function resetFilterKategori() {
-      document.getElementById('filter-kategori-kasir').value = '';
-      document.getElementById('btn-filter-kasir').innerHTML = 'SEMUA KATEGORI <span style="font-size: 1.2rem;">▾</span>';
-      document.getElementById('filter-kategori-manajemen').value = '';
-      document.getElementById('btn-filter-manajemen').innerHTML = 'SEMUA KATEGORI <span style="font-size: 1.2rem;">▾</span>';
+    // =========================================
+    // FUNGSI SORTIR LAPORAN (MODAL PILIHAN WAKTU)
+    // =========================================
+    async function bukaSortirLaporan() {
+      const options = [
+        { label: "Semua Waktu", value: "semua" },
+        { label: "Harian (Hari Ini)", value: "harian" },
+        { label: "Mingguan (7 Hari Terakhir)", value: "mingguan" },
+        { label: "Bulanan (Bulan Ini)", value: "bulanan" },
+        { label: "Pilih Tanggal Sendiri", value: "custom" }
+      ];
+
+      const res = await showModal({ type: 'select', title: 'SORTIR LAPORAN', options: options });
+      
+      if (res !== false) {
+        if (res === 'custom') {
+          const dateRes = await showModal({ 
+            type: 'form', title: 'PILIH TANGGAL', 
+            inputs: [ { id: 'custom_date', label: 'TANGGAL', type: 'date', value: '' } ] 
+          });
+          if (dateRes && dateRes.custom_date) {
+             document.getElementById('filter-mode-laporan').value = 'custom';
+             document.getElementById('filter-date-laporan').value = dateRes.custom_date;
+             document.getElementById('btn-sortir-laporan').innerHTML = `${dateRes.custom_date} <span style="font-size: 1.2rem;">▾</span>`;
+             tampilLaporan();
+          }
+        } else {
+          document.getElementById('filter-mode-laporan').value = res;
+          const selectedOpt = options.find(o => o.value === res);
+          document.getElementById('btn-sortir-laporan').innerHTML = `${selectedOpt.label.toUpperCase()} <span style="font-size: 1.2rem;">▾</span>`;
+          tampilLaporan();
+        }
+      }
     }
 
     function filterProduk() {
@@ -620,7 +662,9 @@
         produkList.forEach(p => { if (p.kategori === kategoriList[index]) p.kategori = "Lainnya"; });
         kategoriList.splice(index, 1);
         saveData(); 
-        resetFilterKategori(); filterProduk(); renderTabelProduk();
+        document.getElementById('filter-kategori-kasir').value = '';
+        document.getElementById('filter-kategori-manajemen').value = '';
+        filterProduk(); renderTabelProduk();
         showModal({ title: 'BERHASIL', message: 'Kategori berhasil dihapus.' });
       }
     }
@@ -919,27 +963,55 @@
 
     function batalForm() { document.getElementById('form-produk').style.display = 'none'; }
 
+    // ==========================================
+    // LOGIKA PERHITUNGAN WAKTU & TAMPIL LAPORAN
+    // ==========================================
     function tampilLaporan() {
       const tbody = document.getElementById('tabel-laporan');
       tbody.innerHTML = '';
-      let totalJualHari = 0; let totalUntungHari = 0;
-      let inputSortir = document.getElementById('input-sortir-tanggal');
-      let tglFilter = inputSortir.value;
+      let totalJualHari = 0; 
+      let totalUntungHari = 0;
+
+      const mode = document.getElementById('filter-mode-laporan').value || 'harian';
+      const customDate = document.getElementById('filter-date-laporan').value;
       
-      if (!tglFilter) {
-        const today = new Date();
-        tglFilter = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-        inputSortir.value = tglFilter;
-      }
+      const today = new Date();
+      const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+      const thisMonthStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+      
+      const lastWeek = new Date(today);
+      lastWeek.setDate(today.getDate() - 7);
 
       const listTrans = transaksiHarian || [];
+      
       listTrans.forEach((trans, index) => {
-        const tanggalTrans = trans.tanggal || tglFilter;
-        if (tanggalTrans === tglFilter) {
-          totalJualHari += trans.totalJual; totalUntungHari += trans.totalUntung;
+        const tanggalTrans = trans.tanggal || todayStr; // fallback jika data lama tak punya tanggal
+        
+        let include = false;
+        
+        if (mode === 'semua') {
+          include = true;
+        } else if (mode === 'harian') {
+          include = (tanggalTrans === todayStr);
+        } else if (mode === 'bulanan') {
+          include = tanggalTrans.startsWith(thisMonthStr);
+        } else if (mode === 'custom') {
+          include = (tanggalTrans === customDate);
+        } else if (mode === 'mingguan') {
+          const transDate = new Date(tanggalTrans);
+          include = (transDate >= lastWeek && transDate <= today);
+        }
+
+        if (include) {
+          totalJualHari += trans.totalJual; 
+          totalUntungHari += trans.totalUntung;
+
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td style="color: var(--text-muted);">${trans.waktu}</td>
+            <td style="color: var(--text-muted);">
+               <strong style="color: var(--text-main); font-size: 0.85rem;">${tanggalTrans}</strong><br>
+               ${trans.waktu}
+            </td>
             <td style="font-weight: 600;">Rp&nbsp;${trans.totalJual.toLocaleString('id-ID')}</td>
             <td class="untung">Rp&nbsp;${trans.totalUntung.toLocaleString('id-ID')}</td>
             <td><span style="background: #f8fafc; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">${trans.items.join(', ')}</span></td>
@@ -957,20 +1029,11 @@
       document.getElementById('total-untung-hari').textContent = totalUntungHari.toLocaleString('id-ID');
     }
 
-    /* =========================================
-       FUNGSI EDIT & HAPUS LAPORAN PENJUALAN
-       ========================================= */
     async function hapusLaporan(index) {
-      const konfirmasi = await showModal({ 
-        type: 'confirm', 
-        title: 'HAPUS LAPORAN', 
-        message: 'Apakah Anda yakin ingin menghapus data transaksi ini?' 
-      });
-
+      const konfirmasi = await showModal({ type: 'confirm', title: 'HAPUS LAPORAN', message: 'Apakah Anda yakin ingin menghapus data transaksi ini?' });
       if (konfirmasi) {
         transaksiHarian.splice(index, 1);
-        saveData();
-        tampilLaporan();
+        saveData(); tampilLaporan();
         showModal({ title: 'DIHAPUS', message: 'Data laporan berhasil dihapus.' });
       }
     }
@@ -979,30 +1042,24 @@
       const trans = transaksiHarian[index];
       
       const inputs = [
+        { id: 'edit_laporan_tanggal', label: 'TANGGAL TRANSAKSI', type: 'date', value: trans.tanggal },
         { id: 'edit_laporan_waktu', label: 'WAKTU TRANSAKSI', value: trans.waktu },
         { id: 'edit_laporan_jual', label: 'TOTAL JUAL (RP)', type: 'number', value: trans.totalJual },
         { id: 'edit_laporan_untung', label: 'TOTAL UNTUNG (RP)', type: 'number', value: trans.totalUntung },
-        { id: 'edit_laporan_detail', label: 'DETAIL ITEM (PISAHKAN DENGAN KOMA)', value: trans.items.join(', ') }
+        { id: 'edit_laporan_detail', label: 'DETAIL ITEM (PISAHKAN KOMA)', value: trans.items.join(', ') }
       ];
 
-      const res = await showModal({
-        type: 'form',
-        title: 'EDIT LAPORAN',
-        message: 'Silakan perbarui detail transaksi di bawah ini:',
-        inputs: inputs
-      });
+      const res = await showModal({ type: 'form', title: 'EDIT LAPORAN', message: 'Perbarui detail transaksi:', inputs: inputs });
 
       if (res) {
+        transaksiHarian[index].tanggal = res.edit_laporan_tanggal;
         transaksiHarian[index].waktu = res.edit_laporan_waktu;
         transaksiHarian[index].totalJual = parseInt(res.edit_laporan_jual) || 0;
         transaksiHarian[index].totalUntung = parseInt(res.edit_laporan_untung) || 0;
-        
-        // Memecah kembali string menjadi array berdasarkan koma
         transaksiHarian[index].items = res.edit_laporan_detail.split(',').map(s => s.trim()).filter(s => s !== "");
         
-        saveData();
-        tampilLaporan();
-        showModal({ title: 'BERHASIL', message: 'Laporan transaksi berhasil diperbarui.' });
+        saveData(); tampilLaporan();
+        showModal({ title: 'BERHASIL', message: 'Laporan transaksi diperbarui.' });
       }
     }
 
