@@ -277,7 +277,8 @@ function renderSavings() {
     sortedSavings.forEach(s => {
         if (!s) return; 
         total += s.amount;
-        const isSelected = selectedSavingId === s.id ? 'selected' : '';
+        // Gunakan String() untuk memastikan perbandingan aman (mencegah bug ID Number vs String)
+        const isSelected = String(selectedSavingId) === String(s.id) ? 'selected' : '';
         tbody.innerHTML += `
         <tr class="${isSelected}" onclick="toggleSavingSelection(this, '${s.id}')">
             <td>${s.date}</td>
@@ -292,10 +293,12 @@ function renderSavings() {
 function toggleSavingSelection(rowElement, id) {
     const rows = document.querySelectorAll("#tableSaving tbody tr");
     rows.forEach(r => r.classList.remove('selected'));
-    if (selectedSavingId === id) {
+    
+    // Gunakan String() agar tidak ada missmatch tipe data
+    if (String(selectedSavingId) === String(id)) {
         selectedSavingId = null;
     } else {
-        selectedSavingId = id;
+        selectedSavingId = String(id); // Simpan secara eksplisit sebagai String
         rowElement.classList.add('selected');
     }
 }
@@ -327,7 +330,9 @@ async function addSaving() {
 // Fungsi Edit
 function editSavingSelected() {
     if (!selectedSavingId) return showToast("Pilih satu baris tabungan terlebih dahulu.");
-    const target = savings.find(s => s && s.id === selectedSavingId);
+    
+    // Gunakan String() untuk pencarian
+    const target = savings.find(s => s && String(s.id) === String(selectedSavingId));
     if (target) {
         document.getElementById('editSavingDate').value = target.date;
         document.getElementById('editSavingAmount').value = target.amount.toLocaleString('id-ID');
@@ -342,7 +347,8 @@ async function saveEditSaving() {
 
     if (!date || isNaN(amount) || amount <= 0) return showToast("Isi tanggal dan jumlah dengan benar!");
 
-    const index = savings.findIndex(s => s && s.id === selectedSavingId);
+    // Gunakan String() untuk pencarian index
+    const index = savings.findIndex(s => s && String(s.id) === String(selectedSavingId));
     if (index !== -1) {
         savings[index].date = date;
         savings[index].amount = amount;
@@ -374,15 +380,16 @@ function closeConfirm() {
 
 // Menyimpan callback sementara sebelum modal ditutup
 document.getElementById("btnConfirmYes").onclick = function() {
-    let eksekusiHapus = confirmCallback; // Simpan perintah hapusnya dulu
-    closeConfirm(); // Tutup modal (ini akan mereset confirmCallback jadi null)
-    if(eksekusiHapus) eksekusiHapus(); // Baru jalankan penghapusan
+    let eksekusiHapus = confirmCallback; 
+    closeConfirm(); 
+    if(eksekusiHapus) eksekusiHapus(); 
 };
 
 function deleteSavingSelected() {
     if (!selectedSavingId) return showToast("Pilih satu baris tabungan yang ingin dihapus.");
     showConfirm("Hapus data tabungan ini?", async () => {
-        savings = savings.filter(s => s && s.id !== selectedSavingId);
+        // Gunakan String() untuk membandingkan ID saat memfilter array
+        savings = savings.filter(s => s && String(s.id) !== String(selectedSavingId));
         selectedSavingId = null;
         renderSavings();
         
