@@ -259,7 +259,7 @@
           </div>
           <div style="margin-bottom: 16px;">
             <label style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; display: block; font-weight: 800; text-transform: uppercase;">NOMINAL PEMBAYARAN</label>
-            <input type="number" id="bayar" placeholder="Masukkan nominal uang..." onkeyup="hitungKembalian()" style="width:100%; font-weight: 600;">
+            <input type="text" inputmode="numeric" id="bayar" placeholder="Masukkan nominal uang..." oninput="formatRupiahRealTime(this); hitungKembalian()" style="width:100%; font-weight: 600;">
           </div>
           <div style="background: var(--bg-surface); padding: 12px; border-radius: 6px; margin-bottom: 16px; border: 1px solid var(--border-color);">
             <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem; font-weight: 800; text-transform: uppercase;">KEMBALIAN</p>
@@ -301,8 +301,10 @@
             <input type="hidden" id="kategori-produk" value="">
             <button id="btn-kategori-produk" class="custom-select-btn" style="width:100%; font-weight: 400;" onclick="bukaKategoriForm()">PILIH KATEGORI <span style="font-size: 1.2rem;">▾</span></button>
             <input type="text" id="barcode" placeholder="BARCODE (OPSIONAL)">
-            <input type="number" id="harga-jual" placeholder="HARGA JUAL (RP)">
-            <input type="number" id="harga-beli" placeholder="HARGA BELI / MODAL (RP)">
+            
+            <input type="text" inputmode="numeric" id="harga-jual" placeholder="HARGA JUAL (RP)" oninput="formatRupiahRealTime(this)">
+            <input type="text" inputmode="numeric" id="harga-beli" placeholder="HARGA BELI / MODAL (RP)" oninput="formatRupiahRealTime(this)">
+            
             <input type="number" id="stok-produk" placeholder="STOK AWAL">
         </div>
         <div style="display:flex; gap:10px; margin-top:16px;">
@@ -399,6 +401,30 @@
       telp: "081234567890"
     };
 
+    /* =========================================
+       FUNGSI BANTU FORMAT RUPIAH OTOMATIS SAAT DIKETIK
+       ========================================= */
+    function formatRupiahRealTime(el) {
+      // Hilangkan karakter selain angka
+      let val = el.value.replace(/\D/g, '');
+      if (val !== '') {
+        // Format ke dalam bentuk ribuan (pakai titik)
+        el.value = parseInt(val, 10).toLocaleString('id-ID');
+      } else {
+        el.value = '';
+      }
+    }
+
+    // Fungsi mengubah string yang ada titik (10.000) kembali jadi integer murni
+    function parseRupiah(val) {
+      if (!val) return 0;
+      return parseInt(val.toString().replace(/\./g, ''), 10) || 0;
+    }
+
+
+    /* =========================================
+       FUNGSI MODAL KUSTOM MULTIFUNGSI
+       ========================================= */
     function showModal({ type = 'alert', title = 'PEMBERITAHUAN', message = '', defaultValue = '', options = [], inputs = [] }) {
       return new Promise((resolve) => {
         const overlay = document.getElementById('custom-modal');
@@ -450,7 +476,14 @@
           formContainer.innerHTML = inputs.map(inp => `
             <div style="text-align: left; width: 100%; margin-bottom: 16px;">
               <label style="font-size: 0.85rem; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; display: block; text-transform: uppercase;">${inp.label}</label>
-              <input type="${inp.type || 'text'}" id="${inp.id}" class="modal-input" value="${inp.value || ''}" placeholder="${inp.placeholder || ''}" style="margin-bottom: 0; text-align: left; font-weight: 500;">
+              <input type="${inp.type || 'text'}" 
+                     inputmode="${inp.isUang ? 'numeric' : 'text'}" 
+                     id="${inp.id}" 
+                     class="modal-input" 
+                     value="${inp.isUang ? (inp.value ? parseInt(inp.value).toLocaleString('id-ID') : '') : (inp.value || '')}" 
+                     placeholder="${inp.placeholder || ''}" 
+                     ${inp.isUang ? 'oninput="formatRupiahRealTime(this)"' : ''} 
+                     style="margin-bottom: 0; text-align: left; font-weight: 500;">
             </div>
           `).join('');
         } else if (type === 'confirm') {
@@ -696,18 +729,20 @@
     function hapusItem(index) { keranjang.splice(index, 1); renderKeranjang(); }
 
     function hitungKembalian() {
-      const totalText = document.getElementById('total-harga').textContent.replace(/\./g, '');
-      const total = parseInt(totalText) || 0;
+      // Gunakan parseRupiah untuk menghitung nilai asli integer
+      const total = parseRupiah(document.getElementById('total-harga').textContent);
       const bayarInput = document.getElementById('bayar').value;
       if (bayarInput === '') { document.getElementById('kembalian').textContent = '0'; return; }
-      const bayar = parseInt(bayarInput) || 0;
+      
+      const bayar = parseRupiah(bayarInput);
       document.getElementById('kembalian').textContent = (bayar - total).toLocaleString('id-ID');
     }
 
     async function prosesBayar() {
       if (keranjang.length === 0) return showModal({ title: 'GAGAL', message: 'Keranjang belanja Anda kosong!' });
-      const totalJual = parseInt(document.getElementById('total-harga').textContent.replace(/\./g, '')) || 0;
-      const bayar = parseInt(document.getElementById('bayar').value) || 0;
+      
+      const totalJual = parseRupiah(document.getElementById('total-harga').textContent);
+      const bayar = parseRupiah(document.getElementById('bayar').value);
       
       if (bayar < totalJual) return showModal({ title: 'UANG KURANG', message: 'Nominal pembayaran kurang dari total belanja!' });
 
@@ -906,8 +941,10 @@
       const nama = document.getElementById('nama-produk').value.trim();
       const kategori = document.getElementById('kategori-produk').value;
       const barcode = document.getElementById('barcode').value.trim();
-      const hargaJual = parseInt(document.getElementById('harga-jual').value);
-      const hargaBeli = parseInt(document.getElementById('harga-beli').value);
+      
+      // Ambil nilai asli integer dari format rupiah
+      const hargaJual = parseRupiah(document.getElementById('harga-jual').value);
+      const hargaBeli = parseRupiah(document.getElementById('harga-beli').value);
       const stok = parseInt(document.getElementById('stok-produk').value);
       const editId = document.getElementById('edit-id').value;
 
@@ -941,8 +978,10 @@
       document.getElementById('kategori-produk').value = produk.kategori;
       document.getElementById('btn-kategori-produk').innerHTML = `${produk.kategori} <span style="font-size: 1.2rem;">▾</span>`;
       document.getElementById('barcode').value = produk.barcode || '';
-      document.getElementById('harga-jual').value = produk.hargaJual;
-      document.getElementById('harga-beli').value = produk.hargaBeli;
+      
+      // Mengubah integer ke bentuk format titik di form edit
+      document.getElementById('harga-jual').value = produk.hargaJual.toLocaleString('id-ID');
+      document.getElementById('harga-beli').value = produk.hargaBeli.toLocaleString('id-ID');
       document.getElementById('stok-produk').value = produk.stok;
     }
 
@@ -957,9 +996,6 @@
 
     function batalForm() { document.getElementById('form-produk').style.display = 'none'; }
 
-    // ==========================================
-    // LOGIKA PERHITUNGAN WAKTU & TAMPIL LAPORAN
-    // ==========================================
     function tampilLaporan() {
       const tbody = document.getElementById('tabel-laporan');
       tbody.innerHTML = '';
@@ -1036,8 +1072,8 @@
       const inputs = [
         { id: 'edit_laporan_tanggal', label: 'TANGGAL TRANSAKSI', type: 'date', value: trans.tanggal },
         { id: 'edit_laporan_waktu', label: 'WAKTU TRANSAKSI', value: trans.waktu },
-        { id: 'edit_laporan_jual', label: 'TOTAL JUAL (RP)', type: 'number', value: trans.totalJual },
-        { id: 'edit_laporan_untung', label: 'TOTAL UNTUNG (RP)', type: 'number', value: trans.totalUntung },
+        { id: 'edit_laporan_jual', label: 'TOTAL JUAL (RP)', isUang: true, value: trans.totalJual },
+        { id: 'edit_laporan_untung', label: 'TOTAL UNTUNG (RP)', isUang: true, value: trans.totalUntung },
         { id: 'edit_laporan_detail', label: 'DETAIL ITEM (PISAHKAN KOMA)', value: trans.items.join(', ') }
       ];
 
@@ -1046,8 +1082,11 @@
       if (res) {
         transaksiHarian[index].tanggal = res.edit_laporan_tanggal;
         transaksiHarian[index].waktu = res.edit_laporan_waktu;
-        transaksiHarian[index].totalJual = parseInt(res.edit_laporan_jual) || 0;
-        transaksiHarian[index].totalUntung = parseInt(res.edit_laporan_untung) || 0;
+        
+        // PENTING: Ubah lagi string format titik ke bentuk asli (integer)
+        transaksiHarian[index].totalJual = parseRupiah(res.edit_laporan_jual);
+        transaksiHarian[index].totalUntung = parseRupiah(res.edit_laporan_untung);
+        
         transaksiHarian[index].items = res.edit_laporan_detail.split(',').map(s => s.trim()).filter(s => s !== "");
         
         saveData(); tampilLaporan();
