@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Keuangan</title>
     <style>
+        /* --- RESET & BASIC STYLE --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -167,37 +168,74 @@
         </div>
     </div>
 
-    <script>
-        // Mengambil elemen HTML untuk diatur oleh JavaScript
+    <script type="module">
+        // 1. Import Firebase SDK versi terbaru
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        // 2. KONFIGURASI FIREBASE KAMU
+        // !! PENTING: Ganti nilai di bawah ini dengan konfigurasi asli dari Firebase Console kamu !!
+        const firebaseConfig = {
+            apiKey: "KODE_API_KEY_KAMU",
+            authDomain: "project-kamu.firebaseapp.com",
+            projectId: "project-kamu",
+            storageBucket: "project-kamu.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdefghij"
+        };
+
+        // Inisialisasi aplikasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Ambil elemen dari HTML
         const loginSection = document.getElementById('login-section');
         const dashboardSection = document.getElementById('dashboard-section');
         const loginForm = document.getElementById('login-form');
 
-        // 1. Cek apakah user sudah login di sesi (tab) ini saat halaman dibuka
+        // 3. CEK SESI LOGIN SAAT INI
+        // Jika sudah login di sesi tab ini, langsung tampilkan dashboard
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
-            // Jika sudah login di sesi ini, sembunyikan login, tampilkan dashboard
             loginSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
         }
 
-        // 2. Logika ketika tombol "Masuk" ditekan
+        // 4. PROSES SUBMIT LOGIN
         loginForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Mencegah browser me-reload halaman
+            event.preventDefault(); // Mencegah reload halaman
 
-            // Ambil nilai input (bisa ditambahkan validasi username/password spesifik di sini jika mau)
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-            // Simpan status login ke sessionStorage
-            // Data ini otomatis musnah saat tab/aplikasi dikeluarkan (otomatis logout)
-            sessionStorage.setItem('isLoggedIn', 'true');
+            // TRIK: Gabungkan username yang diketik dengan domain fiktif
+            // Di Firebase, pastikan kamu mendaftarkan user dengan format "username@aplikasiku.com"
+            const fakeEmail = username + "@aplikasiku.com";
 
-            // Sembunyikan form login, tampilkan menu
-            loginSection.classList.add('hidden');
-            dashboardSection.classList.remove('hidden');
-            
-            // Kosongkan form setelah login berhasil
-            loginForm.reset();
+            // Ubah teks tombol saat memproses
+            const btnSubmit = document.querySelector('.btn-login');
+            btnSubmit.innerText = "Memproses...";
+
+            // Kirim permintaan login ke Firebase
+            signInWithEmailAndPassword(auth, fakeEmail, password)
+                .then((userCredential) => {
+                    // Login Berhasil!
+                    // Simpan status login di sessionStorage (hilang saat browser ditutup)
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    
+                    // Sembunyikan login, tampilkan dashboard
+                    loginSection.classList.add('hidden');
+                    dashboardSection.classList.remove('hidden');
+                    
+                    // Kosongkan form dan kembalikan teks tombol
+                    loginForm.reset();
+                    btnSubmit.innerText = "Masuk";
+                })
+                .catch((error) => {
+                    // Login Gagal!
+                    alert("Login Gagal! Pastikan username dan password benar.");
+                    btnSubmit.innerText = "Masuk"; // Kembalikan teks tombol
+                    console.error("Error Firebase:", error.message);
+                });
         });
     </script>
 
