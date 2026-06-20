@@ -173,15 +173,15 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // 2. KONFIGURASI FIREBASE KAMU
-        // !! PENTING: Ganti nilai di bawah ini dengan konfigurasi asli dari Firebase Console kamu !!
+        // 2. KONFIGURASI FIREBASE KAMU (Sesuai dengan project login-3651c)
         const firebaseConfig = {
-            apiKey: "KODE_API_KEY_KAMU",
-            authDomain: "project-kamu.firebaseapp.com",
-            projectId: "project-kamu",
-            storageBucket: "project-kamu.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdefghij"
+            apiKey: "AIzaSyAJkcYFCW2aSGKoP0wFSXoLvxDtXHOF7XI",
+            authDomain: "login-3651c.firebaseapp.com",
+            projectId: "login-3651c",
+            storageBucket: "login-3651c.firebasestorage.app",
+            messagingSenderId: "899318509963",
+            appId: "1:899318509963:web:793158c5bda7407149ff8e",
+            measurementId: "G-KJLCEH7TZM"
         };
 
         // Inisialisasi aplikasi Firebase
@@ -208,7 +208,7 @@
             const password = document.getElementById('password').value;
 
             // TRIK: Gabungkan username yang diketik dengan domain fiktif
-            // Di Firebase, pastikan kamu mendaftarkan user dengan format "username@aplikasiku.com"
+            // Pastikan di menu Authentication > Users Firebase, user didaftarkan dengan email: username@aplikasiku.com
             const fakeEmail = username + "@aplikasiku.com";
 
             // Ubah teks tombol saat memproses
@@ -219,7 +219,7 @@
             signInWithEmailAndPassword(auth, fakeEmail, password)
                 .then((userCredential) => {
                     // Login Berhasil!
-                    // Simpan status login di sessionStorage (hilang saat browser ditutup)
+                    // Simpan status login di sessionStorage (hilang otomatis saat browser ditutup)
                     sessionStorage.setItem('isLoggedIn', 'true');
                     
                     // Sembunyikan login, tampilkan dashboard
