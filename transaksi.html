@@ -181,6 +181,33 @@
     .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+    /* GRID UNTUK KARTU LAPORAN (Menyamping) */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .summary-card {
+      padding: 16px 8px;
+      border-radius: var(--radius);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .summary-title {
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .summary-value {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin: 0;
+    }
+
     @media (max-width: 768px) {
       .container { padding: 8px; padding-bottom: 80px; }
       .panel { padding: 12px; }
@@ -197,11 +224,18 @@
       .tabs { padding: 10px 8px; gap: 6px; flex-wrap: nowrap; overflow-x: auto; }
       .tabs::-webkit-scrollbar { display: none; }
       .tab { padding: 10px 6px; font-size: 0.72rem; white-space: nowrap; }
+      
+      /* Penyesuaian Grid Laporan di HP */
+      .summary-grid { gap: 8px; }
+      .summary-card { padding: 12px 4px; }
+      .summary-title { font-size: 0.65rem; }
+      .summary-value { font-size: 0.95rem; }
     }
   </style>
 </head>
 <body>
 
+  <!-- LOADING OVERLAY -->
   <div id="loading-overlay">
     <div class="loader"></div>
     <h3 style="color: var(--text-muted);">MENGHUBUNGKAN KE DATABASE...</h3>
@@ -227,6 +261,7 @@
       <p>Kasir: <strong>Admin</strong> &nbsp;&bull;&nbsp; <span id="tanggal"></span></p>
     </header>
 
+    <!-- TAB KASIR -->
     <div class="panel active" id="panel-kasir">
       <div class="main">
         <div class="produk-section">
@@ -271,6 +306,7 @@
       </div>
     </div>
 
+    <!-- TAB MANAJEMEN PRODUK -->
     <div class="panel" id="panel-produk">
       <div style="text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 20px;">
         <h2 style="font-size: 1.5rem; margin: 0;">MANAJEMEN PRODUK</h2>
@@ -301,10 +337,8 @@
             <input type="hidden" id="kategori-produk" value="">
             <button id="btn-kategori-produk" class="custom-select-btn" style="width:100%; font-weight: 400;" onclick="bukaKategoriForm()">PILIH KATEGORI <span style="font-size: 1.2rem;">▾</span></button>
             <input type="text" id="barcode" placeholder="BARCODE (OPSIONAL)">
-            
             <input type="text" inputmode="numeric" id="harga-jual" placeholder="HARGA JUAL (RP)" oninput="formatRupiahRealTime(this)">
             <input type="text" inputmode="numeric" id="harga-beli" placeholder="HARGA BELI / MODAL (RP)" oninput="formatRupiahRealTime(this)">
-            
             <input type="number" id="stok-produk" placeholder="STOK AWAL">
         </div>
         <div style="display:flex; gap:10px; margin-top:16px;">
@@ -314,11 +348,29 @@
       </div>
     </div>
 
+    <!-- TAB LAPORAN -->
     <div class="panel" id="panel-laporan">
-      <div style="text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 24px;">
+      <div style="text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 16px;">
         <h2 style="font-size: 1.5rem; margin: 0;">LAPORAN PENJUALAN</h2>
       </div>
+
+      <!-- KARTU RINGKASAN DISUSUN MENYAMPING DI BAWAH JUDUL -->
+      <div class="summary-grid">
+        <div class="summary-card" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+            <p class="summary-title" style="color: var(--text-muted);">OMSET PENJUALAN</p>
+            <p class="summary-value" style="color: var(--text-main);">Rp&nbsp;<span id="total-hari-ini">0</span></p>
+        </div>
+        <div class="summary-card" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+            <p class="summary-title" style="color: var(--success-hover);">TOTAL KEUNTUNGAN</p>
+            <p class="summary-value" style="color: var(--success);">Rp&nbsp;<span id="total-untung-hari">0</span></p>
+        </div>
+        <div class="summary-card" style="background: #eff6ff; border: 1px solid #bfdbfe;">
+            <p class="summary-title" style="color: #1d4ed8;">TOTAL MODAL</p>
+            <p class="summary-value" style="color: var(--primary);">Rp&nbsp;<span id="total-modal-hari">0</span></p>
+        </div>
+      </div>
       
+      <!-- TOMBOL SORTIR CUSTOM -->
       <div style="text-align: center; margin-bottom: 24px; background: #f8fafc; padding: 12px; border-radius: var(--radius); border: 1px solid var(--border-color);">
         <input type="hidden" id="filter-mode-laporan" value="harian">
         <input type="hidden" id="filter-date-laporan" value="">
@@ -327,16 +379,6 @@
         </button>
       </div>
       
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <div style="background: var(--bg-surface); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border-color);">
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px; font-weight: 800; text-transform: uppercase;">OMSET PENJUALAN</p>
-            <p style="font-size: 1.5rem; font-weight: 800; margin: 0;">Rp&nbsp;<span id="total-hari-ini">0</span></p>
-        </div>
-        <div style="background: #f0fdf4; padding: 20px; border-radius: var(--radius); border: 1px solid #bbf7d0;">
-            <p style="color: var(--success-hover); font-size: 0.9rem; margin-bottom: 4px; font-weight: 800; text-transform: uppercase;">TOTAL KEUNTUNGAN</p>
-            <p style="font-size: 1.5rem; font-weight: 800; margin: 0; color: var(--success);">Rp&nbsp;<span id="total-untung-hari">0</span></p>
-        </div>
-      </div>
       <div class="table-container">
         <table>
           <thead>
@@ -356,12 +398,14 @@
 
   </div>
 
+  <!-- MENU TAB BAWAH -->
   <div class="tabs">
     <div class="tab active" onclick="showTab(0)">KASIR</div>
     <div class="tab" onclick="showTab(1)">MANAJEMEN PRODUK</div>
     <div class="tab" onclick="showTab(2)">LAPORAN</div>
   </div>
 
+  <!-- STRUK OVERLAY -->
   <div class="struk-overlay" id="struk-overlay">
     <div class="struk" id="struk-kertas">
       <div style="text-align: center; margin-bottom: 16px;">
@@ -401,30 +445,20 @@
       telp: "081234567890"
     };
 
-    /* =========================================
-       FUNGSI BANTU FORMAT RUPIAH OTOMATIS SAAT DIKETIK
-       ========================================= */
     function formatRupiahRealTime(el) {
-      // Hilangkan karakter selain angka
       let val = el.value.replace(/\D/g, '');
       if (val !== '') {
-        // Format ke dalam bentuk ribuan (pakai titik)
         el.value = parseInt(val, 10).toLocaleString('id-ID');
       } else {
         el.value = '';
       }
     }
 
-    // Fungsi mengubah string yang ada titik (10.000) kembali jadi integer murni
     function parseRupiah(val) {
       if (!val) return 0;
       return parseInt(val.toString().replace(/\./g, ''), 10) || 0;
     }
 
-
-    /* =========================================
-       FUNGSI MODAL KUSTOM MULTIFUNGSI
-       ========================================= */
     function showModal({ type = 'alert', title = 'PEMBERITAHUAN', message = '', defaultValue = '', options = [], inputs = [] }) {
       return new Promise((resolve) => {
         const overlay = document.getElementById('custom-modal');
@@ -595,9 +629,6 @@
       }
     }
 
-    // =========================================
-    // FUNGSI SORTIR LAPORAN (MODAL PILIHAN WAKTU)
-    // =========================================
     async function bukaSortirLaporan() {
       const options = [
         { label: "Semua Waktu", value: "semua" },
@@ -729,7 +760,6 @@
     function hapusItem(index) { keranjang.splice(index, 1); renderKeranjang(); }
 
     function hitungKembalian() {
-      // Gunakan parseRupiah untuk menghitung nilai asli integer
       const total = parseRupiah(document.getElementById('total-harga').textContent);
       const bayarInput = document.getElementById('bayar').value;
       if (bayarInput === '') { document.getElementById('kembalian').textContent = '0'; return; }
@@ -941,8 +971,6 @@
       const nama = document.getElementById('nama-produk').value.trim();
       const kategori = document.getElementById('kategori-produk').value;
       const barcode = document.getElementById('barcode').value.trim();
-      
-      // Ambil nilai asli integer dari format rupiah
       const hargaJual = parseRupiah(document.getElementById('harga-jual').value);
       const hargaBeli = parseRupiah(document.getElementById('harga-beli').value);
       const stok = parseInt(document.getElementById('stok-produk').value);
@@ -979,7 +1007,6 @@
       document.getElementById('btn-kategori-produk').innerHTML = `${produk.kategori} <span style="font-size: 1.2rem;">▾</span>`;
       document.getElementById('barcode').value = produk.barcode || '';
       
-      // Mengubah integer ke bentuk format titik di form edit
       document.getElementById('harga-jual').value = produk.hargaJual.toLocaleString('id-ID');
       document.getElementById('harga-beli').value = produk.hargaBeli.toLocaleString('id-ID');
       document.getElementById('stok-produk').value = produk.stok;
@@ -996,11 +1023,15 @@
 
     function batalForm() { document.getElementById('form-produk').style.display = 'none'; }
 
+    // ==========================================
+    // LOGIKA PERHITUNGAN WAKTU & TAMPIL LAPORAN (DENGAN MODAL)
+    // ==========================================
     function tampilLaporan() {
       const tbody = document.getElementById('tabel-laporan');
       tbody.innerHTML = '';
       let totalJualHari = 0; 
       let totalUntungHari = 0;
+      let totalModalHari = 0;
 
       const mode = document.getElementById('filter-mode-laporan').value || 'harian';
       const customDate = document.getElementById('filter-date-laporan').value;
@@ -1053,8 +1084,13 @@
           tbody.appendChild(row);
         }
       });
+
+      // MENGHITUNG MODAL
+      totalModalHari = totalJualHari - totalUntungHari;
+
       document.getElementById('total-hari-ini').textContent = totalJualHari.toLocaleString('id-ID');
       document.getElementById('total-untung-hari').textContent = totalUntungHari.toLocaleString('id-ID');
+      document.getElementById('total-modal-hari').textContent = totalModalHari.toLocaleString('id-ID');
     }
 
     async function hapusLaporan(index) {
@@ -1082,11 +1118,8 @@
       if (res) {
         transaksiHarian[index].tanggal = res.edit_laporan_tanggal;
         transaksiHarian[index].waktu = res.edit_laporan_waktu;
-        
-        // PENTING: Ubah lagi string format titik ke bentuk asli (integer)
         transaksiHarian[index].totalJual = parseRupiah(res.edit_laporan_jual);
         transaksiHarian[index].totalUntung = parseRupiah(res.edit_laporan_untung);
-        
         transaksiHarian[index].items = res.edit_laporan_detail.split(',').map(s => s.trim()).filter(s => s !== "");
         
         saveData(); tampilLaporan();
