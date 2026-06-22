@@ -181,7 +181,7 @@
     .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* GRID UNTUK KARTU LAPORAN (Menyamping) */
+    /* GRID UNTUK KARTU LAPORAN */
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -349,14 +349,6 @@
         <h2 style="font-size: 1.5rem; margin: 0;">LAPORAN PENJUALAN</h2>
       </div>
       
-      <div style="text-align: center; margin-bottom: 24px; background: #f8fafc; padding: 12px; border-radius: var(--radius); border: 1px solid var(--border-color);">
-        <input type="hidden" id="filter-mode-laporan" value="harian">
-        <input type="hidden" id="filter-date-laporan" value="">
-        <button id="btn-sortir-laporan" class="custom-select-btn" style="margin: 0 auto; min-width: 250px; max-width: 100%; justify-content: space-between;" onclick="bukaSortirLaporan()">
-          HARIAN <span style="font-size: 1.2rem;">▾</span>
-        </button>
-      </div>
-      
       <div class="summary-grid">
         <div class="summary-card" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
             <p class="summary-title" style="color: var(--text-muted);">OMSET PENJUALAN</p>
@@ -370,6 +362,14 @@
             <p class="summary-title" style="color: #1d4ed8;">TOTAL MODAL</p>
             <p class="summary-value" style="color: var(--primary);">Rp&nbsp;<span id="total-modal-hari">0</span></p>
         </div>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 24px; background: #f8fafc; padding: 12px; border-radius: var(--radius); border: 1px solid var(--border-color);">
+        <input type="hidden" id="filter-mode-laporan" value="harian">
+        <input type="hidden" id="filter-date-laporan" value="">
+        <button id="btn-sortir-laporan" class="custom-select-btn" style="margin: 0 auto; min-width: 250px; max-width: 100%; justify-content: space-between;" onclick="bukaSortirLaporan()">
+          HARIAN <span style="font-size: 1.2rem;">▾</span>
+        </button>
       </div>
       
       <div class="table-container">
@@ -532,19 +532,33 @@
       });
     }
 
+    /* PERBAIKAN LOAD DATA: Mengonversi data Firebase secara aman ke format Array murni */
     async function loadData() {
       try {
         const snapProduk = await database.ref('produkList').once('value');
-        if (snapProduk.exists()) produkList = snapProduk.val();
+        if (snapProduk.exists()) {
+          const val = snapProduk.val();
+          produkList = Array.isArray(val) ? val : Object.values(val);
+        } else { produkList = []; }
 
         const snapTrans = await database.ref('transaksiHarian').once('value');
-        if (snapTrans.exists()) transaksiHarian = snapTrans.val();
+        if (snapTrans.exists()) {
+          const val = snapTrans.val();
+          transaksiHarian = Array.isArray(val) ? val : Object.values(val);
+        } else { transaksiHarian = []; }
 
         const snapPengaturan = await database.ref('pengaturanWarung').once('value');
         if (snapPengaturan.exists()) pengaturan = snapPengaturan.val();
 
         const snapKategori = await database.ref('kategoriList').once('value');
-        if (snapKategori.exists()) kategoriList = snapKategori.val();
+        if (snapKategori.exists()) {
+          const val = snapKategori.val();
+          kategoriList = Array.isArray(val) ? val : Object.values(val);
+        }
+
+        // Bersihkan tracking null/undefined kosong bawaan Firebase
+        produkList = produkList.filter(p => p !== null && p !== undefined);
+        transaksiHarian = transaksiHarian.filter(t => t !== null && t !== undefined);
 
       } catch (error) { console.error("Gagal memuat data dari Firebase:", error); } 
       finally { document.getElementById('loading-overlay').style.display = 'none'; }
@@ -620,39 +634,11 @@
       }
     }
 
-    /* =========================================
-       FUNGSI SORTIR LAPORAN DIPERBARUI
-       ========================================= */
-    async function bukaSortirLaporan() {
-      const options = [
-        { label: "SEMUA WAKTU", value: "semua" },
-        { label: "HARIAN", value: "harian" },
-        { label: "MINGGUAN", value: "mingguan" },
-        { label: "BULANAN", value: "bulanan" },
-        { label: "PILIH TANGGAL", value: "custom" }
-      ];
-
-      const res = await showModal({ type: 'select', title: 'SORTIR LAPORAN', options: options });
-      
-      if (res !== false) {
-        if (res === 'custom') {
-          const dateRes = await showModal({ 
-            type: 'form', title: 'PILIH TANGGAL', 
-            inputs: [ { id: 'custom_date', label: 'TANGGAL', type: 'date', value: '' } ] 
-          });
-          if (dateRes && dateRes.custom_date) {
-             document.getElementById('filter-mode-laporan').value = 'custom';
-             document.getElementById('filter-date-laporan').value = dateRes.custom_date;
-             document.getElementById('btn-sortir-laporan').innerHTML = `${dateRes.custom_date} <span style="font-size: 1.2rem;">▾</span>`;
-             tampilLaporan();
-          }
-        } else {
-          document.getElementById('filter-mode-laporan').value = res;
-          const selectedOpt = options.find(o => o.value === res);
-          document.getElementById('btn-sortir-laporan').innerHTML = `${selectedOpt.label} <span style="font-size: 1.2rem;">▾</span>`;
-          tampilLaporan();
-        }
-      }
+    function resetFilterKategori() {
+      document.getElementById('filter-kategori-kasir').value = '';
+      document.getElementById('btn-filter-kasir').innerHTML = 'SEMUA KATEGORI <span style="font-size: 1.2rem;">▾</span>';
+      document.getElementById('filter-kategori-manajemen').value = '';
+      document.getElementById('btn-filter-manajemen').innerHTML = 'SEMUA KATEGORI <span style="font-size: 1.2rem;">▾</span>';
     }
 
     function filterProduk() {
@@ -714,17 +700,16 @@
         produkList.forEach(p => { if (p.kategori === kategoriList[index]) p.kategori = "Lainnya"; });
         kategoriList.splice(index, 1);
         saveData(); 
-        document.getElementById('filter-kategori-kasir').value = '';
-        document.getElementById('filter-kategori-manajemen').value = '';
-        filterProduk(); renderTabelProduk();
+        resetFilterKategori(); filterProduk(); renderTabelProduk();
         showModal({ title: 'BERHASIL', message: 'Kategori berhasil dihapus.' });
       }
     }
 
     async function tambahKeKeranjang(produk) {
       if (produk.stok <= 0) { return showModal({ title: 'STOK HABIS', message: `Mohon maaf, stok produk <b>${produk.nama}</b> kosong.` }); }
-      const existing = keranjang.find(item => item.id === produk.id);
-      if (existing) existing.qty += 1; else keranjang.push({ ...produk, qty: 1 });
+      const existing = keranjang.find(item => item.id === proudk.id); // Typo protection
+      const target = keranjang.find(item => item.id === produk.id);
+      if (target) target.qty += 1; else keranjang.push({ ...produk, qty: 1 });
       renderKeranjang();
     }
 
@@ -816,7 +801,6 @@
     async function shareStruk() {
       const strukKertas = document.getElementById('struk-kertas');
       const actionArea = document.getElementById('struk-action-area');
-      
       actionArea.style.display = 'none'; 
 
       try {
@@ -1018,7 +1002,7 @@
     function batalForm() { document.getElementById('form-produk').style.display = 'none'; }
 
     /* =========================================
-       LOGIKA TAMPIL LAPORAN (DIBALIK DARI BARU KE LAMA)
+       PERBAIKAN LOGIKA LAPORAN & SORTIR FIREBASE
        ========================================= */
     function tampilLaporan() {
       const tbody = document.getElementById('tabel-laporan');
@@ -1031,25 +1015,23 @@
       const customDate = document.getElementById('filter-date-laporan').value;
       
       const today = new Date();
-      const currentYear = today.getFullYear();
-      const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
-      const currentDate = String(today.getDate()).padStart(2, '0');
-
-      const todayStr = `${currentYear}-${currentMonth}-${currentDate}`;
-      const thisMonthStr = `${currentYear}-${currentMonth}`;
+      const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+      const thisMonthStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
       
       const lastWeek = new Date();
       lastWeek.setDate(lastWeek.getDate() - 7);
       lastWeek.setHours(0,0,0,0);
       today.setHours(23,59,59,999);
 
-      const listTrans = transaksiHarian || [];
+      // Proteksi ganda untuk memastikan format data berupa array murni
+      let listTrans = transaksiHarian || [];
+      if (!Array.isArray(listTrans)) {
+        listTrans = Object.values(listTrans);
+      }
+      listTrans = listTrans.filter(t => t !== null && t !== undefined);
       
-      // Looping mundur (transaksi terbaru di atas)
-      for (let i = listTrans.length - 1; i >= 0; i--) {
-        const trans = listTrans[i];
+      listTrans.forEach((trans, index) => {
         const tanggalTrans = trans.tanggal || todayStr; 
-        
         let include = false;
         
         if (mode === 'semua') {
@@ -1081,14 +1063,15 @@
             <td><span style="background: #f8fafc; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">${trans.items.join(', ')}</span></td>
             <td>
               <div class="aksi-btn-tabel">
-                <button onclick="editLaporan(${i})" class="btn-warning">Edit</button>
-                <button onclick="hapusLaporan(${i})" class="btn-danger">Hapus</button>
+                <button onclick="editLaporan(${index})" class="btn-warning">Edit</button>
+                <button onclick="hapusLaporan(${index})" class="btn-danger">Hapus</button>
               </div>
             </td>
           `;
-          tbody.appendChild(row);
+          // Menyusun data terbaru berada paling atas secara realtime
+          tbody.insertBefore(row, tbody.firstChild);
         }
-      }
+      });
 
       totalModalHari = totalJualHari - totalUntungHari;
 
@@ -1122,10 +1105,8 @@
       if (res) {
         transaksiHarian[index].tanggal = res.edit_laporan_tanggal;
         transaksiHarian[index].waktu = res.edit_laporan_waktu;
-        
         transaksiHarian[index].totalJual = parseRupiah(res.edit_laporan_jual);
         transaksiHarian[index].totalUntung = parseRupiah(res.edit_laporan_untung);
-        
         transaksiHarian[index].items = res.edit_laporan_detail.split(',').map(s => s.trim()).filter(s => s !== "");
         
         saveData(); tampilLaporan();
