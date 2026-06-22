@@ -211,10 +211,10 @@ tbody tr.selected { background-color: #d1e7dd !important; }
 
         <div style="background: #f9fafb; padding: 12px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 15px;">
             <h4 style="margin: 0 0 10px 0; font-size: 13px; color: #444; text-align: left;">Catat Cicilan Baru</h4>
-            <div style="display: flex; gap: 8px;">
-                <input type="date" id="instDate" style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; height: 35px;">
-                <input type="text" id="instAmount" placeholder="Jumlah (Rp)" inputmode="numeric" oninput="formatInputRupiah(this)" style="flex: 1.2; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; height: 35px; box-sizing: border-box;">
-                <button style="background: #198754; color: white; border: none; border-radius: 8px; padding: 0 12px; font-weight: bold; font-size: 12px; cursor: pointer; height: 35px;" onclick="addInstallment()">Simpan</button>
+            <div style="display: flex; gap: 8px; height: 38px; align-items: stretch;">
+                <input type="date" id="instDate" style="flex: 1; padding: 0 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; box-sizing: border-box; margin: 0;">
+                <input type="text" id="instAmount" placeholder="Jumlah (Rp)" inputmode="numeric" oninput="formatInputRupiah(this)" style="flex: 1.2; padding: 0 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; box-sizing: border-box; margin: 0;">
+                <button style="background: #198754; color: white; border: none; border-radius: 8px; padding: 0 12px; font-weight: bold; font-size: 12px; cursor: pointer; box-sizing: border-box; margin: 0;" onclick="addInstallment()">Simpan</button>
             </div>
         </div>
         
@@ -299,26 +299,22 @@ let loanTypePickerTarget = 'add';
 // URL Firebase Database Anda
 const FIREBASE_URL = "https://pinjaman-4f235-default-rtdb.asia-southeast1.firebasedatabase.app";
 
-// Load pertama kali
 window.onload = () => {
     document.getElementById('loanDate').valueAsDate = new Date();
     document.getElementById('instDate').valueAsDate = new Date();
-    loadDataFromFirebase(); // Panggil data dari Firebase saat aplikasi dibuka
+    loadDataFromFirebase();
 };
 
 // ================= FUNGSI FIREBASE REST API =================
-
-// Diperbarui: Fungsi Mengambil Data (Anti-Error untuk Object/Array dari Firebase)
 async function loadDataFromFirebase() {
     try {
         const resLoans = await fetch(`${FIREBASE_URL}/loans.json`);
         const dataLoans = await resLoans.json();
         
-        // Cek dan format data Pinjaman agar selalu menjadi Array murni
         if (Array.isArray(dataLoans)) {
-            loans = dataLoans.filter(l => l !== null);
+            loans = dataLoans.filter(l => l && l.id); // Validasi ketat membuang data null
         } else if (dataLoans && typeof dataLoans === 'object') {
-            loans = Object.values(dataLoans).filter(l => l !== null);
+            loans = Object.values(dataLoans).filter(l => l && l.id);
         } else {
             loans = [];
         }
@@ -326,11 +322,10 @@ async function loadDataFromFirebase() {
         const resInst = await fetch(`${FIREBASE_URL}/installments.json`);
         const dataInst = await resInst.json();
         
-        // Cek dan format data Cicilan agar selalu menjadi Array murni
         if (Array.isArray(dataInst)) {
-            installments = dataInst.filter(i => i !== null);
+            installments = dataInst.filter(i => i && i.id); // Validasi ketat membuang data null
         } else if (dataInst && typeof dataInst === 'object') {
-            installments = Object.values(dataInst).filter(i => i !== null);
+            installments = Object.values(dataInst).filter(i => i && i.id);
         } else {
             installments = [];
         }
@@ -342,7 +337,6 @@ async function loadDataFromFirebase() {
     }
 }
 
-// Fungsi Menyimpan Data secara Massal
 async function saveDataToFirebase() {
     try {
         await fetch(`${FIREBASE_URL}/loans.json`, {
@@ -462,15 +456,13 @@ function renderLoans() {
     let totLent = 0;
     let totBorrowed = 0;
     
-    // Default jadi array kosong jika firebase return null (mencegah error)
     if (!Array.isArray(loans)) loans = [];
     if (!Array.isArray(installments)) installments = [];
 
     const sortedLoans = [...loans].sort((a,b) => new Date(b.date) - new Date(a.date));
 
     sortedLoans.forEach(l => {
-        // Hitung total cicilan
-        const insts = installments.filter(i => i.loanId === l.id);
+        const insts = installments.filter(i => i && i.loanId === l.id);
         const totalPaid = insts.reduce((sum, i) => sum + i.amount, 0);
         const remaining = l.amount - totalPaid;
 
@@ -530,13 +522,13 @@ function addLoan() {
     document.getElementById('loanAmount').value = "";
     
     renderLoans();
-    saveDataToFirebase(); // Simpan ke Firebase
+    saveDataToFirebase(); 
     showToast("Pinjaman berhasil ditambahkan!");
 }
 
 function editLoanSelected() {
     if (!selectedLoanId) return showToast("Pilih satu baris pinjaman terlebih dahulu.");
-    const target = loans.find(l => l.id === selectedLoanId);
+    const target = loans.find(l => l && l.id === selectedLoanId);
     if (target) {
         document.getElementById('editLoanDate').value = target.date;
         document.getElementById('editLoanPerson').value = target.person;
@@ -557,7 +549,7 @@ function saveEditLoan() {
 
     if (!date || !person || isNaN(amount) || amount <= 0) return showToast("Isi semua data pinjaman dengan benar!");
 
-    const index = loans.findIndex(l => l.id === selectedLoanId);
+    const index = loans.findIndex(l => l && l.id === selectedLoanId);
     if(index !== -1) {
         loans[index].date = date;
         loans[index].person = person;
@@ -568,7 +560,7 @@ function saveEditLoan() {
         selectedLoanId = null; 
         
         renderLoans();
-        saveDataToFirebase(); // Simpan ke Firebase
+        saveDataToFirebase(); 
         showToast("Pinjaman berhasil diperbarui!");
     }
 }
@@ -578,15 +570,13 @@ function closeEditLoanModal() { document.getElementById('editLoanModal').style.d
 function deleteLoanSelected() {
     if (!selectedLoanId) return showToast("Pilih satu baris pinjaman yang ingin dihapus.");
     showConfirm("Hapus data pinjaman ini beserta riwayat cicilannya?", () => {
-        // Hapus cicilannya
-        installments = installments.filter(i => i.loanId !== selectedLoanId);
-        // Hapus pinjaman
-        loans = loans.filter(l => l.id !== selectedLoanId);
+        installments = installments.filter(i => i && i.loanId !== selectedLoanId);
+        loans = loans.filter(l => l && l.id !== selectedLoanId);
         
         selectedLoanId = null;
         
         renderLoans();
-        saveDataToFirebase(); // Simpan ke Firebase
+        saveDataToFirebase();
         showToast("Pinjaman berhasil dihapus!");
     });
 }
@@ -594,7 +584,7 @@ function deleteLoanSelected() {
 // ================= RINCIAN & CICILAN =================
 function viewLoanDetails() {
     if (!selectedLoanId) return showToast("Pilih satu baris pinjaman terlebih dahulu.");
-    const loan = loans.find(l => l.id === selectedLoanId);
+    const loan = loans.find(l => l && l.id === selectedLoanId);
     if (!loan) return;
 
     document.getElementById('viewLoanTitle').innerText = "Rincian: " + loan.person;
@@ -602,8 +592,7 @@ function viewLoanDetails() {
 
     if(!document.getElementById('instDate').value) document.getElementById('instDate').valueAsDate = new Date();
     
-    // Ambil cicilan milik pinjaman ini
-    const insts = installments.filter(i => i.loanId === selectedLoanId).sort((a,b) => new Date(b.date) - new Date(a.date));
+    const insts = installments.filter(i => i && i.loanId === selectedLoanId).sort((a,b) => new Date(b.date) - new Date(a.date));
     const tbody = document.querySelector("#tableViewLoan tbody");
     tbody.innerHTML = "";
 
@@ -643,8 +632,8 @@ function addInstallment() {
 
     if (!date || isNaN(amount) || amount <= 0) return showToast("Isi tanggal dan jumlah cicilan dengan benar!");
 
-    const loan = loans.find(l => l.id === selectedLoanId);
-    const insts = installments.filter(i => i.loanId === selectedLoanId);
+    const loan = loans.find(l => l && l.id === selectedLoanId);
+    const insts = installments.filter(i => i && i.loanId === selectedLoanId);
     const totalPaid = insts.reduce((sum, i) => sum + i.amount, 0);
     
     if (totalPaid + amount > loan.amount) {
@@ -662,19 +651,22 @@ function addInstallment() {
     
     viewLoanDetails(); 
     renderLoans();     
-    saveDataToFirebase(); // Simpan ke Firebase
+    saveDataToFirebase();
     showToast("Cicilan berhasil ditambahkan!");
 }
 
-// Diperbarui: Fungsi Hapus Cicilan dengan pencocokan string yang presisi
+// PERBAIKAN FUNGSI HAPUS CICILAN
 function deleteInstallment(id) {
     showConfirm("Hapus riwayat cicilan ini?", () => {
-        // Gunakan String() agar tipe data selalu presisi saat difilter
-        installments = installments.filter(i => String(i.id) !== String(id));
+        // Gunakan metode splice untuk memotong/menghapus array secara mutlak di memori
+        const index = installments.findIndex(i => i && String(i.id) === String(id));
+        if (index !== -1) {
+            installments.splice(index, 1);
+        }
         
         viewLoanDetails();
         renderLoans();
-        saveDataToFirebase(); // Simpan pembaruan ke Firebase
+        saveDataToFirebase();
         showToast("Cicilan berhasil dihapus!");
     });
 }
