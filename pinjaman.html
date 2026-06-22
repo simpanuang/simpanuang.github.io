@@ -154,8 +154,8 @@ tbody tr.selected { background-color: #d1e7dd !important; }
         <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
         <p style="color: #6b7280; font-size: 14px; margin-top: 0; margin-bottom: 25px;">Tindakan ini tidak dapat dibatalkan.</p>
         <div class="btn-group">
-            <button class="btn-secondary" onclick="closeConfirm()">Batal</button>
-            <button class="btn-delete" id="btnConfirmYes">Ya, Hapus</button>
+            <button type="button" class="btn-secondary" onclick="closeConfirm()">Batal</button>
+            <button type="button" class="btn-delete" id="btnConfirmYes">Ya, Hapus</button>
         </div>
     </div>
 </div>
@@ -164,7 +164,7 @@ tbody tr.selected { background-color: #d1e7dd !important; }
     <div class="modal-content" style="max-width: 350px;">
         <h3>Tipe Pinjaman</h3>
         <div id="loanTypeList" class="custom-list"></div>
-        <button class="btn-secondary" onclick="closeLoanTypePicker()" style="width: 100%; margin-top: 20px;">Batal</button>
+        <button type="button" class="btn-secondary" onclick="closeLoanTypePicker()" style="width: 100%; margin-top: 20px;">Batal</button>
     </div>
 </div>
 
@@ -194,8 +194,8 @@ tbody tr.selected { background-color: #d1e7dd !important; }
             </div>
         </div>
         <div class="btn-group">
-            <button class="btn-secondary" onclick="closeEditLoanModal()">Batal</button>
-            <button class="btn-add" onclick="saveEditLoan()">Simpan</button>
+            <button type="button" class="btn-secondary" onclick="closeEditLoanModal()">Batal</button>
+            <button type="button" class="btn-add" onclick="saveEditLoan()">Simpan</button>
         </div>
     </div>
 </div>
@@ -214,7 +214,7 @@ tbody tr.selected { background-color: #d1e7dd !important; }
             <div style="display: flex; gap: 8px; height: 38px; align-items: stretch;">
                 <input type="date" id="instDate" style="flex: 1; padding: 0 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; box-sizing: border-box; margin: 0;">
                 <input type="text" id="instAmount" placeholder="Jumlah (Rp)" inputmode="numeric" oninput="formatInputRupiah(this)" style="flex: 1.2; padding: 0 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; box-sizing: border-box; margin: 0;">
-                <button style="background: #198754; color: white; border: none; border-radius: 8px; padding: 0 12px; font-weight: bold; font-size: 12px; cursor: pointer; box-sizing: border-box; margin: 0;" onclick="addInstallment()">Simpan</button>
+                <button type="button" style="background: #198754; color: white; border: none; border-radius: 8px; padding: 0 12px; font-weight: bold; font-size: 12px; cursor: pointer; box-sizing: border-box; margin: 0;" onclick="addInstallment()">Simpan</button>
             </div>
         </div>
         
@@ -231,7 +231,7 @@ tbody tr.selected { background-color: #d1e7dd !important; }
             </table>
             <p id="viewLoanEmpty" style="text-align: center; font-size: 12px; color: #6b7280; display: none; margin-top: 15px;">Belum ada data cicilan dibayar.</p>
         </div>
-        <button class="btn-secondary" onclick="closeViewLoanModal()" style="width: 100%;">Tutup</button>
+        <button type="button" class="btn-secondary" onclick="closeViewLoanModal()" style="width: 100%;">Tutup</button>
     </div>
 </div>
 
@@ -267,10 +267,10 @@ tbody tr.selected { background-color: #d1e7dd !important; }
     </div>
 
     <div class="btn-group">
-        <button class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addLoan()">Tambah</button>
-        <button style="background: #f59e0b; color: white; padding: 12px 5px; font-size: 12px;" onclick="editLoanSelected()">Edit</button>
-        <button style="background: #3b82f6; color: white; padding: 12px 5px; font-size: 12px;" onclick="viewLoanDetails()">Lihat</button>
-        <button class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteLoanSelected()">Hapus</button>
+        <button type="button" class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addLoan()">Tambah</button>
+        <button type="button" style="background: #f59e0b; color: white; padding: 12px 5px; font-size: 12px;" onclick="editLoanSelected()">Edit</button>
+        <button type="button" style="background: #3b82f6; color: white; padding: 12px 5px; font-size: 12px;" onclick="viewLoanDetails()">Lihat</button>
+        <button type="button" class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteLoanSelected()">Hapus</button>
     </div>
 
     <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Pinjaman</h3>
@@ -290,7 +290,6 @@ tbody tr.selected { background-color: #d1e7dd !important; }
 <script>
 /* ===================== JAVASCRIPT & FIREBASE INTEGRATION ===================== */
 
-// Variabel Data dan State
 let loans = [];
 let installments = [];
 let selectedLoanId = null;
@@ -305,7 +304,6 @@ window.onload = () => {
     loadDataFromFirebase();
 };
 
-// ================= FUNGSI FIREBASE REST API =================
 async function loadDataFromFirebase() {
     try {
         const resLoans = await fetch(`${FIREBASE_URL}/loans.json`);
@@ -355,8 +353,6 @@ async function saveDataToFirebase() {
     }
 }
 
-
-// ================= FUNGSI UTILITAS =================
 function formatRupiah(angka) {
     return angka ? angka.toLocaleString('id-ID') : "0";
 }
@@ -376,7 +372,6 @@ function showToast(message) {
     toastTimeout = setTimeout(() => { toast.classList.remove("show"); }, 3000);
 }
 
-// ================= MODAL KONFIRMASI GLOBAL (DI PERBAIKI) =================
 let confirmCallback = null;
 function showConfirm(message, callback) {
     document.getElementById("confirmMessage").innerText = message;
@@ -388,16 +383,16 @@ function closeConfirm() {
     confirmCallback = null;
 }
 
-// PERBAIKAN LOGIKA TOMBOL HAPUS (Eksekusi callback dulu baru tutup modal)
-document.getElementById("btnConfirmYes").onclick = function() {
+// PERBAIKAN: Pastikan WebView tidak me-refresh halaman saat klik tombol Ya
+document.getElementById("btnConfirmYes").addEventListener("click", function(e) {
+    e.preventDefault(); 
     if(confirmCallback) {
-        confirmCallback(); // Lakukan hapus data
+        confirmCallback(); 
     }
-    closeConfirm(); // Tutup modal konfirmasinya
-};
+    closeConfirm(); 
+});
 
 
-// ================= CUSTOM DROPDOWN TIPE PINJAMAN =================
 function openLoanTypePicker(target) {
     loanTypePickerTarget = target;
     renderLoanTypePickerList();
@@ -443,7 +438,6 @@ function renderLoanTypePickerList() {
     document.getElementById('loanTypeList').innerHTML = html;
 }
 
-// ================= RENDER UTAMA =================
 function toggleLoanSelection(rowElement, id) {
     const rows = document.querySelectorAll("#tableLoan tbody tr");
     rows.forEach(r => r.classList.remove('selected'));
@@ -503,7 +497,6 @@ function renderLoans() {
     document.getElementById('totBorrowed').innerText = formatRupiah(totBorrowed);
 }
 
-// ================= CRUD PINJAMAN =================
 function addLoan() {
     const date = document.getElementById('loanDate').value;
     const person = document.getElementById('loanPerson').value.trim();
@@ -586,7 +579,6 @@ function deleteLoanSelected() {
     });
 }
 
-// ================= RINCIAN & CICILAN =================
 function viewLoanDetails() {
     if (!selectedLoanId) return showToast("Pilih satu baris pinjaman terlebih dahulu.");
     const loan = loans.find(l => l && l.id === selectedLoanId);
@@ -616,7 +608,7 @@ function viewLoanDetails() {
                 <td style="text-align:center;">${item.date}</td>
                 <td style="text-align: right; padding-right: 8px;">Rp ${formatRupiah(item.amount)}</td>
                 <td style="text-align:center;">
-                    <button onclick="deleteInstallment('${item.id}')" style="background:#dc3545; color:white; padding:4px 8px; border:none; border-radius:4px; font-size:10px; cursor:pointer;">X</button>
+                    <button type="button" onclick="deleteInstallment(event, '${item.id}')" style="background:#dc3545; color:white; padding:4px 8px; border:none; border-radius:4px; font-size:10px; cursor:pointer;">X</button>
                 </td>
             </tr>`;
         });
@@ -660,7 +652,12 @@ function addInstallment() {
     showToast("Cicilan berhasil ditambahkan!");
 }
 
-function deleteInstallment(id) {
+// PERBAIKAN: Tambahkan 'e' untuk mencegat event klik WebView yang error
+function deleteInstallment(e, id) {
+    if(e) {
+        e.preventDefault(); 
+        e.stopPropagation(); 
+    }
     showConfirm("Hapus riwayat cicilan ini?", () => {
         const index = installments.findIndex(i => i && String(i.id) === String(id));
         if (index !== -1) {
@@ -690,3 +687,4 @@ window.addEventListener('click', function(event) {
 </script>
 </body>
 </html>
+l
