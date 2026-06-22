@@ -29,7 +29,6 @@
       --radius: 8px;
     }
 
-    /* KUNCI LAYAR AGAR TIDAK BISA DIGESER KE SAMPING */
     html, body { 
       background: var(--bg-body); 
       color: var(--text-main); 
@@ -165,7 +164,7 @@
     .modal-title { font-size: 1.3rem; margin-bottom: 12px; color: var(--text-main); }
     .modal-message { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
     .modal-input { width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 24px; font-size: 1rem; color: var(--text-main); text-align: center; }
-    .modal-options-container { display: none; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; margin-bottom: 24px; padding-right: 4px; }
+    .modal-options-container { display: none; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; margin-bottom: 24px; padding-right: 4px; }
     .modal-options-container::-webkit-scrollbar { width: 6px; }
     .modal-options-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
     .modal-option-btn { background: var(--bg-surface); border: 1px solid var(--border-color); padding: 14px 16px; border-radius: 8px; font-size: 0.95rem; color: var(--text-main); cursor: pointer; text-align: left; font-weight: 600; transition: all 0.2s; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
@@ -450,6 +449,9 @@
       return parseInt(val.toString().replace(/\./g, ''), 10) || 0;
     }
 
+    /* =========================================
+       PERBAIKAN ROOT: RESET KONTEN MODAL SECARA PENUH
+       ========================================= */
     function showModal({ type = 'alert', title = 'PEMBERITAHUAN', message = '', defaultValue = '', options = [], inputs = [] }) {
       return new Promise((resolve) => {
         const overlay = document.getElementById('custom-modal');
@@ -465,6 +467,10 @@
         msgEl.innerHTML = message;
         msgEl.style.display = message ? 'block' : 'none';
 
+        // PENYEBAB BUG KEMARIN: Container tidak dikosongkan! (Kini sudah dikosongkan dengan mutlak)
+        optionsContainer.innerHTML = '';
+        formContainer.innerHTML = '';
+        
         inputEl.style.display = 'none';
         optionsContainer.style.display = 'none';
         formContainer.style.display = 'none';
@@ -472,7 +478,6 @@
         btnConfirm.style.display = 'block';
         btnConfirm.textContent = 'OK';
         inputEl.value = '';
-        formContainer.innerHTML = '';
 
         if (type === 'prompt') {
           inputEl.style.display = 'block';
@@ -532,20 +537,20 @@
       });
     }
 
-    /* PERBAIKAN LOAD DATA: Mengonversi data Firebase secara aman ke format Array murni */
+    /* PERBAIKAN LOAD DATA FIREBASE AGAR TIDAK ERROR (Filter null values) */
     async function loadData() {
       try {
         const snapProduk = await database.ref('produkList').once('value');
         if (snapProduk.exists()) {
           const val = snapProduk.val();
-          produkList = Array.isArray(val) ? val : Object.values(val);
-        } else { produkList = []; }
+          produkList = (Array.isArray(val) ? val : Object.values(val)).filter(p => p);
+        }
 
         const snapTrans = await database.ref('transaksiHarian').once('value');
         if (snapTrans.exists()) {
           const val = snapTrans.val();
-          transaksiHarian = Array.isArray(val) ? val : Object.values(val);
-        } else { transaksiHarian = []; }
+          transaksiHarian = (Array.isArray(val) ? val : Object.values(val)).filter(t => t);
+        }
 
         const snapPengaturan = await database.ref('pengaturanWarung').once('value');
         if (snapPengaturan.exists()) pengaturan = snapPengaturan.val();
@@ -553,12 +558,8 @@
         const snapKategori = await database.ref('kategoriList').once('value');
         if (snapKategori.exists()) {
           const val = snapKategori.val();
-          kategoriList = Array.isArray(val) ? val : Object.values(val);
+          kategoriList = (Array.isArray(val) ? val : Object.values(val)).filter(k => k);
         }
-
-        // Bersihkan tracking null/undefined kosong bawaan Firebase
-        produkList = produkList.filter(p => p !== null && p !== undefined);
-        transaksiHarian = transaksiHarian.filter(t => t !== null && t !== undefined);
 
       } catch (error) { console.error("Gagal memuat data dari Firebase:", error); } 
       finally { document.getElementById('loading-overlay').style.display = 'none'; }
@@ -634,11 +635,39 @@
       }
     }
 
-    function resetFilterKategori() {
-      document.getElementById('filter-kategori-kasir').value = '';
-      document.getElementById('btn-filter-kasir').innerHTML = 'SEMUA KATEGORI <span style="font-size: 1.2rem;">▾</span>';
-      document.getElementById('filter-kategori-manajemen').value = '';
-      document.getElementById('btn-filter-manajemen').innerHTML = 'SEMUA KATEGORI <span style="font-size: 1.2rem;">▾</span>';
+    /* =========================================
+       PERBAIKAN SORTIR LAPORAN (Tanpa Tanda Kurung)
+       ========================================= */
+    async function bukaSortirLaporan() {
+      const options = [
+        { label: "SEMUA WAKTU", value: "semua" },
+        { label: "HARIAN", value: "harian" },
+        { label: "MINGGUAN", value: "mingguan" },
+        { label: "BULANAN", value: "bulanan" },
+        { label: "PILIH TANGGAL", value: "custom" }
+      ];
+
+      const res = await showModal({ type: 'select', title: 'SORTIR LAPORAN', options: options });
+      
+      if (res !== false) {
+        if (res === 'custom') {
+          const dateRes = await showModal({ 
+            type: 'form', title: 'PILIH TANGGAL', 
+            inputs: [ { id: 'custom_date', label: 'TANGGAL', type: 'date', value: '' } ] 
+          });
+          if (dateRes && dateRes.custom_date) {
+             document.getElementById('filter-mode-laporan').value = 'custom';
+             document.getElementById('filter-date-laporan').value = dateRes.custom_date;
+             document.getElementById('btn-sortir-laporan').innerHTML = `${dateRes.custom_date} <span style="font-size: 1.2rem;">▾</span>`;
+             tampilLaporan();
+          }
+        } else {
+          document.getElementById('filter-mode-laporan').value = res;
+          const selectedOpt = options.find(o => o.value === res);
+          document.getElementById('btn-sortir-laporan').innerHTML = `${selectedOpt.label} <span style="font-size: 1.2rem;">▾</span>`;
+          tampilLaporan();
+        }
+      }
     }
 
     function filterProduk() {
@@ -700,16 +729,17 @@
         produkList.forEach(p => { if (p.kategori === kategoriList[index]) p.kategori = "Lainnya"; });
         kategoriList.splice(index, 1);
         saveData(); 
-        resetFilterKategori(); filterProduk(); renderTabelProduk();
+        document.getElementById('filter-kategori-kasir').value = '';
+        document.getElementById('filter-kategori-manajemen').value = '';
+        filterProduk(); renderTabelProduk();
         showModal({ title: 'BERHASIL', message: 'Kategori berhasil dihapus.' });
       }
     }
 
     async function tambahKeKeranjang(produk) {
       if (produk.stok <= 0) { return showModal({ title: 'STOK HABIS', message: `Mohon maaf, stok produk <b>${produk.nama}</b> kosong.` }); }
-      const existing = keranjang.find(item => item.id === proudk.id); // Typo protection
-      const target = keranjang.find(item => item.id === produk.id);
-      if (target) target.qty += 1; else keranjang.push({ ...produk, qty: 1 });
+      const existing = keranjang.find(item => item.id === produk.id);
+      if (existing) existing.qty += 1; else keranjang.push({ ...produk, qty: 1 });
       renderKeranjang();
     }
 
@@ -801,6 +831,7 @@
     async function shareStruk() {
       const strukKertas = document.getElementById('struk-kertas');
       const actionArea = document.getElementById('struk-action-area');
+      
       actionArea.style.display = 'none'; 
 
       try {
@@ -1002,7 +1033,7 @@
     function batalForm() { document.getElementById('form-produk').style.display = 'none'; }
 
     /* =========================================
-       PERBAIKAN LOGIKA LAPORAN & SORTIR FIREBASE
+       PERBAIKAN LOGIKA LAPORAN & PENYUSUNAN REAL-TIME
        ========================================= */
     function tampilLaporan() {
       const tbody = document.getElementById('tabel-laporan');
@@ -1015,22 +1046,25 @@
       const customDate = document.getElementById('filter-date-laporan').value;
       
       const today = new Date();
-      const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-      const thisMonthStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+      const currentYear = today.getFullYear();
+      const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
+      const currentDate = String(today.getDate()).padStart(2, '0');
+
+      const todayStr = `${currentYear}-${currentMonth}-${currentDate}`;
+      const thisMonthStr = `${currentYear}-${currentMonth}`;
       
       const lastWeek = new Date();
       lastWeek.setDate(lastWeek.getDate() - 7);
       lastWeek.setHours(0,0,0,0);
       today.setHours(23,59,59,999);
 
-      // Proteksi ganda untuk memastikan format data berupa array murni
       let listTrans = transaksiHarian || [];
-      if (!Array.isArray(listTrans)) {
-        listTrans = Object.values(listTrans);
-      }
-      listTrans = listTrans.filter(t => t !== null && t !== undefined);
       
-      listTrans.forEach((trans, index) => {
+      // Looping data terbalik agar transaksi TERBARU muncul paling atas (atas ke bawah)
+      for (let i = listTrans.length - 1; i >= 0; i--) {
+        const trans = listTrans[i];
+        if(!trans) continue;
+
         const tanggalTrans = trans.tanggal || todayStr; 
         let include = false;
         
@@ -1063,15 +1097,14 @@
             <td><span style="background: #f8fafc; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">${trans.items.join(', ')}</span></td>
             <td>
               <div class="aksi-btn-tabel">
-                <button onclick="editLaporan(${index})" class="btn-warning">Edit</button>
-                <button onclick="hapusLaporan(${index})" class="btn-danger">Hapus</button>
+                <button onclick="editLaporan(${i})" class="btn-warning">Edit</button>
+                <button onclick="hapusLaporan(${i})" class="btn-danger">Hapus</button>
               </div>
             </td>
           `;
-          // Menyusun data terbaru berada paling atas secara realtime
-          tbody.insertBefore(row, tbody.firstChild);
+          tbody.appendChild(row); 
         }
-      });
+      }
 
       totalModalHari = totalJualHari - totalUntungHari;
 
