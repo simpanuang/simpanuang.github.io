@@ -312,7 +312,7 @@ async function loadDataFromFirebase() {
         const dataLoans = await resLoans.json();
         
         if (Array.isArray(dataLoans)) {
-            loans = dataLoans.filter(l => l && l.id); // Validasi ketat membuang data null
+            loans = dataLoans.filter(l => l && l.id);
         } else if (dataLoans && typeof dataLoans === 'object') {
             loans = Object.values(dataLoans).filter(l => l && l.id);
         } else {
@@ -323,7 +323,7 @@ async function loadDataFromFirebase() {
         const dataInst = await resInst.json();
         
         if (Array.isArray(dataInst)) {
-            installments = dataInst.filter(i => i && i.id); // Validasi ketat membuang data null
+            installments = dataInst.filter(i => i && i.id);
         } else if (dataInst && typeof dataInst === 'object') {
             installments = Object.values(dataInst).filter(i => i && i.id);
         } else {
@@ -376,7 +376,7 @@ function showToast(message) {
     toastTimeout = setTimeout(() => { toast.classList.remove("show"); }, 3000);
 }
 
-// Modal Konfirmasi Global
+// ================= MODAL KONFIRMASI GLOBAL (DI PERBAIKI) =================
 let confirmCallback = null;
 function showConfirm(message, callback) {
     document.getElementById("confirmMessage").innerText = message;
@@ -387,10 +387,15 @@ function closeConfirm() {
     document.getElementById("confirmModal").style.display = "none";
     confirmCallback = null;
 }
+
+// PERBAIKAN LOGIKA TOMBOL HAPUS (Eksekusi callback dulu baru tutup modal)
 document.getElementById("btnConfirmYes").onclick = function() {
-    closeConfirm();
-    if(confirmCallback) confirmCallback();
+    if(confirmCallback) {
+        confirmCallback(); // Lakukan hapus data
+    }
+    closeConfirm(); // Tutup modal konfirmasinya
 };
+
 
 // ================= CUSTOM DROPDOWN TIPE PINJAMAN =================
 function openLoanTypePicker(target) {
@@ -655,10 +660,8 @@ function addInstallment() {
     showToast("Cicilan berhasil ditambahkan!");
 }
 
-// PERBAIKAN FUNGSI HAPUS CICILAN
 function deleteInstallment(id) {
     showConfirm("Hapus riwayat cicilan ini?", () => {
-        // Gunakan metode splice untuk memotong/menghapus array secara mutlak di memori
         const index = installments.findIndex(i => i && String(i.id) === String(id));
         if (index !== -1) {
             installments.splice(index, 1);
