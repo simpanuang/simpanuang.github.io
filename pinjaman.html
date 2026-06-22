@@ -149,7 +149,7 @@ tbody tr.selected { background-color: #d1e7dd !important; }
 
 <div id="toast">Notifikasi</div>
 
-<div id="confirmModal" class="modal">
+<div id="confirmModal" class="modal" style="z-index: 2500;">
     <div class="modal-content" style="text-align: center; max-width: 350px;">
         <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
         <p style="color: #6b7280; font-size: 14px; margin-top: 0; margin-bottom: 25px;">Tindakan ini tidak dapat dibatalkan.</p>
@@ -308,16 +308,32 @@ window.onload = () => {
 
 // ================= FUNGSI FIREBASE REST API =================
 
-// Fungsi Mengambil Data
+// Diperbarui: Fungsi Mengambil Data (Anti-Error untuk Object/Array dari Firebase)
 async function loadDataFromFirebase() {
     try {
         const resLoans = await fetch(`${FIREBASE_URL}/loans.json`);
         const dataLoans = await resLoans.json();
-        loans = dataLoans || [];
+        
+        // Cek dan format data Pinjaman agar selalu menjadi Array murni
+        if (Array.isArray(dataLoans)) {
+            loans = dataLoans.filter(l => l !== null);
+        } else if (dataLoans && typeof dataLoans === 'object') {
+            loans = Object.values(dataLoans).filter(l => l !== null);
+        } else {
+            loans = [];
+        }
 
         const resInst = await fetch(`${FIREBASE_URL}/installments.json`);
         const dataInst = await resInst.json();
-        installments = dataInst || [];
+        
+        // Cek dan format data Cicilan agar selalu menjadi Array murni
+        if (Array.isArray(dataInst)) {
+            installments = dataInst.filter(i => i !== null);
+        } else if (dataInst && typeof dataInst === 'object') {
+            installments = Object.values(dataInst).filter(i => i !== null);
+        } else {
+            installments = [];
+        }
 
         renderLoans();
     } catch (error) {
@@ -650,13 +666,15 @@ function addInstallment() {
     showToast("Cicilan berhasil ditambahkan!");
 }
 
+// Diperbarui: Fungsi Hapus Cicilan dengan pencocokan string yang presisi
 function deleteInstallment(id) {
     showConfirm("Hapus riwayat cicilan ini?", () => {
-        installments = installments.filter(i => i.id !== id);
+        // Gunakan String() agar tipe data selalu presisi saat difilter
+        installments = installments.filter(i => String(i.id) !== String(id));
         
         viewLoanDetails();
         renderLoans();
-        saveDataToFirebase(); // Simpan ke Firebase
+        saveDataToFirebase(); // Simpan pembaruan ke Firebase
         showToast("Cicilan berhasil dihapus!");
     });
 }
