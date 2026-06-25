@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Aplikasi Keuangan Harian</title>
 
 <style>
@@ -325,6 +325,14 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
 
 <script>
 // ==========================================
+// 0. PENCEGAH ERROR APLIKASI WEBVIEW (PENTING)
+// ==========================================
+window.onerror = function(msg, url, line) {
+    alert("Terjadi kesalahan sistem (Baris " + line + "). Silakan refresh aplikasi.");
+    return true; 
+};
+
+// ==========================================
 // 1. INISIALISASI FIREBASE
 // ==========================================
 const firebaseConfig = {
@@ -337,7 +345,11 @@ const firebaseConfig = {
     appId: "1:909592822715:web:9015e7a9282f7e079dba9e",
     measurementId: "G-CY4SPQ2SNL"
 };
+
 firebase.initializeApp(firebaseConfig);
+
+// Memaksa WebSockets untuk menghindari koneksi terputus/ditolak di aplikasi WebView/Median
+firebase.database.INTERNAL.forceWebSockets(); 
 const database = firebase.database();
 
 let data = [];
@@ -355,22 +367,27 @@ let descPickerTarget = 'add';
 // ==========================================
 // 2. LOAD DATA DARI FIREBASE (Real-Time)
 // ==========================================
-function loadFirebaseData() {
-    database.ref('transactions').on('value', (snapshot) => { 
-        data = []; 
-        snapshot.forEach((child) => { data.push(child.val()); }); 
-        applyFilter(); renderBudget(); renderCharts(); updateDescHistory(); 
-    });
-    database.ref('budgets').on('value', (snapshot) => { 
-        budgets = []; 
-        snapshot.forEach((child) => { budgets.push(child.val()); }); 
-        renderBudget(); updateCategoryDropdown(); 
-    });
-}
-// Jalankan fungsi load data otomatis tanpa login
-loadFirebaseData();
-// Secara otomatis arahkan ke menu Ringkasan agar data terlihat langsung
-setTimeout(() => { document.querySelector('.nav-item[data-index="1"]').click(); }, 100);
+document.addEventListener("DOMContentLoaded", function() {
+    function loadFirebaseData() {
+        database.ref('transactions').on('value', (snapshot) => { 
+            data = []; 
+            snapshot.forEach((child) => { data.push(child.val()); }); 
+            applyFilter(); renderBudget(); renderCharts(); updateDescHistory(); 
+        });
+        database.ref('budgets').on('value', (snapshot) => { 
+            budgets = []; 
+            snapshot.forEach((child) => { budgets.push(child.val()); }); 
+            renderBudget(); updateCategoryDropdown(); 
+        });
+    }
+
+    // Jalankan langsung saat DOM aplikasi siap
+    document.getElementById('main-app').style.display = 'block';
+    loadFirebaseData();
+    
+    // Secara otomatis arahkan ke menu Ringkasan agar data terlihat langsung
+    setTimeout(() => { document.querySelector('.nav-item[data-index="1"]').click(); }, 100);
+});
 
 // ==========================================
 // 3. FUNGSI UTILITAS UMUM
@@ -450,7 +467,7 @@ function toggleSaveMenu() { const menu = document.getElementById('saveMenu'); me
 function toggleFilter() { const container = document.getElementById('filterContainer'); container.style.display = container.style.display === 'none' ? 'block' : 'none'; }
 function handleFilterChange() { const filterValue = document.getElementById('filterSelect').value; const customDateContainer = document.getElementById('customDateContainer'); if (filterValue === 'custom') { customDateContainer.style.display = 'block'; } else { customDateContainer.style.display = 'none'; } applyFilter(); }
 
-// FUNGSI INI SUDAH DIPERBARUI AGAR DATA TERBARU MUNCUL DI ATAS (Berdasarkan ID timestamp)
+// Diperbarui: Sorting dari data terbaru ke data terlama (berdasarkan Waktu/ID)
 function getFilteredData() {
     const filterValue = document.getElementById('filterSelect').value;
     let resultData = [];
@@ -580,21 +597,25 @@ function deleteSelected() {
 }
 
 function saveExcel() {
-    let tableHtml = `<table border="1"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Tipe</th><th>Jumlah (Rp)</th></tr></thead><tbody>`;
-    const currentData = getFilteredData(); if (currentData.length === 0) return showToast("Tidak ada data untuk diekspor.");
-    currentData.forEach(item => { let tipe = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'; let kategori = item.category ? item.category : "-"; tableHtml += `<tr><td>${item.date}</td><td>${item.desc}</td><td>${kategori}</td><td>${tipe}</td><td>${item.amount}</td></tr>`; });
-    tableHtml += "</tbody></table>";
-    const blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Laporan_Keuangan_Harian.xls"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
-    showToast("Berhasil disimpan ke Excel!"); document.getElementById('saveMenu').style.display = 'none';
+    try {
+        let tableHtml = `<table border="1"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Tipe</th><th>Jumlah (Rp)</th></tr></thead><tbody>`;
+        const currentData = getFilteredData(); if (currentData.length === 0) return showToast("Tidak ada data untuk diekspor.");
+        currentData.forEach(item => { let tipe = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'; let kategori = item.category ? item.category : "-"; tableHtml += `<tr><td>${item.date}</td><td>${item.desc}</td><td>${kategori}</td><td>${tipe}</td><td>${item.amount}</td></tr>`; });
+        tableHtml += "</tbody></table>";
+        const blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Laporan_Keuangan_Harian.xls"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        showToast("Berhasil disimpan ke Excel!"); document.getElementById('saveMenu').style.display = 'none';
+    } catch(e) { alert("Gagal mengunduh: Aplikasi WebView mungkin tidak mendukung unduhan langsung."); }
 }
 function savePDF() {
-    const { jsPDF } = window.jspdf; const rows = document.querySelectorAll("#tableData tbody tr"); rows.forEach(row => row.classList.remove('selected')); document.getElementById('actionRowContainer').style.display = 'none'; document.getElementById('filterContainer').style.display = 'none';
-    showToast("Menyiapkan PDF...");
-    html2canvas(document.getElementById("printArea"), { scale: 2 }).then(canvas => {
-        let pdf = new jsPDF('p', 'mm', 'a4'); let width = pdf.internal.pageSize.getWidth(); let height = (canvas.height * width) / canvas.width;
-        pdf.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0, width, height); pdf.save("Laporan_Keuangan_Harian.pdf");
-        document.getElementById('actionRowContainer').style.display = 'flex'; renderTable(); document.getElementById('saveMenu').style.display = 'none';
-    });
+    try {
+        const { jsPDF } = window.jspdf; document.getElementById('btnLogout').style.display = 'none'; const rows = document.querySelectorAll("#tableData tbody tr"); rows.forEach(row => row.classList.remove('selected')); document.getElementById('actionRowContainer').style.display = 'none'; document.getElementById('filterContainer').style.display = 'none';
+        showToast("Menyiapkan PDF...");
+        html2canvas(document.getElementById("printArea"), { scale: 2 }).then(canvas => {
+            let pdf = new jsPDF('p', 'mm', 'a4'); let width = pdf.internal.pageSize.getWidth(); let height = (canvas.height * width) / canvas.width;
+            pdf.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0, width, height); pdf.save("Laporan_Keuangan_Harian.pdf");
+            document.getElementById('actionRowContainer').style.display = 'flex'; renderTable(); document.getElementById('saveMenu').style.display = 'none';
+        });
+    } catch(e) { alert("Gagal mengunduh PDF: Sistem WebView mungkin tidak mendukung fitur ini."); }
 }
 
 function renderCharts() {
@@ -614,7 +635,6 @@ function renderCharts() {
     chartKategori = new Chart(document.getElementById('chartKategori'), { type: 'doughnut', data: { labels: catLabels, datasets: [{ data: catData, backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false } });
 }
 
-
 // ==========================================
 // 6. KONTROL NAVBAR MENU (KLIK LUAR DLL)
 // ==========================================
@@ -625,7 +645,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
         
         const index = parseInt(item.getAttribute('data-index'));
         if (index === 0) { document.getElementById('menu-transaksi').style.display = "block"; document.getElementById('judul').innerText = "TAMBAH TRANSAKSI"; if(!document.getElementById('date').value) document.getElementById('date').valueAsDate = new Date(); } 
-        else if (index === 1) { document.getElementById('menu-ringkasan').style.display = "block"; document.getElementById('judul').innerText = "LAPORAN KEUANGAN HARIAN"; } 
+        else if (index === 1) { document.getElementById('menu-ringkasan').style.display = "block"; document.getElementById('judul').innerText = "LAPORAN KEUANGAN HARIAN"; applyFilter(); } 
         else if (index === 2) { document.getElementById('menu-anggaran').style.display = "block"; document.getElementById('judul').innerText = "KELOLA ANGGARAN"; } 
         else if (index === 3) { document.getElementById('menu-dashboard').style.display = "block"; document.getElementById('judul').innerText = "DASHBOARD"; setTimeout(() => { renderCharts(); }, 50); } 
     });
