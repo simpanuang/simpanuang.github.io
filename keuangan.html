@@ -13,26 +13,10 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f4f6f9;
     margin: 0;
-    padding: 0; 
+    padding: 20px 10px 80px 10px; 
 }
 
-#login-screen {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #f4f6f9; display: flex; justify-content: center;
-    align-items: center; padding: 20px; box-sizing: border-box; z-index: 9999;
-}
-
-.login-box {
-    background: white; padding: 30px 20px; border-radius: 20px;
-    width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    text-align: center;
-}
-
-#main-app {
-    display: none; 
-    padding: 20px 10px 80px 10px;
-}
-
+/* CONTAINER APLIKASI */
 .container {
     background: white; padding: 20px; border-radius: 20px;
     max-width: 500px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -43,14 +27,6 @@ h2 {
     color: #198754; margin-top: 0; margin-bottom: 25px;
     font-size: 1.4rem; text-align: center;
 }
-
-#btnLogout {
-    position: absolute; top: 20px; right: 20px;
-    background: none; border: none; cursor: pointer;
-    padding: 5px; display: none; transition: transform 0.2s;
-}
-
-#btnLogout:active { transform: scale(0.9); }
 
 .summary {
     display: grid; grid-template-columns: repeat(3, 1fr);
@@ -194,7 +170,6 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
 #toast.show { visibility: visible; opacity: 1; }
 </style>
 
-<!-- Firebase App & Database -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -203,7 +178,6 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
 
 <div id="toast">Notifikasi</div>
 
-<!-- MODAL KONFIRMASI -->
 <div id="confirmModal" class="modal">
     <div class="modal-content" style="text-align: center;">
         <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
@@ -212,7 +186,6 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
     </div>
 </div>
 
-<!-- MODAL PILIHAN UMUM -->
 <div id="categoryModal" class="modal"><div class="modal-content"><h3>Pilih Kategori</h3><div id="categoryList" class="custom-list"></div><button class="btn-secondary" onclick="closeCategoryPicker()" style="width: 100%; margin-top: 20px;">Batal</button></div></div>
 <div id="typeModal" class="modal"><div class="modal-content"><h3>Pilih Tipe</h3><div id="typeList" class="custom-list"></div><button class="btn-secondary" onclick="closeTypePicker()" style="width: 100%; margin-top: 20px;">Batal</button></div></div>
 
@@ -226,19 +199,16 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
     </div>
 </div>
 
-<!-- MAIN AREA -->
 <div class="container" id="printArea">
-    <h2 id="judul">DASHBOARD</h2>
+    <h2 id="judul">LAPORAN KEUANGAN HARIAN</h2>
 
-    <!-- MENU DASHBOARD -->
-    <div id="menu-dashboard" style="display:block;"> 
+    <div id="menu-dashboard" style="display:none;"> 
         <div class="canvas-container"><h4>Pengeluaran Harian</h4><div class="chart-wrapper" id="wrapperHarian"><canvas id="chartHarian"></canvas></div></div>
         <div class="canvas-container"><h4>Pengeluaran Bulanan</h4><div class="chart-wrapper" id="wrapperBulanan"><canvas id="chartBulanan"></canvas></div></div>
         <div class="canvas-container"><h4>Pengeluaran per Kategori</h4><div class="chart-wrapper" id="wrapperKategori"><canvas id="chartKategori"></canvas></div></div>
     </div>
 
-    <!-- MENU RINGKASAN -->
-    <div id="menu-ringkasan" style="display:none;">
+    <div id="menu-ringkasan" style="display:block;">
         <div class="summary">
             <div class="box">Pemasukan:<div class="val">Rp <span id="income">0</span></div></div>
             <div class="box">Pengeluaran:<div class="val">Rp <span id="expense">0</span></div></div>
@@ -274,7 +244,6 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
         <table id="tableData"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Tipe</th><th>Jumlah</th></tr></thead><tbody></tbody></table>
     </div>
 
-    <!-- MENU TRANSAKSI -->
     <div id="menu-transaksi" style="display:none;">
         <div class="form-group">
             <div class="form-item"><label>Tanggal</label><input type="date" id="date"></div>
@@ -286,7 +255,6 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
         <div class="btn-group"><button class="btn-add" onclick="addData()">Tambah Transaksi</button></div>
     </div>
 
-    <!-- MENU ANGGARAN -->
     <div id="menu-anggaran" style="display:none;">
         <div class="summary" style="margin-bottom: 25px;">
             <div class="box" style="background: #f3f4f6;">Total Limit:<div class="val" style="color: #374151;">Rp <span id="totBudgetLimit">0</span></div></div>
@@ -307,10 +275,7 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
         <table id="tableBudget"><thead><tr><th>Kategori</th><th>Limit</th><th>Terpakai</th><th>Sisa</th></tr></thead><tbody></tbody></table>
     </div>
 
-</div> <!-- END container / printArea -->
-
-<!-- MODAL EDIT (Transaksi, Budget, Rincian Anggaran) -->
-<div id="editModal" class="modal">
+</div> <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>Edit Transaksi</h3>
         <div class="form-group">
@@ -347,12 +312,11 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
     </div>
 </div>
 
-<!-- NAVBAR (Hanya 4 Menu) -->
 <div class="navbar">
     <div class="nav-item" data-index="0">Transaksi</div>
-    <div class="nav-item" data-index="1">Ringkasan</div>
+    <div class="nav-item active" data-index="1">Ringkasan</div>
     <div class="nav-item" data-index="2">Anggaran</div>
-    <div class="nav-item active" data-index="3">Dashboard</div>
+    <div class="nav-item" data-index="3">Dashboard</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
@@ -403,10 +367,10 @@ function loadFirebaseData() {
         renderBudget(); updateCategoryDropdown(); 
     });
 }
-// Jalankan langsung saat aplikasi dibuka
-document.getElementById('main-app').style.display = 'block';
+// Jalankan fungsi load data otomatis tanpa login
 loadFirebaseData();
-setTimeout(() => { document.querySelector('.nav-item[data-index="3"]').click(); }, 100);
+// Secara otomatis arahkan ke menu Ringkasan agar data terlihat langsung
+setTimeout(() => { document.querySelector('.nav-item[data-index="1"]').click(); }, 100);
 
 // ==========================================
 // 3. FUNGSI UTILITAS UMUM
@@ -486,10 +450,9 @@ function toggleSaveMenu() { const menu = document.getElementById('saveMenu'); me
 function toggleFilter() { const container = document.getElementById('filterContainer'); container.style.display = container.style.display === 'none' ? 'block' : 'none'; }
 function handleFilterChange() { const filterValue = document.getElementById('filterSelect').value; const customDateContainer = document.getElementById('customDateContainer'); if (filterValue === 'custom') { customDateContainer.style.display = 'block'; } else { customDateContainer.style.display = 'none'; } applyFilter(); }
 
-// FUNGSI INI SUDAH DIPERBARUI AGAR DATA TERBARU MUNCUL DI ATAS
+// FUNGSI INI SUDAH DIPERBARUI AGAR DATA TERBARU MUNCUL DI ATAS (Berdasarkan ID timestamp)
 function getFilteredData() {
     const filterValue = document.getElementById('filterSelect').value;
-    
     let resultData = [];
     if (filterValue === 'all') {
         resultData = [...data];
@@ -506,17 +469,13 @@ function getFilteredData() {
         });
     }
 
-    // Urutkan data berdasarkan tanggal terbaru. Jika tanggalnya sama, urutkan berdasarkan waktu input terbaru.
+    // Urutkan data berdasarkan ID (yang merupakan Timestamp/waktu input) dari terbesar (terbaru) ke terkecil
     return resultData.sort((a, b) => {
-        if (a.date === b.date) {
-            return b.id - a.id; 
-        }
-        return new Date(b.date) - new Date(a.date);
+        return Number(b.id) - Number(a.id);
     });
 }
 
 function applyFilter() { selectedIds = []; updateSummary(); renderTable(); }
-
 function updateSummary() {
     let income = 0, expense = 0; const currentData = getFilteredData();
     currentData.forEach(item => { if (item.type === 'income') income += item.amount; else expense += item.amount; });
@@ -629,7 +588,7 @@ function saveExcel() {
     showToast("Berhasil disimpan ke Excel!"); document.getElementById('saveMenu').style.display = 'none';
 }
 function savePDF() {
-    const { jsPDF } = window.jspdf; document.getElementById('btnLogout').style.display = 'none'; const rows = document.querySelectorAll("#tableData tbody tr"); rows.forEach(row => row.classList.remove('selected')); document.getElementById('actionRowContainer').style.display = 'none'; document.getElementById('filterContainer').style.display = 'none';
+    const { jsPDF } = window.jspdf; const rows = document.querySelectorAll("#tableData tbody tr"); rows.forEach(row => row.classList.remove('selected')); document.getElementById('actionRowContainer').style.display = 'none'; document.getElementById('filterContainer').style.display = 'none';
     showToast("Menyiapkan PDF...");
     html2canvas(document.getElementById("printArea"), { scale: 2 }).then(canvas => {
         let pdf = new jsPDF('p', 'mm', 'a4'); let width = pdf.internal.pageSize.getWidth(); let height = (canvas.height * width) / canvas.width;
@@ -641,6 +600,7 @@ function savePDF() {
 function renderCharts() {
     const dashboard = document.getElementById('menu-dashboard'); if (!dashboard || dashboard.style.display === 'none') return; 
     if (typeof Chart === 'undefined') { setTimeout(renderCharts, 200); return; }
+    
     document.getElementById('wrapperHarian').innerHTML = '<canvas id="chartHarian"></canvas>'; document.getElementById('wrapperBulanan').innerHTML = '<canvas id="chartBulanan"></canvas>'; document.getElementById('wrapperKategori').innerHTML = '<canvas id="chartKategori"></canvas>';
     
     const expenses = data.filter(item => item.type === 'expense'); 
@@ -662,6 +622,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); item.classList.add('active');
         document.getElementById('menu-ringkasan').style.display = "none"; document.getElementById('menu-transaksi').style.display = "none"; document.getElementById('menu-anggaran').style.display = "none"; document.getElementById('menu-dashboard').style.display = "none"; 
+        
         const index = parseInt(item.getAttribute('data-index'));
         if (index === 0) { document.getElementById('menu-transaksi').style.display = "block"; document.getElementById('judul').innerText = "TAMBAH TRANSAKSI"; if(!document.getElementById('date').value) document.getElementById('date').valueAsDate = new Date(); } 
         else if (index === 1) { document.getElementById('menu-ringkasan').style.display = "block"; document.getElementById('judul').innerText = "LAPORAN KEUANGAN HARIAN"; } 
