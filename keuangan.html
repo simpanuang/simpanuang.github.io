@@ -13,7 +13,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f4f6f9;
     margin: 0;
-    padding: 20px 10px 90px 10px; /* Jarak bawah 90px agar konten tidak tertutup menu */
+    padding: 20px 10px 90px 10px;
 }
 
 /* CONTAINER APLIKASI */
@@ -238,8 +238,23 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
 
     <!-- MENU DASHBOARD -->
     <div id="menu-dashboard" style="display:none;"> 
+        <div class="action-row" id="dashboardActionRow">
+            <button style="background: #6b7280;" onclick="toggleDashboardFilter()">Sortir ▾</button>
+            <button class="btn-add" onclick="document.querySelector('.nav-item[data-index=\'0\']').click()">Tambah Transaksi</button>
+        </div>
+        
+        <div id="filterDashboardContainer" style="display: none; background: #f3f4f6; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: left;">
+            <label style="font-size: 13px; font-weight: 600; color: #4b5563;">Tampilkan Data Grafik Berdasarkan:</label>
+            <select id="filterDashboardSelect" onchange="renderCharts()" style="width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 13px; height: 40px; background: white;">
+                <option value="all">Semua Waktu</option>
+                <option value="this_year">Tahun Ini</option>
+                <option value="this_month">Bulan Ini</option>
+            </select>
+        </div>
+
         <div class="canvas-container"><h4>Pengeluaran Harian</h4><div class="chart-wrapper" id="wrapperHarian"><canvas id="chartHarian"></canvas></div></div>
         <div class="canvas-container"><h4>Pengeluaran Bulanan</h4><div class="chart-wrapper" id="wrapperBulanan"><canvas id="chartBulanan"></canvas></div></div>
+        <div class="canvas-container"><h4>Pengeluaran Tahunan</h4><div class="chart-wrapper" id="wrapperTahunan"><canvas id="chartTahunan"></canvas></div></div>
         <div class="canvas-container"><h4>Pengeluaran per Kategori</h4><div class="chart-wrapper" id="wrapperKategori"><canvas id="chartKategori"></canvas></div></div>
     </div>
 
@@ -267,7 +282,11 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
         <div id="filterContainer" style="display: none; background: #f3f4f6; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: left;">
             <label style="font-size: 13px; font-weight: 600; color: #4b5563;">Tampilkan Berdasarkan Waktu:</label>
             <select id="filterSelect" onchange="handleFilterChange()" style="width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 13px; height: 40px; background: white;">
-                <option value="all">Semua Waktu</option><option value="daily">Harian (Hari Ini)</option><option value="weekly">Mingguan (7 Hari Terakhir)</option><option value="monthly">Bulanan (Bulan Ini)</option><option value="custom">Pilih Tanggal Sendiri</option>
+                <option value="all">Semua Waktu</option>
+                <option value="daily">Harian (Hari Ini)</option>
+                <option value="weekly">Mingguan (7 Hari Terakhir)</option>
+                <option value="monthly" selected>Bulanan (Bulan Ini)</option>
+                <option value="custom">Pilih Tanggal Sendiri</option>
             </select>
             <div id="customDateContainer" style="display: none; margin-top: 15px;">
                 <label style="font-size: 12px; font-weight: 600; color: #4b5563;">Rentang Tanggal:</label>
@@ -278,18 +297,6 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
             </div>
         </div>
         <table id="tableData"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Tipe</th><th>Jumlah</th></tr></thead><tbody></tbody></table>
-    </div>
-
-    <!-- MENU TRANSAKSI -->
-    <div id="menu-transaksi" style="display:none;">
-        <div class="form-group">
-            <div class="form-item"><label>Tanggal</label><input type="date" id="date"></div>
-            <div class="form-item"><label>Keterangan</label><div class="custom-select" onclick="openDescPicker('add')"><span id="selectedDescText" style="color: #888;">Ketik atau pilih keterangan...</span><span class="arrow">▼</span></div><input type="hidden" id="desc"></div>
-            <div class="form-item"><label>Kategori</label><div class="custom-select" onclick="openCategoryPicker('add')"><span id="selectedCategoryText">Pilih Kategori</span><span class="arrow">▼</span></div><input type="hidden" id="category"></div>
-            <div class="form-item"><label>Tipe</label><div class="custom-select" onclick="openTypePicker('add')"><span id="selectedTypeText">Pengeluaran</span><span class="arrow">▼</span></div><input type="hidden" id="type" value="expense"></div>
-            <div class="form-item"><label>Jumlah (Rp)</label><input type="text" inputmode="numeric" id="amount" placeholder="0" oninput="formatInputRupiah(this)"></div>
-        </div>
-        <div class="btn-group"><button class="btn-add" onclick="addData()">Tambah Transaksi</button></div>
     </div>
 
     <!-- MENU ANGGARAN -->
@@ -309,7 +316,8 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
             <button style="background: #3b82f6; color: white; padding: 12px 5px; font-size: 12px;" onclick="viewBudgetDetails()">Lihat</button>
             <button class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteBudgetSelected()">Hapus</button>
         </div>
-        <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Anggaran</h3>
+        <!-- Menambahkan keterangan (Bulan Ini) untuk penegasan -->
+        <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Anggaran (Bulan Ini)</h3>
         <table id="tableBudget"><thead><tr><th>Kategori</th><th>Limit</th><th>Terpakai</th><th>Sisa</th></tr></thead><tbody></tbody></table>
     </div>
 
@@ -343,6 +351,7 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
 
 <div id="viewBudgetModal" class="modal">
     <div class="modal-content" style="max-width: 450px;">
+        <!-- Keterangan (Bulan Ini) di judul Modal -->
         <h3 id="viewBudgetTitle" style="margin-bottom: 10px;">Rincian Anggaran</h3>
         <p id="viewBudgetTotal" style="text-align: center; color: #b91c1c; font-weight: bold; margin-top: 0; margin-bottom: 15px;">Total: Rp 0</p>
         <div style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
@@ -353,7 +362,7 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
     </div>
 </div>
 
-<!-- NAVBAR DIKEMBALIKAN KE BAWAH -->
+<!-- NAVBAR -->
 <div class="navbar">
     <div class="nav-item" data-index="0">Transaksi</div>
     <div class="nav-item active" data-index="1">Ringkasan</div>
@@ -386,7 +395,7 @@ const database = firebase.database();
 
 let data = [];
 let budgets = [];
-let chartHarian, chartBulanan, chartKategori;
+let chartHarian, chartBulanan, chartTahunan, chartKategori; 
 let selectedIds = []; 
 let editTargetId = null; 
 let selectedBudgetCategory = null; 
@@ -493,6 +502,8 @@ function renderCategoryPickerList() {
 // ==========================================
 function toggleSaveMenu() { const menu = document.getElementById('saveMenu'); menu.style.display = menu.style.display === 'none' ? 'block' : 'none'; }
 function toggleFilter() { const container = document.getElementById('filterContainer'); container.style.display = container.style.display === 'none' ? 'block' : 'none'; }
+function toggleDashboardFilter() { const container = document.getElementById('filterDashboardContainer'); container.style.display = container.style.display === 'none' ? 'block' : 'none'; }
+
 function handleFilterChange() { const filterValue = document.getElementById('filterSelect').value; const customDateContainer = document.getElementById('customDateContainer'); if (filterValue === 'custom') { customDateContainer.style.display = 'block'; } else { customDateContainer.style.display = 'none'; } applyFilter(); }
 
 function getFilteredData() {
@@ -514,10 +525,7 @@ function getFilteredData() {
         });
     }
 
-    // Urutkan dari terbaru ke terlama
-    return resultData.sort((a, b) => {
-        return (Number(b.id) || 0) - (Number(a.id) || 0);
-    });
+    return resultData.sort((a, b) => { return (Number(b.id) || 0) - (Number(a.id) || 0); });
 }
 
 function applyFilter() { selectedIds = []; updateSummary(); renderTable(); }
@@ -539,12 +547,23 @@ function toggleBudgetSelection(rowElement, category) {
     const rows = document.querySelectorAll("#tableBudget tbody tr"); rows.forEach(r => r.classList.remove('selected'));
     if (selectedBudgetCategory === category) { selectedBudgetCategory = null; } else { selectedBudgetCategory = category; rowElement.classList.add('selected'); }
 }
+
+// LOGIKA ANGGARAN (MENGHITUNG BULAN INI SAJA)
 function renderBudget() {
     const tbody = document.querySelector("#tableBudget tbody"); tbody.innerHTML = ""; let totalLimit = 0; let totalUsed = 0;
+    
+    // Identifikasi format tahun & bulan saat ini (misal: 2026-07)
+    const t = new Date(); const yyyy = t.getFullYear(); const mm = String(t.getMonth() + 1).padStart(2, '0'); const currentMonthStr = `${yyyy}-${mm}`;
+    
     budgets.forEach(b => {
-        const used = data.filter(d => d.type === 'expense' && d.category === b.category).reduce((sum, d) => sum + d.amount, 0); const remaining = b.limit - used; totalLimit += b.limit; totalUsed += used; const isSelected = selectedBudgetCategory === b.category ? 'selected' : '';
+        // Logika kunci: d.date.startsWith(currentMonthStr)
+        // Anggaran yang dijumlahkan HANYA pengeluaran yang terjadi di bulan ini
+        const used = data.filter(d => d.type === 'expense' && d.category === b.category && d.date.startsWith(currentMonthStr)).reduce((sum, d) => sum + d.amount, 0); 
+        
+        const remaining = b.limit - used; totalLimit += b.limit; totalUsed += used; const isSelected = selectedBudgetCategory === b.category ? 'selected' : '';
         tbody.innerHTML += `<tr class="${isSelected}" onclick="toggleBudgetSelection(this, '${b.category}')"><td>${b.category}</td><td>Rp ${formatRupiah(b.limit)}</td><td>Rp ${formatRupiah(used)}</td><td style="color:${remaining < 0 ? '#dc3545' : '#198754'}">Rp ${formatRupiah(remaining)}</td></tr>`;
     });
+    
     document.getElementById('totBudgetLimit').innerText = formatRupiah(totalLimit); document.getElementById('totBudgetUsed').innerText = formatRupiah(totalUsed); document.getElementById('totBudgetRemaining').innerText = formatRupiah(totalLimit - totalUsed);
 }
 
@@ -588,9 +607,14 @@ function deleteBudgetSelected() {
 }
 function viewBudgetDetails() {
     if (!selectedBudgetCategory) return showToast("Pilih satu baris anggaran terlebih dahulu.");
-    document.getElementById('viewBudgetTitle').innerText = "Rincian: " + selectedBudgetCategory;
+    document.getElementById('viewBudgetTitle').innerText = "Rincian: " + selectedBudgetCategory + " (Bulan Ini)";
     const tbody = document.querySelector("#tableViewBudget tbody"); tbody.innerHTML = "";
-    const expenses = data.filter(d => d.type === 'expense' && d.category === selectedBudgetCategory);
+    
+    // Pastikan modal rincian juga hanya menarik dari bulan ini
+    const t = new Date(); const yyyy = t.getFullYear(); const mm = String(t.getMonth() + 1).padStart(2, '0'); const currentMonthStr = `${yyyy}-${mm}`;
+
+    const expenses = data.filter(d => d.type === 'expense' && d.category === selectedBudgetCategory && d.date.startsWith(currentMonthStr));
+    
     if (expenses.length === 0) {
         document.getElementById('viewBudgetEmpty').style.display = 'block'; document.getElementById('tableViewBudget').style.display = 'none'; document.getElementById('viewBudgetTotal').innerText = "Total: Rp 0";
     } else {
@@ -640,7 +664,7 @@ function savePDF() {
     try {
         if (!window.jspdf) { showToast("Sistem pembuat PDF belum siap. Tunggu sebentar."); return; }
         const { jsPDF } = window.jspdf; const rows = document.querySelectorAll("#tableData tbody tr"); rows.forEach(row => row.classList.remove('selected')); document.getElementById('actionRowContainer').style.display = 'none'; document.getElementById('filterContainer').style.display = 'none';
-        document.querySelector('.navbar').style.display = 'none'; // Sembunyikan navbar agar tidak ter-print
+        document.querySelector('.navbar').style.display = 'none'; 
         
         showToast("Menyiapkan PDF...");
         html2canvas(document.getElementById("printArea"), { scale: 2 }).then(canvas => {
@@ -658,21 +682,33 @@ function renderCharts() {
     const dashboard = document.getElementById('menu-dashboard'); 
     if (!dashboard || dashboard.style.display === 'none') return; 
     
-    if (typeof Chart === 'undefined') {
-        console.warn("Library Grafik gagal dimuat.");
-        return; 
+    if (typeof Chart === 'undefined') { return; }
+    
+    document.getElementById('wrapperHarian').innerHTML = '<canvas id="chartHarian"></canvas>'; 
+    document.getElementById('wrapperBulanan').innerHTML = '<canvas id="chartBulanan"></canvas>'; 
+    document.getElementById('wrapperTahunan').innerHTML = '<canvas id="chartTahunan"></canvas>';
+    document.getElementById('wrapperKategori').innerHTML = '<canvas id="chartKategori"></canvas>';
+    
+    const filterVal = document.getElementById('filterDashboardSelect') ? document.getElementById('filterDashboardSelect').value : 'all';
+    const t = new Date(); const currentYear = t.getFullYear().toString(); const currentMonth = String(t.getMonth() + 1).padStart(2, '0'); const currentYearMonth = `${currentYear}-${currentMonth}`;
+
+    let filteredExpenses = data.filter(item => item.type === 'expense');
+    if (filterVal === 'this_year') {
+        filteredExpenses = filteredExpenses.filter(item => item.date.startsWith(currentYear));
+    } else if (filterVal === 'this_month') {
+        filteredExpenses = filteredExpenses.filter(item => item.date.startsWith(currentYearMonth));
     }
     
-    document.getElementById('wrapperHarian').innerHTML = '<canvas id="chartHarian"></canvas>'; document.getElementById('wrapperBulanan').innerHTML = '<canvas id="chartBulanan"></canvas>'; document.getElementById('wrapperKategori').innerHTML = '<canvas id="chartKategori"></canvas>';
-    
-    const expenses = data.filter(item => item.type === 'expense'); 
-    const dailyMap = {}; expenses.forEach(item => { if (!dailyMap[item.date]) dailyMap[item.date] = 0; dailyMap[item.date] += item.amount; }); const dailyLabels = Object.keys(dailyMap).sort(); const dailyData = dailyLabels.map(date => dailyMap[date]);
+    const dailyMap = {}; filteredExpenses.forEach(item => { if (!dailyMap[item.date]) dailyMap[item.date] = 0; dailyMap[item.date] += item.amount; }); const dailyLabels = Object.keys(dailyMap).sort(); const dailyData = dailyLabels.map(date => dailyMap[date]);
     chartHarian = new Chart(document.getElementById('chartHarian'), { type: 'bar', data: { labels: dailyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: dailyData, backgroundColor: '#ef4444', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }} });
     
-    const monthlyMap = {}; expenses.forEach(item => { const month = item.date.substring(0, 7); if (!monthlyMap[month]) monthlyMap[month] = 0; monthlyMap[month] += item.amount; }); const monthlyLabels = Object.keys(monthlyMap).sort(); const monthlyData = monthlyLabels.map(m => monthlyMap[m]);
+    const monthlyMap = {}; filteredExpenses.forEach(item => { const month = item.date.substring(0, 7); if (!monthlyMap[month]) monthlyMap[month] = 0; monthlyMap[month] += item.amount; }); const monthlyLabels = Object.keys(monthlyMap).sort(); const monthlyData = monthlyLabels.map(m => monthlyMap[m]);
     chartBulanan = new Chart(document.getElementById('chartBulanan'), { type: 'bar', data: { labels: monthlyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: monthlyData, backgroundColor: '#3b82f6', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }} });
     
-    const catMap = {}; expenses.forEach(item => { if (!catMap[item.category]) catMap[item.category] = 0; catMap[item.category] += item.amount; }); const catLabels = Object.keys(catMap); const catData = catLabels.map(cat => catMap[cat]);
+    const yearlyMap = {}; filteredExpenses.forEach(item => { const year = item.date.substring(0, 4); if (!yearlyMap[year]) yearlyMap[year] = 0; yearlyMap[year] += item.amount; }); const yearlyLabels = Object.keys(yearlyMap).sort(); const yearlyData = yearlyLabels.map(y => yearlyMap[y]);
+    chartTahunan = new Chart(document.getElementById('chartTahunan'), { type: 'bar', data: { labels: yearlyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: yearlyData, backgroundColor: '#f59e0b', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }} });
+
+    const catMap = {}; filteredExpenses.forEach(item => { if (!catMap[item.category]) catMap[item.category] = 0; catMap[item.category] += item.amount; }); const catLabels = Object.keys(catMap); const catData = catLabels.map(cat => catMap[cat]);
     chartKategori = new Chart(document.getElementById('chartKategori'), { type: 'doughnut', data: { labels: catLabels, datasets: [{ data: catData, backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false } });
 }
 
@@ -687,7 +723,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
         const index = parseInt(item.getAttribute('data-index'));
         if (index === 0) { document.getElementById('menu-transaksi').style.display = "block"; document.getElementById('judul').innerText = "TAMBAH TRANSAKSI"; if(!document.getElementById('date').value) document.getElementById('date').valueAsDate = new Date(); } 
         else if (index === 1) { document.getElementById('menu-ringkasan').style.display = "block"; document.getElementById('judul').innerText = "LAPORAN KEUANGAN HARIAN"; applyFilter(); } 
-        else if (index === 2) { document.getElementById('menu-anggaran').style.display = "block"; document.getElementById('judul').innerText = "KELOLA ANGGARAN"; } 
+        else if (index === 2) { document.getElementById('menu-anggaran').style.display = "block"; document.getElementById('judul').innerText = "KELOLA ANGGARAN"; renderBudget(); } 
         else if (index === 3) { document.getElementById('menu-dashboard').style.display = "block"; document.getElementById('judul').innerText = "DASHBOARD"; setTimeout(() => { renderCharts(); }, 50); } 
     });
 });
