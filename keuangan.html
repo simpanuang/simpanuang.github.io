@@ -101,11 +101,12 @@ tbody tr { cursor: pointer; transition: background-color 0.2s; background: white
 tbody tr:hover { background: #f9fafb; }
 tbody tr.selected { background-color: #d1e7dd !important; }
 
-/* UKURAN KOLOM TABEL KHUSUS */
-#tableData th:nth-child(1), #tableData td:nth-child(1) { width: 22%; font-size: 12px; } 
-#tableData th:nth-child(2), #tableData td:nth-child(2) { width: 30%; } 
-#tableData th:nth-child(3), #tableData td:nth-child(3) { width: 24%; font-size: 12px; white-space: nowrap; } 
-#tableData th:nth-child(4), #tableData td:nth-child(4) { width: 24%; font-size: 12px; } 
+/* UKURAN KOLOM TABEL KHUSUS (5 Kolom) */
+#tableData th:nth-child(1), #tableData td:nth-child(1) { width: 17%; font-size: 11px; } /* Tanggal */
+#tableData th:nth-child(2), #tableData td:nth-child(2) { width: 17%; font-size: 11px; } /* Akun */
+#tableData th:nth-child(3), #tableData td:nth-child(3) { width: 28%; font-size: 12px; } /* Keterangan */
+#tableData th:nth-child(4), #tableData td:nth-child(4) { width: 16%; font-size: 11px; } /* Tipe */
+#tableData th:nth-child(5), #tableData td:nth-child(5) { width: 22%; font-size: 11px; } /* Jumlah */
 
 #tableViewBudget { font-size: 12px; }
 #tableViewBudget th:nth-child(1), #tableViewBudget td:nth-child(1) { width: 25%; }
@@ -274,18 +275,18 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
 }
 .modal-balance-input:focus { border-color: #111827 !important; }
 
-/* Label Metode Pembayaran di Tabel */
+/* Label Metode Pembayaran di Kolom Tabel */
 .method-badge {
     display: inline-block;
-    margin-top: 4px;
     font-size: 9px;
     background: #f3f4f6;
-    padding: 3px 6px;
+    padding: 4px 6px;
     border-radius: 4px;
     color: #4b5563;
     font-weight: bold;
     border: 1px solid #e5e7eb;
     text-transform: uppercase;
+    text-align: center;
 }
 </style>
 
@@ -388,7 +389,20 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
                 </div>
             </div>
         </div>
-        <table id="tableData"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Tipe</th><th>Jumlah</th></tr></thead><tbody></tbody></table>
+        
+        <!-- Pemisahan Kolom Tanggal, Akun, Keterangan, Tipe, Jumlah -->
+        <table id="tableData">
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Akun</th>
+                    <th>Keterangan</th>
+                    <th>Tipe</th>
+                    <th>Jumlah</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 
     <div id="menu-transaksi" style="display:none;">
@@ -558,7 +572,7 @@ document.addEventListener("DOMContentLoaded", function() {
             data = []; 
             snapshot.forEach((child) => { data.push(child.val()); }); 
             applyFilter(); renderBudget(); renderCharts(); updateDescHistory(); 
-            updateAccountUI(); // Update saldo setiap ada perubahan transaksi
+            updateAccountUI(); 
         });
         database.ref('budgets').on('value', (snapshot) => { 
             budgets = []; 
@@ -702,8 +716,15 @@ function renderTable() {
     const tbody = document.querySelector("#tableData tbody"); tbody.innerHTML = ""; const currentData = getFilteredData();
     currentData.forEach(item => { 
         const isSelected = selectedIds.includes(item.id.toString()) ? 'selected' : ''; 
-        const methodBadge = item.method ? `<br><span class="method-badge">${item.method}</span>` : '';
-        tbody.innerHTML += `<tr class="${isSelected}" onclick="toggleSelection(this, '${item.id}')"><td>${item.date}</td><td style="text-align:left; line-height: 1.4;">${item.desc} ${methodBadge}</td><td>${item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</td><td style="text-align:right">Rp ${formatRupiah(item.amount)}</td></tr>`; 
+        const methodBadge = item.method ? `<span class="method-badge">${item.method.toUpperCase()}</span>` : `<span class="method-badge">CASH</span>`;
+        
+        tbody.innerHTML += `<tr class="${isSelected}" onclick="toggleSelection(this, '${item.id}')">
+            <td>${item.date}</td>
+            <td>${methodBadge}</td>
+            <td style="text-align:left;">${item.desc}</td>
+            <td>${item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</td>
+            <td style="text-align:right">Rp ${formatRupiah(item.amount)}</td>
+        </tr>`; 
     });
 }
 
@@ -795,9 +816,9 @@ function deleteSelected() {
 
 function saveExcel() {
     try {
-        let tableHtml = `<table border="1"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Tipe</th><th>Jumlah (Rp)</th></tr></thead><tbody>`;
+        let tableHtml = `<table border="1"><thead><tr><th>Tanggal</th><th>Akun</th><th>Keterangan</th><th>Kategori</th><th>Tipe</th><th>Jumlah (Rp)</th></tr></thead><tbody>`;
         const currentData = getFilteredData(); if (currentData.length === 0) return showToast("Tidak ada data untuk diekspor.");
-        currentData.forEach(item => { let tipe = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'; let kategori = item.category ? item.category : "-"; let meth = item.method ? `(${item.method.toUpperCase()})` : ''; tableHtml += `<tr><td>${item.date}</td><td>${item.desc} ${meth}</td><td>${kategori}</td><td>${tipe}</td><td>${item.amount}</td></tr>`; });
+        currentData.forEach(item => { let tipe = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'; let kategori = item.category ? item.category : "-"; let meth = item.method ? item.method.toUpperCase() : 'CASH'; tableHtml += `<tr><td>${item.date}</td><td>${meth}</td><td>${item.desc}</td><td>${kategori}</td><td>${tipe}</td><td>${item.amount}</td></tr>`; });
         tableHtml += "</tbody></table>";
         const blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Laporan_Keuangan_Harian.xls"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
         showToast("Berhasil disimpan ke Excel!"); document.getElementById('saveMenu').style.display = 'none';
