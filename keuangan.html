@@ -246,10 +246,7 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
     align-items: center;
     gap: 4px;
 }
-
-.account-header span {
-    font-size: 9px; /* Panah kecil */
-}
+.account-header span { font-size: 9px; }
 
 .account-val {
     background: #ffffff;
@@ -258,17 +255,15 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
     padding: 10px 8px;
     color: #374151;
     display: flex;
-    justify-content: space-between; /* Membuat Rp di kiri, angka di kanan */
+    justify-content: space-between;
     align-items: center;
 }
 
-/* Warna sesuai gambar 1000844377.jpg */
 .bg-cash { background: #3b82f6; color: #ffffff; }
 .bg-bca { background: #facc15; color: #111827; }
 .bg-seabank { background: #fbcfe8; color: #111827; }
 .bg-shopeepay { background: #bbf7d0; color: #111827; }
 
-/* Modal Khusus Saldo */
 .modal-balance-input {
     text-align: right; 
     font-size: 22px !important; 
@@ -277,8 +272,20 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
     height: 56px !important;
     border: 2px solid #e5e7eb !important;
 }
-.modal-balance-input:focus {
-    border-color: #111827 !important;
+.modal-balance-input:focus { border-color: #111827 !important; }
+
+/* Label Metode Pembayaran di Tabel */
+.method-badge {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 9px;
+    background: #f3f4f6;
+    padding: 3px 6px;
+    border-radius: 4px;
+    color: #4b5563;
+    font-weight: bold;
+    border: 1px solid #e5e7eb;
+    text-transform: uppercase;
 }
 </style>
 
@@ -300,6 +307,7 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
 
 <div id="categoryModal" class="modal"><div class="modal-content"><h3>Pilih Kategori</h3><div id="categoryList" class="custom-list"></div><button class="btn-secondary" onclick="closeCategoryPicker()" style="width: 100%; margin-top: 20px;">Batal</button></div></div>
 <div id="typeModal" class="modal"><div class="modal-content"><h3>Pilih Tipe</h3><div id="typeList" class="custom-list"></div><button class="btn-secondary" onclick="closeTypePicker()" style="width: 100%; margin-top: 20px;">Batal</button></div></div>
+<div id="methodModal" class="modal"><div class="modal-content"><h3>Pembayaran Dengan</h3><div id="methodList" class="custom-list"></div><button class="btn-secondary" onclick="closeMethodPicker()" style="width: 100%; margin-top: 20px;">Batal</button></div></div>
 
 <div id="descModal" class="modal">
     <div class="modal-content">
@@ -387,6 +395,7 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
         <div class="form-group">
             <div class="form-item"><label>Tanggal</label><input type="date" id="date"></div>
             <div class="form-item"><label>Keterangan</label><div class="custom-select" onclick="openDescPicker('add')"><span id="selectedDescText" style="color: #888;">Ketik atau pilih keterangan...</span><span class="arrow">▼</span></div><input type="hidden" id="desc"></div>
+            <div class="form-item"><label>Pembayaran</label><div class="custom-select" onclick="openMethodPicker('add')"><span id="selectedMethodText">CASH</span><span class="arrow">▼</span></div><input type="hidden" id="method" value="cash"></div>
             <div class="form-item"><label>Kategori</label><div class="custom-select" onclick="openCategoryPicker('add')"><span id="selectedCategoryText">Pilih Kategori</span><span class="arrow">▼</span></div><input type="hidden" id="category"></div>
             <div class="form-item"><label>Tipe</label><div class="custom-select" onclick="openTypePicker('add')"><span id="selectedTypeText">Pengeluaran</span><span class="arrow">▼</span></div><input type="hidden" id="type" value="expense"></div>
             <div class="form-item"><label>Jumlah (Rp)</label><input type="text" inputmode="numeric" id="amount" placeholder="0" oninput="formatInputRupiah(this)"></div>
@@ -430,6 +439,7 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
         <div class="form-group">
             <div class="form-item"><label>Tanggal</label><input type="date" id="editDate"></div>
             <div class="form-item"><label>Keterangan</label><div class="custom-select" onclick="openDescPicker('edit')"><span id="selectedEditDescText"></span><span class="arrow">▼</span></div><input type="hidden" id="editDesc"></div>
+            <div class="form-item"><label>Pembayaran</label><div class="custom-select" onclick="openMethodPicker('edit')"><span id="selectedEditMethodText">CASH</span><span class="arrow">▼</span></div><input type="hidden" id="editMethod"></div>
             <div class="form-item"><label>Kategori</label><div class="custom-select" onclick="openCategoryPicker('edit')"><span id="selectedEditCategoryText">Pilih Kategori</span><span class="arrow">▼</span></div><input type="hidden" id="editCategory"></div>
             <div class="form-item"><label>Tipe</label><div class="custom-select" onclick="openTypePicker('edit')"><span id="selectedEditTypeText">Pengeluaran</span><span class="arrow">▼</span></div><input type="hidden" id="editType"></div>
             <div class="form-item"><label>Jumlah (Rp)</label><input type="text" inputmode="numeric" id="editAmount" oninput="formatInputRupiah(this)"></div>
@@ -523,14 +533,21 @@ let editBudgetOldCategory = null;
 let categoryPickerTarget = 'add'; 
 let typePickerTarget = 'add';
 let descPickerTarget = 'add';
+let methodPickerTarget = 'add';
+
+// Menyimpan SALDO BASIS
 let accountBalances = { cash: 0, bca: 0, seabank: 0, shopeepay: 0 };
+const methodOptions = [
+    { val: 'cash', label: 'CASH' },
+    { val: 'bca', label: 'BCA' },
+    { val: 'seabank', label: 'SEABANK' },
+    { val: 'shopeepay', label: 'SHOPEEPAY' }
+];
 
 // ==========================================
 // 2. LOAD DATA DARI FIREBASE (Real-Time)
 // ==========================================
 document.addEventListener("DOMContentLoaded", function() {
-    
-    // Set default month untuk filter anggaran ke bulan ini
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -541,13 +558,13 @@ document.addEventListener("DOMContentLoaded", function() {
             data = []; 
             snapshot.forEach((child) => { data.push(child.val()); }); 
             applyFilter(); renderBudget(); renderCharts(); updateDescHistory(); 
+            updateAccountUI(); // Update saldo setiap ada perubahan transaksi
         });
         database.ref('budgets').on('value', (snapshot) => { 
             budgets = []; 
             snapshot.forEach((child) => { budgets.push(child.val()); }); 
             renderBudget(); updateCategoryDropdown(); 
         });
-        // Load Saldo Akun
         database.ref('account_balances').on('value', (snapshot) => {
             if (snapshot.exists()) {
                 accountBalances = snapshot.val();
@@ -595,6 +612,18 @@ function renderTypePickerList() {
     document.getElementById('typeList').innerHTML = html;
 }
 
+function openMethodPicker(target) { methodPickerTarget = target; renderMethodPickerList(); document.getElementById('methodModal').style.display = 'flex'; }
+function closeMethodPicker() { document.getElementById('methodModal').style.display = 'none'; }
+function selectMethod(val, label) {
+    if (methodPickerTarget === 'add') { document.getElementById('method').value = val; document.getElementById('selectedMethodText').innerText = label; document.getElementById('selectedMethodText').style.color = "#333"; } else { document.getElementById('editMethod').value = val; document.getElementById('selectedEditMethodText').innerText = label; }
+    closeMethodPicker();
+}
+function renderMethodPickerList() {
+    let currentSelected = methodPickerTarget === 'add' ? document.getElementById('method').value : document.getElementById('editMethod').value;
+    let html = ''; methodOptions.forEach(opt => { const isSelected = opt.val === currentSelected; html += `<div class="custom-item ${isSelected ? 'selected' : ''}" onclick="selectMethod('${opt.val}', '${opt.label}')"><span>${opt.label}</span>${isSelected ? '<span class="check">✓</span>' : ''}</div>`; });
+    document.getElementById('methodList').innerHTML = html;
+}
+
 function openDescPicker(target) { descPickerTarget = target; let currentVal = descPickerTarget === 'add' ? document.getElementById('desc').value : document.getElementById('editDesc').value; document.getElementById('customDescInput').value = currentVal; renderDescPickerList(); document.getElementById('descModal').style.display = 'flex'; setTimeout(() => document.getElementById('customDescInput').focus(), 100); }
 function closeDescPicker() { document.getElementById('descModal').style.display = 'none'; }
 function selectDesc(val) {
@@ -640,16 +669,12 @@ function toggleSaveMenu() { const menu = document.getElementById('saveMenu'); me
 function toggleFilter() { const container = document.getElementById('filterContainer'); container.style.display = container.style.display === 'none' ? 'block' : 'none'; }
 function handleFilterChange() { const filterValue = document.getElementById('filterSelect').value; const customDateContainer = document.getElementById('customDateContainer'); if (filterValue === 'custom') { customDateContainer.style.display = 'block'; } else { customDateContainer.style.display = 'none'; } applyFilter(); }
 
-// Sorting Berdasarkan Data Terbaru (ID/Timestamp Terbesar) ke Terlama
 function getFilteredData() {
     const filterValue = document.getElementById('filterSelect').value;
     let resultData = [];
-    if (filterValue === 'all') {
-        resultData = [...data];
-    } else {
+    if (filterValue === 'all') { resultData = [...data]; } else {
         const t = new Date(); const yyyy = t.getFullYear(); const mm = String(t.getMonth() + 1).padStart(2, '0'); const dd = String(t.getDate()).padStart(2, '0'); const todayStr = `${yyyy}-${mm}-${dd}`;
         const todayObj = new Date(t.setHours(0,0,0,0)); const lastWeekObj = new Date(todayObj); lastWeekObj.setDate(lastWeekObj.getDate() - 7);
-        
         resultData = data.filter(item => {
             if (!item || !item.date) return false;
             if (filterValue === 'daily') return item.date === todayStr;
@@ -659,11 +684,7 @@ function getFilteredData() {
             return true;
         });
     }
-
-    // Urutkan dari terbaru ke terlama
-    return resultData.sort((a, b) => {
-        return (Number(b.id) || 0) - (Number(a.id) || 0);
-    });
+    return resultData.sort((a, b) => { return (Number(b.id) || 0) - (Number(a.id) || 0); });
 }
 
 function applyFilter() { selectedIds = []; updateSummary(); renderTable(); }
@@ -679,45 +700,31 @@ function selectAllRows() {
 }
 function renderTable() {
     const tbody = document.querySelector("#tableData tbody"); tbody.innerHTML = ""; const currentData = getFilteredData();
-    currentData.forEach(item => { const isSelected = selectedIds.includes(item.id.toString()) ? 'selected' : ''; tbody.innerHTML += `<tr class="${isSelected}" onclick="toggleSelection(this, '${item.id}')"><td>${item.date}</td><td style="text-align:left">${item.desc}</td><td>${item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</td><td style="text-align:right">Rp ${formatRupiah(item.amount)}</td></tr>`; });
+    currentData.forEach(item => { 
+        const isSelected = selectedIds.includes(item.id.toString()) ? 'selected' : ''; 
+        const methodBadge = item.method ? `<br><span class="method-badge">${item.method}</span>` : '';
+        tbody.innerHTML += `<tr class="${isSelected}" onclick="toggleSelection(this, '${item.id}')"><td>${item.date}</td><td style="text-align:left; line-height: 1.4;">${item.desc} ${methodBadge}</td><td>${item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</td><td style="text-align:right">Rp ${formatRupiah(item.amount)}</td></tr>`; 
+    });
 }
 
-// ANGGARAN
-function toggleBudgetFilter() {
-    const container = document.getElementById('budgetFilterContainer');
-    container.style.display = container.style.display === 'none' ? 'block' : 'none';
-}
-
-function toggleBudgetSelection(rowElement, category) {
-    const rows = document.querySelectorAll("#tableBudget tbody tr"); rows.forEach(r => r.classList.remove('selected'));
-    if (selectedBudgetCategory === category) { selectedBudgetCategory = null; } else { selectedBudgetCategory = category; rowElement.classList.add('selected'); }
-}
-
+function toggleBudgetFilter() { const container = document.getElementById('budgetFilterContainer'); container.style.display = container.style.display === 'none' ? 'block' : 'none'; }
+function toggleBudgetSelection(rowElement, category) { const rows = document.querySelectorAll("#tableBudget tbody tr"); rows.forEach(r => r.classList.remove('selected')); if (selectedBudgetCategory === category) { selectedBudgetCategory = null; } else { selectedBudgetCategory = category; rowElement.classList.add('selected'); } }
 function renderBudget() {
     const tbody = document.querySelector("#tableBudget tbody"); tbody.innerHTML = ""; let totalLimit = 0; let totalUsed = 0;
-    const selectedMonth = document.getElementById('budgetMonthSelect').value; // Mengambil bulan yg dipilih misal "2026-06"
-
+    const selectedMonth = document.getElementById('budgetMonthSelect').value; 
     budgets.forEach(b => {
-        // Hanya jumlahkan pengeluaran yang bulannya sesuai dengan filter bulan anggaran
-        const used = data.filter(d => {
-            return d.type === 'expense' && d.category === b.category && d.date && d.date.startsWith(selectedMonth);
-        }).reduce((sum, d) => sum + d.amount, 0); 
-        
-        const remaining = b.limit - used; 
-        totalLimit += b.limit; 
-        totalUsed += used; 
-        const isSelected = selectedBudgetCategory === b.category ? 'selected' : '';
-        
+        const used = data.filter(d => { return d.type === 'expense' && d.category === b.category && d.date && d.date.startsWith(selectedMonth); }).reduce((sum, d) => sum + d.amount, 0); 
+        const remaining = b.limit - used; totalLimit += b.limit; totalUsed += used; const isSelected = selectedBudgetCategory === b.category ? 'selected' : '';
         tbody.innerHTML += `<tr class="${isSelected}" onclick="toggleBudgetSelection(this, '${b.category}')"><td>${b.category}</td><td>Rp ${formatRupiah(b.limit)}</td><td>Rp ${formatRupiah(used)}</td><td style="color:${remaining < 0 ? '#dc3545' : '#198754'}">Rp ${formatRupiah(remaining)}</td></tr>`;
     });
     document.getElementById('totBudgetLimit').innerText = formatRupiah(totalLimit); document.getElementById('totBudgetUsed').innerText = formatRupiah(totalUsed); document.getElementById('totBudgetRemaining').innerText = formatRupiah(totalLimit - totalUsed);
 }
 
 function addData() {
-    const date = document.getElementById('date').value; const desc = document.getElementById('desc').value.trim(); const type = document.getElementById('type').value; const category = document.getElementById('category').value; const amountStr = document.getElementById('amount').value.replace(/\./g, ''); const amount = parseInt(amountStr, 10);
+    const date = document.getElementById('date').value; const desc = document.getElementById('desc').value.trim(); const method = document.getElementById('method').value; const type = document.getElementById('type').value; const category = document.getElementById('category').value; const amountStr = document.getElementById('amount').value.replace(/\./g, ''); const amount = parseInt(amountStr, 10);
     if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) { showToast("Mohon isi semua data dengan lengkap!"); return; }
     const id = Date.now().toString();
-    database.ref('transactions/' + id).set({ id: id, date: date, desc: desc, type: type, category: category, amount: amount }).then(() => { document.getElementById('desc').value = ""; document.getElementById('selectedDescText').innerText = "Ketik atau pilih keterangan..."; document.getElementById('selectedDescText').style.color = "#888"; document.getElementById('amount').value = ""; showToast("Transaksi berhasil ditambahkan!"); });
+    database.ref('transactions/' + id).set({ id: id, date: date, desc: desc, method: method, type: type, category: category, amount: amount }).then(() => { document.getElementById('desc').value = ""; document.getElementById('selectedDescText').innerText = "Ketik atau pilih keterangan..."; document.getElementById('selectedDescText').style.color = "#888"; document.getElementById('amount').value = ""; showToast("Transaksi berhasil ditambahkan!"); });
 }
 function addBudget() {
     const category = document.getElementById('budgetCategory').value.trim(); const amountStr = document.getElementById('budgetAmount').value.replace(/\./g, ''); const amount = parseInt(amountStr, 10);
@@ -746,23 +753,15 @@ function saveEditBudget() {
 function closeEditBudgetModal() { document.getElementById('editBudgetModal').style.display = 'none'; editBudgetOldCategory = null; }
 function deleteBudgetSelected() {
     if (!selectedBudgetCategory) return showToast("Pilih satu baris anggaran yang ingin dihapus.");
-    showConfirm(`Hapus anggaran '${selectedBudgetCategory}'? (Riwayat transaksi tidak ikut terhapus)`, () => {
-        const targetBudget = budgets.find(b => b.category === selectedBudgetCategory);
-        if (targetBudget) { database.ref('budgets/' + targetBudget.id).remove().then(() => { selectedBudgetCategory = null; showToast("Anggaran berhasil dihapus!"); }); }
-    });
+    showConfirm(`Hapus anggaran '${selectedBudgetCategory}'? (Riwayat transaksi tidak ikut terhapus)`, () => { const targetBudget = budgets.find(b => b.category === selectedBudgetCategory); if (targetBudget) { database.ref('budgets/' + targetBudget.id).remove().then(() => { selectedBudgetCategory = null; showToast("Anggaran berhasil dihapus!"); }); } });
 }
 function viewBudgetDetails() {
     if (!selectedBudgetCategory) return showToast("Pilih satu baris anggaran terlebih dahulu.");
     document.getElementById('viewBudgetTitle').innerText = "Rincian: " + selectedBudgetCategory;
     const tbody = document.querySelector("#tableViewBudget tbody"); tbody.innerHTML = "";
     const selectedMonth = document.getElementById('budgetMonthSelect').value;
-    
-    // Hanya tampilkan rincian di bulan yang sedang dipilih filternya
     const expenses = data.filter(d => d.type === 'expense' && d.category === selectedBudgetCategory && d.date && d.date.startsWith(selectedMonth));
-    
-    if (expenses.length === 0) {
-        document.getElementById('viewBudgetEmpty').style.display = 'block'; document.getElementById('tableViewBudget').style.display = 'none'; document.getElementById('viewBudgetTotal').innerText = "Total: Rp 0";
-    } else {
+    if (expenses.length === 0) { document.getElementById('viewBudgetEmpty').style.display = 'block'; document.getElementById('tableViewBudget').style.display = 'none'; document.getElementById('viewBudgetTotal').innerText = "Total: Rp 0"; } else {
         document.getElementById('viewBudgetEmpty').style.display = 'none'; document.getElementById('tableViewBudget').style.display = 'table'; let total = 0;
         expenses.forEach(item => { total += item.amount; tbody.innerHTML += `<tr><td>${item.date}</td><td>${item.desc}</td><td>Rp ${formatRupiah(item.amount)}</td></tr>`; });
         document.getElementById('viewBudgetTotal').innerText = "Total: Rp " + formatRupiah(total);
@@ -777,6 +776,7 @@ function editSelected() {
     editTargetId = selectedIds[0]; const item = data.find(d => d.id.toString() === editTargetId);
     if (item) {
         document.getElementById('editDate').value = item.date; document.getElementById('editDesc').value = item.desc; document.getElementById('selectedEditDescText').innerText = item.desc || "Pilih Keterangan";
+        document.getElementById('editMethod').value = item.method || 'cash'; document.getElementById('selectedEditMethodText').innerText = (item.method || 'cash').toUpperCase();
         document.getElementById('editType').value = item.type; document.getElementById('selectedEditTypeText').innerText = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
         document.getElementById('editCategory').value = item.category || ""; document.getElementById('selectedEditCategoryText').innerText = item.category || "Pilih Kategori"; document.getElementById('editAmount').value = item.amount.toLocaleString('id-ID');
         document.getElementById('editModal').style.display = 'flex';
@@ -784,9 +784,9 @@ function editSelected() {
 }
 function closeEditModal() { document.getElementById('editModal').style.display = 'none'; editTargetId = null; }
 function saveEdit() {
-    const date = document.getElementById('editDate').value; const desc = document.getElementById('editDesc').value.trim(); const type = document.getElementById('editType').value; const category = document.getElementById('editCategory').value; const amountStr = document.getElementById('editAmount').value.replace(/\./g, ''); const amount = parseInt(amountStr, 10);
+    const date = document.getElementById('editDate').value; const desc = document.getElementById('editDesc').value.trim(); const method = document.getElementById('editMethod').value; const type = document.getElementById('editType').value; const category = document.getElementById('editCategory').value; const amountStr = document.getElementById('editAmount').value.replace(/\./g, ''); const amount = parseInt(amountStr, 10);
     if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) return showToast("Mohon isi semua data dengan benar!");
-    database.ref('transactions/' + editTargetId).update({ date: date, desc: desc, type: type, category: category, amount: amount }).then(() => { closeEditModal(); selectedIds = []; showToast("Data berhasil diperbarui!"); });
+    database.ref('transactions/' + editTargetId).update({ date: date, desc: desc, method: method, type: type, category: category, amount: amount }).then(() => { closeEditModal(); selectedIds = []; showToast("Data berhasil diperbarui!"); });
 }
 function deleteSelected() {
     if (selectedIds.length === 0) return showToast("Pilih transaksi yang ingin dihapus.");
@@ -797,13 +797,11 @@ function saveExcel() {
     try {
         let tableHtml = `<table border="1"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Tipe</th><th>Jumlah (Rp)</th></tr></thead><tbody>`;
         const currentData = getFilteredData(); if (currentData.length === 0) return showToast("Tidak ada data untuk diekspor.");
-        currentData.forEach(item => { let tipe = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'; let kategori = item.category ? item.category : "-"; tableHtml += `<tr><td>${item.date}</td><td>${item.desc}</td><td>${kategori}</td><td>${tipe}</td><td>${item.amount}</td></tr>`; });
+        currentData.forEach(item => { let tipe = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran'; let kategori = item.category ? item.category : "-"; let meth = item.method ? `(${item.method.toUpperCase()})` : ''; tableHtml += `<tr><td>${item.date}</td><td>${item.desc} ${meth}</td><td>${kategori}</td><td>${tipe}</td><td>${item.amount}</td></tr>`; });
         tableHtml += "</tbody></table>";
         const blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Laporan_Keuangan_Harian.xls"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
         showToast("Berhasil disimpan ke Excel!"); document.getElementById('saveMenu').style.display = 'none';
-    } catch (e) {
-        alert("Penyimpanan File mungkin dibatasi oleh aplikasi WebView Anda.");
-    }
+    } catch (e) { alert("Penyimpanan File mungkin dibatasi oleh aplikasi WebView Anda."); }
 }
 function savePDF() {
     try {
@@ -816,57 +814,72 @@ function savePDF() {
             pdf.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0, width, height); pdf.save("Laporan_Keuangan_Harian.pdf");
             document.getElementById('actionRowContainer').style.display = 'flex'; renderTable(); document.getElementById('saveMenu').style.display = 'none';
         });
-    } catch (e) {
-        alert("Penyimpanan PDF mungkin dibatasi oleh aplikasi WebView Anda.");
-        document.getElementById('actionRowContainer').style.display = 'flex'; renderTable();
-    }
+    } catch (e) { alert("Penyimpanan PDF mungkin dibatasi oleh aplikasi WebView Anda."); document.getElementById('actionRowContainer').style.display = 'flex'; renderTable(); }
 }
 
 function renderCharts() {
     const dashboard = document.getElementById('menu-dashboard'); 
     if (!dashboard || dashboard.style.display === 'none') return; 
-    
-    if (typeof Chart === 'undefined') {
-        console.warn("Library Grafik gagal dimuat.");
-        return; 
-    }
+    if (typeof Chart === 'undefined') { console.warn("Library Grafik gagal dimuat."); return; }
     
     document.getElementById('wrapperHarian').innerHTML = '<canvas id="chartHarian"></canvas>'; document.getElementById('wrapperBulanan').innerHTML = '<canvas id="chartBulanan"></canvas>'; document.getElementById('wrapperTahunan').innerHTML = '<canvas id="chartTahunan"></canvas>'; document.getElementById('wrapperKategori').innerHTML = '<canvas id="chartKategori"></canvas>';
-    
     const expenses = data.filter(item => item.type === 'expense' && item.date); 
     
-    // Grafik Harian
     const dailyMap = {}; expenses.forEach(item => { if (!dailyMap[item.date]) dailyMap[item.date] = 0; dailyMap[item.date] += item.amount; }); const dailyLabels = Object.keys(dailyMap).sort(); const dailyData = dailyLabels.map(date => dailyMap[date]);
     chartHarian = new Chart(document.getElementById('chartHarian'), { type: 'bar', data: { labels: dailyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: dailyData, backgroundColor: '#ef4444', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }} });
     
-    // Grafik Bulanan (YYYY-MM)
     const monthlyMap = {}; expenses.forEach(item => { const month = item.date.substring(0, 7); if (!monthlyMap[month]) monthlyMap[month] = 0; monthlyMap[month] += item.amount; }); const monthlyLabels = Object.keys(monthlyMap).sort(); const monthlyData = monthlyLabels.map(m => monthlyMap[m]);
     chartBulanan = new Chart(document.getElementById('chartBulanan'), { type: 'bar', data: { labels: monthlyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: monthlyData, backgroundColor: '#3b82f6', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }} });
     
-    // Grafik TAHUNAN (1 Tahun: YYYY)
     const yearlyMap = {}; expenses.forEach(item => { const year = item.date.substring(0, 4); if (!yearlyMap[year]) yearlyMap[year] = 0; yearlyMap[year] += item.amount; }); const yearlyLabels = Object.keys(yearlyMap).sort(); const yearlyData = yearlyLabels.map(y => yearlyMap[y]);
     chartTahunan = new Chart(document.getElementById('chartTahunan'), { type: 'bar', data: { labels: yearlyLabels, datasets: [{ label: 'Pengeluaran (Rp)', data: yearlyData, backgroundColor: '#f59e0b', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }} });
     
-    // Grafik Kategori
     const catMap = {}; expenses.forEach(item => { if (!catMap[item.category]) catMap[item.category] = 0; catMap[item.category] += item.amount; }); const catLabels = Object.keys(catMap); const catData = catLabels.map(cat => catMap[cat]);
     chartKategori = new Chart(document.getElementById('chartKategori'), { type: 'doughnut', data: { labels: catLabels, datasets: [{ data: catData, backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false } });
 }
 
 // ==========================================
-// 6. KONTROL DETAIL AKUN (SALDO TERPISAH)
+// 6. KONTROL DETAIL AKUN (SALDO TERPISAH DINAMIS)
 // ==========================================
+
+// Fungsi Kalkulasi Akumulasi Pengeluaran/Pemasukan Tiap Metode
+function getNetBalances() {
+    let net = { cash: 0, bca: 0, seabank: 0, shopeepay: 0 };
+    data.forEach(item => {
+        if (item.method && net[item.method] !== undefined) {
+            if (item.type === 'income') {
+                net[item.method] += item.amount;
+            } else if (item.type === 'expense') {
+                net[item.method] -= item.amount;
+            }
+        }
+    });
+    return net;
+}
+
 function updateAccountUI() {
-    document.getElementById('val-cash').innerText = formatRupiah(accountBalances.cash || 0);
-    document.getElementById('val-bca').innerText = formatRupiah(accountBalances.bca || 0);
-    document.getElementById('val-seabank').innerText = formatRupiah(accountBalances.seabank || 0);
-    document.getElementById('val-shopeepay').innerText = formatRupiah(accountBalances.shopeepay || 0);
+    const net = getNetBalances();
+    
+    // Saldo Tampil = Saldo Basis (Firebase) + Hasil Kalkulasi Transaksi
+    const dispCash = (accountBalances.cash || 0) + net.cash;
+    const dispBca = (accountBalances.bca || 0) + net.bca;
+    const dispSeabank = (accountBalances.seabank || 0) + net.seabank;
+    const dispShopeepay = (accountBalances.shopeepay || 0) + net.shopeepay;
+
+    document.getElementById('val-cash').innerText = formatRupiah(dispCash);
+    document.getElementById('val-bca').innerText = formatRupiah(dispBca);
+    document.getElementById('val-seabank').innerText = formatRupiah(dispSeabank);
+    document.getElementById('val-shopeepay').innerText = formatRupiah(dispShopeepay);
 }
 
 function openAccountModal(key, name) {
     document.getElementById('currentEditAccountKey').value = key;
     document.getElementById('accountModalTitle').innerText = "Saldo " + name;
     
-    let currentVal = accountBalances[key] || 0;
+    // Ambil saldo yang TAMPIL SAAT INI (Bukan sekadar saldo basis)
+    const net = getNetBalances();
+    const currentVal = (accountBalances[key] || 0) + (net[key] || 0);
+    
     document.getElementById('accountAmountInput').value = formatRupiah(currentVal);
     
     document.getElementById('accountModal').style.display = 'flex';
@@ -884,14 +897,19 @@ function closeAccountModal() {
 function saveAccountBalance() {
     const key = document.getElementById('currentEditAccountKey').value;
     const amountStr = document.getElementById('accountAmountInput').value.replace(/\./g, '');
-    const amount = parseInt(amountStr, 10);
+    const targetAmount = parseInt(amountStr, 10);
     
-    if (isNaN(amount)) {
+    if (isNaN(targetAmount)) {
         showToast("Masukkan nominal yang valid!");
         return;
     }
 
-    database.ref('account_balances/' + key).set(amount).then(() => {
+    // Kalkulasi ulang Saldo Basis: Saldo Baru - Akumulasi Transaksi
+    const net = getNetBalances();
+    const newBase = targetAmount - (net[key] || 0);
+
+    // Menyimpan Saldo Basis ke Firebase
+    database.ref('account_balances/' + key).set(newBase).then(() => {
         closeAccountModal();
         showToast("Saldo " + key.toUpperCase() + " diperbarui!");
     }).catch(error => {
@@ -917,11 +935,11 @@ document.querySelectorAll('.nav-item').forEach(item => {
 
 window.addEventListener('click', function(event) {
     const editMod = document.getElementById('editModal'); const editBdgMod = document.getElementById('editBudgetModal'); const viewBdgMod = document.getElementById('viewBudgetModal'); const confMod = document.getElementById('confirmModal');
-    const catMod = document.getElementById('categoryModal'); const typeMod = document.getElementById('typeModal'); const descMod = document.getElementById('descModal'); const accMod = document.getElementById('accountModal');
+    const catMod = document.getElementById('categoryModal'); const typeMod = document.getElementById('typeModal'); const descMod = document.getElementById('descModal'); const accMod = document.getElementById('accountModal'); const methodMod = document.getElementById('methodModal');
     const btnSimpan = document.getElementById('btnSimpan'); const saveMenu = document.getElementById('saveMenu');
     
     if (event.target == editMod) closeEditModal(); if (event.target == editBdgMod) closeEditBudgetModal(); if (event.target == viewBdgMod) closeViewBudgetModal(); if (event.target == confMod) confMod.style.display = "none";
-    if (event.target == catMod) closeCategoryPicker(); if (event.target == typeMod) closeTypePicker(); if (event.target == descMod) closeDescPicker(); if (event.target == accMod) closeAccountModal();
+    if (event.target == catMod) closeCategoryPicker(); if (event.target == typeMod) closeTypePicker(); if (event.target == descMod) closeDescPicker(); if (event.target == accMod) closeAccountModal(); if (event.target == methodMod) closeMethodPicker();
     if (btnSimpan && saveMenu) { if (!btnSimpan.contains(event.target) && !saveMenu.contains(event.target)) { saveMenu.style.display = 'none'; } }
 });
 
