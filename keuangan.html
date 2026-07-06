@@ -196,6 +196,90 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 #toast.show { visibility: visible; opacity: 1; }
+
+/* =========================================
+   DETAIL AKUN (SESUAI GAMBAR)
+   ========================================= */
+.account-title {
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 8px;
+    color: #111827;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.account-container {
+    display: flex;
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.account-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    border-right: 1px solid #d1d5db;
+    transition: opacity 0.2s;
+}
+.account-col:last-child {
+    border-right: none;
+}
+.account-col:active {
+    opacity: 0.7;
+}
+
+.account-header {
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    padding: 8px 2px;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+.account-header span {
+    font-size: 9px; /* Panah kecil */
+}
+
+.account-val {
+    background: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 10px 8px;
+    color: #374151;
+    display: flex;
+    justify-content: space-between; /* Membuat Rp di kiri, angka di kanan */
+    align-items: center;
+}
+
+/* Warna sesuai gambar 1000844377.jpg */
+.bg-cash { background: #3b82f6; color: #ffffff; }
+.bg-bca { background: #facc15; color: #111827; }
+.bg-seabank { background: #fbcfe8; color: #111827; }
+.bg-shopeepay { background: #bbf7d0; color: #111827; }
+
+/* Modal Khusus Saldo */
+.modal-balance-input {
+    text-align: right; 
+    font-size: 22px !important; 
+    font-weight: bold; 
+    color: #111827; 
+    height: 56px !important;
+    border: 2px solid #e5e7eb !important;
+}
+.modal-balance-input:focus {
+    border-color: #111827 !important;
+}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -244,6 +328,28 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
             <div class="box">Saldo Akhir:<div class="val">Rp <span id="balance">0</span></div></div>
         </div>
         <h3 style="text-align: center; margin-top: 25px; margin-bottom: 15px; color: #374151;">Data Transaksi</h3>
+        
+        <!-- TABEL DETAIL AKUN BARU -->
+        <div class="account-title">DETAIL AKUN</div>
+        <div class="account-container">
+            <div class="account-col" onclick="openAccountModal('cash', 'CASH')">
+                <div class="account-header bg-cash">CASH <span>▼</span></div>
+                <div class="account-val"><span>Rp</span> <span id="val-cash">0</span></div>
+            </div>
+            <div class="account-col" onclick="openAccountModal('bca', 'BCA')">
+                <div class="account-header bg-bca">BCA <span>▼</span></div>
+                <div class="account-val"><span>Rp</span> <span id="val-bca">0</span></div>
+            </div>
+            <div class="account-col" onclick="openAccountModal('seabank', 'SEABANK')">
+                <div class="account-header bg-seabank">SEABANK <span>▼</span></div>
+                <div class="account-val"><span>Rp</span> <span id="val-seabank">0</span></div>
+            </div>
+            <div class="account-col" onclick="openAccountModal('shopeepay', 'SHOPEEPAY')">
+                <div class="account-header bg-shopeepay">SHOPEEPAY <span>▼</span></div>
+                <div class="account-val"><span>Rp</span> <span id="val-shopeepay">0</span></div>
+            </div>
+        </div>
+
         <div class="action-row" id="actionRowContainer">
             <button style="background: #6b7280;" onclick="toggleFilter()">Sortir ▾</button>
             <button style="background: #0d6efd;" onclick="selectAllRows()">Pilih Semua</button>
@@ -316,7 +422,9 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
         <table id="tableBudget"><thead><tr><th>Kategori</th><th>Limit</th><th>Terpakai</th><th>Sisa</th></tr></thead><tbody></tbody></table>
     </div>
 
-</div> <div id="editModal" class="modal">
+</div> 
+
+<div id="editModal" class="modal">
     <div class="modal-content">
         <h3>Edit Transaksi</h3>
         <div class="form-group">
@@ -350,6 +458,27 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
             <p id="viewBudgetEmpty" style="text-align: center; font-size: 13px; color: #6b7280; display: none; margin-top: 20px;">Belum ada pengeluaran di bulan ini.</p>
         </div>
         <button class="btn-secondary" onclick="closeViewBudgetModal()" style="width: 100%;">Tutup</button>
+    </div>
+</div>
+
+<!-- POP-UP MODAL UPDATE SALDO AKUN -->
+<div id="accountModal" class="modal">
+    <div class="modal-content" style="max-width: 320px; text-align: center;">
+        <h3 id="accountModalTitle" style="font-size: 1.25rem; color: #111827; margin-bottom: 5px;">Update Saldo</h3>
+        <p style="font-size: 12px; color: #6b7280; margin-top: 0; margin-bottom: 20px;">Sesuaikan jumlah saldo riil Anda.</p>
+        
+        <div class="form-group">
+            <div class="form-item">
+                <label style="text-align: left;">Nominal Saldo (Rp)</label>
+                <input type="text" inputmode="numeric" id="accountAmountInput" class="modal-balance-input" placeholder="0" oninput="formatInputRupiah(this)">
+            </div>
+        </div>
+        <input type="hidden" id="currentEditAccountKey">
+        
+        <div class="btn-group" style="margin-top: 25px;">
+            <button class="btn-secondary" onclick="closeAccountModal()">Batal</button>
+            <button class="btn-add" style="background: #111827; color: #fff;" onclick="saveAccountBalance()">Simpan</button>
+        </div>
     </div>
 </div>
 
@@ -394,6 +523,7 @@ let editBudgetOldCategory = null;
 let categoryPickerTarget = 'add'; 
 let typePickerTarget = 'add';
 let descPickerTarget = 'add';
+let accountBalances = { cash: 0, bca: 0, seabank: 0, shopeepay: 0 };
 
 // ==========================================
 // 2. LOAD DATA DARI FIREBASE (Real-Time)
@@ -416,6 +546,15 @@ document.addEventListener("DOMContentLoaded", function() {
             budgets = []; 
             snapshot.forEach((child) => { budgets.push(child.val()); }); 
             renderBudget(); updateCategoryDropdown(); 
+        });
+        // Load Saldo Akun
+        database.ref('account_balances').on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                accountBalances = snapshot.val();
+            } else {
+                accountBalances = { cash: 0, bca: 0, seabank: 0, shopeepay: 0 };
+            }
+            updateAccountUI();
         });
     }
 
@@ -714,7 +853,54 @@ function renderCharts() {
 }
 
 // ==========================================
-// 6. KONTROL NAVBAR MENU (KLIK LUAR DLL)
+// 6. KONTROL DETAIL AKUN (SALDO TERPISAH)
+// ==========================================
+function updateAccountUI() {
+    document.getElementById('val-cash').innerText = formatRupiah(accountBalances.cash || 0);
+    document.getElementById('val-bca').innerText = formatRupiah(accountBalances.bca || 0);
+    document.getElementById('val-seabank').innerText = formatRupiah(accountBalances.seabank || 0);
+    document.getElementById('val-shopeepay').innerText = formatRupiah(accountBalances.shopeepay || 0);
+}
+
+function openAccountModal(key, name) {
+    document.getElementById('currentEditAccountKey').value = key;
+    document.getElementById('accountModalTitle').innerText = "Saldo " + name;
+    
+    let currentVal = accountBalances[key] || 0;
+    document.getElementById('accountAmountInput').value = formatRupiah(currentVal);
+    
+    document.getElementById('accountModal').style.display = 'flex';
+    setTimeout(() => {
+        const input = document.getElementById('accountAmountInput');
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+    }, 100);
+}
+
+function closeAccountModal() {
+    document.getElementById('accountModal').style.display = 'none';
+}
+
+function saveAccountBalance() {
+    const key = document.getElementById('currentEditAccountKey').value;
+    const amountStr = document.getElementById('accountAmountInput').value.replace(/\./g, '');
+    const amount = parseInt(amountStr, 10);
+    
+    if (isNaN(amount)) {
+        showToast("Masukkan nominal yang valid!");
+        return;
+    }
+
+    database.ref('account_balances/' + key).set(amount).then(() => {
+        closeAccountModal();
+        showToast("Saldo " + key.toUpperCase() + " diperbarui!");
+    }).catch(error => {
+        showToast("Gagal menyimpan saldo.");
+    });
+}
+
+// ==========================================
+// 7. KONTROL NAVBAR MENU (KLIK LUAR DLL)
 // ==========================================
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
@@ -731,11 +917,11 @@ document.querySelectorAll('.nav-item').forEach(item => {
 
 window.addEventListener('click', function(event) {
     const editMod = document.getElementById('editModal'); const editBdgMod = document.getElementById('editBudgetModal'); const viewBdgMod = document.getElementById('viewBudgetModal'); const confMod = document.getElementById('confirmModal');
-    const catMod = document.getElementById('categoryModal'); const typeMod = document.getElementById('typeModal'); const descMod = document.getElementById('descModal'); 
+    const catMod = document.getElementById('categoryModal'); const typeMod = document.getElementById('typeModal'); const descMod = document.getElementById('descModal'); const accMod = document.getElementById('accountModal');
     const btnSimpan = document.getElementById('btnSimpan'); const saveMenu = document.getElementById('saveMenu');
     
     if (event.target == editMod) closeEditModal(); if (event.target == editBdgMod) closeEditBudgetModal(); if (event.target == viewBdgMod) closeViewBudgetModal(); if (event.target == confMod) confMod.style.display = "none";
-    if (event.target == catMod) closeCategoryPicker(); if (event.target == typeMod) closeTypePicker(); if (event.target == descMod) closeDescPicker(); 
+    if (event.target == catMod) closeCategoryPicker(); if (event.target == typeMod) closeTypePicker(); if (event.target == descMod) closeDescPicker(); if (event.target == accMod) closeAccountModal();
     if (btnSimpan && saveMenu) { if (!btnSimpan.contains(event.target) && !saveMenu.contains(event.target)) { saveMenu.style.display = 'none'; } }
 });
 
