@@ -156,7 +156,6 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
 
-    /* Grid Khusus Form Modal (2x2) */
     .modal-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -164,7 +163,6 @@
       margin-bottom: 12px;
     }
 
-    /* Grid Khusus Form Barang */
     .item-grid {
       display: grid;
       grid-template-columns: 2fr 1.2fr 0.8fr auto;
@@ -195,38 +193,48 @@
       background-color: var(--warning);
     }
 
-    /* Tabel yang Bisa Digeser Tanpa Menumpuk */
+    /* Pengaturan Tabel (Geser Kanan-Kiri & Atas-Bawah) */
     .table-container {
       width: 100%;
-      overflow-x: auto; /* Kunci agar bisa digeser */
+      max-height: 220px; /* Membatasi tinggi agar muat sekitar 3 baris */
+      overflow-y: auto; /* Mengaktifkan scroll atas-bawah */
+      overflow-x: auto; /* Mengaktifkan scroll kanan-kiri */
       -webkit-overflow-scrolling: touch;
       margin-top: 14px;
       border: 1px solid var(--border);
       border-radius: 8px;
+      background-color: #ffffff;
     }
 
     table {
       width: 100%;
-      min-width: 550px; /* Memaksa tabel tidak menyusut, sehingga teks tidak tumpang tindih */
+      min-width: 550px; 
       border-collapse: collapse;
       text-align: left;
       font-size: 13px;
     }
 
     th, td {
-      white-space: nowrap; /* Mencegah teks turun ke bawah */
+      white-space: nowrap; 
       padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
       color: var(--text-main);
     }
 
+    td {
+      border-bottom: 1px solid var(--border);
+    }
+
     th {
+      position: sticky; /* Membuat header tetap menempel saat di-scroll ke bawah */
+      top: 0;
+      z-index: 10;
       background-color: #f1f5f9;
       color: var(--text-muted);
       font-weight: 600;
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      box-shadow: inset 0 -1px 0 var(--border); /* Pengganti border-bottom untuk efek sticky */
     }
 
     tr:last-child td { border-bottom: none; }
@@ -268,8 +276,6 @@
       .stat-card { padding: 8px 10px; }
       .stat-card .label { font-size: 9px; }
       .stat-card .value { font-size: 13px; }
-      
-      /* Grid Barang jadi 1 baris ke bawah jika di layar HP kecil */
       .item-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -297,7 +303,6 @@
     <div class="card">
       <h3 class="section-title">Pencatatan Modal Awal</h3>
       <form id="modalForm">
-        <!-- Baris Atas: Nominal & Keterangan -->
         <div class="modal-grid">
           <div class="input-group">
             <label>Nominal Modal</label>
@@ -311,7 +316,6 @@
             <input type="text" id="modalKeterangan" placeholder="Contoh: Beli bahan baku" required />
           </div>
         </div>
-        <!-- Baris Bawah: Tanggal & Tombol Tambah -->
         <div class="modal-grid">
           <div class="input-group">
             <label>Tanggal</label>
@@ -382,15 +386,12 @@
   </div>
 
   <script>
-    // --- KONFIGURASI FIREBASE ---
     const FIREBASE_BASE_URL = 'https://catatanmodal-default-rtdb.asia-southeast1.firebasedatabase.app';
 
-    // --- STATE DATA ---
     let modalMap = {};
     let itemsMap = {};
-    let editingModalKey = null; // Menyimpan ID jika sedang edit modal
+    let editingModalKey = null; 
 
-    // --- ELEMEN DOM MODAL ---
     const modalForm = document.getElementById('modalForm');
     const modalNominalInput = document.getElementById('modalNominal');
     const modalKeteranganInput = document.getElementById('modalKeterangan');
@@ -399,7 +400,6 @@
     const modalTableBody = document.getElementById('modalTableBody');
     const emptyModalState = document.getElementById('emptyModalState');
 
-    // --- ELEMEN DOM PENJUALAN ---
     const itemForm = document.getElementById('itemForm');
     const namaBarangInput = document.getElementById('namaBarang');
     const hargaJualInput = document.getElementById('hargaJual');
@@ -408,16 +408,13 @@
     const itemsTableBody = document.getElementById('itemsTableBody');
     const emptyItemState = document.getElementById('emptyItemState');
 
-    // --- ELEMEN DOM SUMMARY ---
     const summaryModal = document.getElementById('summaryModal');
     const summaryJual = document.getElementById('summaryJual');
     const summaryLaba = document.getElementById('summaryLaba');
     const cardLaba = document.getElementById('cardLaba');
 
-    // Default Tanggal Hari Ini
     modalTanggalInput.valueAsDate = new Date();
 
-    // --- HELPER FUNCTION ---
     function formatNumberString(str) {
       const clean = String(str).replace(/\D/g, '');
       if (!clean) return '';
@@ -434,7 +431,6 @@
       }).format(amount);
     }
 
-    // Auto Format Titik
     function attachThousandSeparator(inputElement) {
       inputElement.addEventListener('input', (e) => {
         const cursorPosition = e.target.selectionStart;
@@ -450,7 +446,6 @@
     attachThousandSeparator(hargaJualInput);
     attachThousandSeparator(qtyInput);
 
-    // --- RENDER UI UTAMA ---
     function render() {
       // 1. Render Tabel Daftar Modal
       modalTableBody.innerHTML = '';
@@ -522,13 +517,11 @@
       summaryJual.textContent = formatRupiah(totalPenjualanAmount);
       summaryLaba.textContent = formatRupiah(hasilBersih);
 
-      // Warna label Hasil Bersih
       cardLaba.classList.remove('profit', 'loss');
       if (hasilBersih > 0) cardLaba.classList.add('profit');
       else if (hasilBersih < 0) cardLaba.classList.add('loss');
     }
 
-    // --- MENGAMBIL DATA DARI FIREBASE ---
     async function loadData() {
       try {
         const [resModals, resItems] = await Promise.all([
@@ -545,7 +538,6 @@
       }
     }
 
-    // --- FUNGSI MODAL ---
     modalForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const nominal = parseFormattedNumber(modalNominalInput.value);
@@ -561,18 +553,16 @@
 
       try {
         if (editingModalKey) {
-          // Update Mode
           await fetch(`${FIREBASE_BASE_URL}/modals/${editingModalKey}.json`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
           modalMap[editingModalKey] = payload;
-          editingModalKey = null; // Reset state
+          editingModalKey = null; 
           btnSubmitModal.textContent = 'Tambah Modal';
           btnSubmitModal.classList.remove('btn-edit-mode');
         } else {
-          // Add Mode
           const res = await fetch(`${FIREBASE_BASE_URL}/modals.json`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -608,16 +598,15 @@
     async function hapusModal(key) {
       if (!confirm('Hapus riwayat modal ini?')) return;
       delete modalMap[key];
-      render(); // Update UI Instant
+      render(); 
       try {
         await fetch(`${FIREBASE_BASE_URL}/modals/${key}.json`, { method: 'DELETE' });
       } catch (err) {
         console.error('Gagal hapus modal', err);
-        loadData(); // rollback jika gagal
+        loadData(); 
       }
     }
 
-    // --- FUNGSI PENJUALAN ---
     itemForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const nama = namaBarangInput.value.trim();
@@ -656,16 +645,15 @@
     async function hapusBarang(key) {
       if (!confirm('Hapus transaksi penjualan ini?')) return;
       delete itemsMap[key];
-      render(); // Update UI instant
+      render(); 
       try {
         await fetch(`${FIREBASE_BASE_URL}/items/${key}.json`, { method: 'DELETE' });
       } catch (error) {
         console.error('Gagal menghapus barang:', error);
-        loadData(); // rollback
+        loadData(); 
       }
     }
 
-    // Load data otomatis saat web dibuka
     loadData();
   </script>
 </body>
