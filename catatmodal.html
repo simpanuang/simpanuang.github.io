@@ -18,6 +18,7 @@
       --primary-hover: #1d4ed8;
       --success: #10b981;
       --danger: #ef4444;
+      --warning: #f59e0b;
       --radius: 12px;
       --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
@@ -86,15 +87,10 @@
       text-overflow: ellipsis;
     }
 
-    .stat-card.profit .value {
-      color: var(--success);
-    }
+    .stat-card.profit .value { color: var(--success); }
+    .stat-card.loss .value { color: var(--danger); }
 
-    .stat-card.loss .value {
-      color: var(--danger);
-    }
-
-    /* Kartu Form */
+    /* Kartu & Form Umum */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -103,44 +99,19 @@
       box-shadow: var(--shadow-sm);
     }
 
-    .form-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .modal-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .modal-label-group h3 {
-      font-size: 13px;
-      font-weight: 600;
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
       color: var(--text-main);
-    }
-
-    .modal-label-group p {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr 0.8fr auto;
-      gap: 10px;
-      align-items: flex-end;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
     }
 
     .input-group {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
     }
 
     .input-group label {
@@ -168,99 +139,122 @@
       padding-left: 36px !important;
     }
 
-    .input-group input,
-    .modal-input-field {
+    input {
       width: 100%;
       padding: 9px 12px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-main);
       background-color: #ffffff;
       outline: none;
       transition: all 0.2s ease;
     }
 
-    .modal-input-field {
-      width: 200px;
-      font-weight: 600;
-    }
-
-    .input-group input:focus,
-    .modal-input-field:focus {
+    input:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    /* Grid Khusus Form Modal (2x2) */
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    /* Grid Khusus Form Barang */
+    .item-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 0.8fr auto;
+      gap: 10px;
+      align-items: flex-end;
     }
 
     .btn-submit {
       background-color: var(--primary);
       color: #ffffff;
       border: none;
-      padding: 10px 18px;
+      padding: 10px 16px;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       transition: background-color 0.2s ease;
-      height: 39px;
+      height: 38px;
       white-space: nowrap;
+      width: 100%;
     }
 
     .btn-submit:hover {
       background-color: var(--primary-hover);
     }
+    
+    .btn-submit.btn-edit-mode {
+      background-color: var(--warning);
+    }
 
-    /* Tabel */
+    /* Tabel yang Bisa Digeser Tanpa Menumpuk */
     .table-container {
-      overflow-x: auto;
+      width: 100%;
+      overflow-x: auto; /* Kunci agar bisa digeser */
+      -webkit-overflow-scrolling: touch;
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
     }
 
     table {
       width: 100%;
+      min-width: 550px; /* Memaksa tabel tidak menyusut, sehingga teks tidak tumpang tindih */
       border-collapse: collapse;
       text-align: left;
       font-size: 13px;
     }
 
+    th, td {
+      white-space: nowrap; /* Mencegah teks turun ke bawah */
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+    }
+
     th {
-      padding: 10px 12px;
       background-color: #f1f5f9;
       color: var(--text-muted);
       font-weight: 600;
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      border-bottom: 1px solid var(--border);
     }
 
-    th:first-child { border-top-left-radius: 8px; }
-    th:last-child { border-top-right-radius: 8px; }
+    tr:last-child td { border-bottom: none; }
 
-    td {
-      padding: 12px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text-main);
+    /* Tombol Aksi (Icon) */
+    .action-btns {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
     }
 
-    tr:last-child td {
-      border-bottom: none;
-    }
-
-    .btn-delete {
+    .btn-icon {
       background: none;
       border: none;
-      color: var(--text-muted);
       cursor: pointer;
-      padding: 4px 8px;
+      padding: 6px;
       border-radius: 4px;
-      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: all 0.15s ease;
     }
 
-    .btn-delete:hover {
-      color: var(--danger);
-      background-color: #fee2e2;
-    }
+    .btn-icon.edit { color: var(--primary); background-color: #eff6ff; }
+    .btn-icon.edit:hover { background-color: #dbeafe; }
+    
+    .btn-icon.delete { color: var(--danger); background-color: #fef2f2; }
+    .btn-icon.delete:hover { background-color: #fee2e2; }
 
     .empty-state {
       text-align: center;
@@ -270,38 +264,23 @@
     }
 
     @media (max-width: 600px) {
-      .top-stats-row {
-        gap: 6px;
-      }
-      .stat-card {
-        padding: 8px 10px;
-      }
-      .stat-card .label {
-        font-size: 9px;
-      }
-      .stat-card .value {
-        font-size: 13px;
-      }
-      .modal-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .modal-input-field {
-        width: 100%;
-      }
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
+      .top-stats-row { gap: 6px; }
+      .stat-card { padding: 8px 10px; }
+      .stat-card .label { font-size: 9px; }
+      .stat-card .value { font-size: 13px; }
+      
+      /* Grid Barang jadi 1 baris ke bawah jika di layar HP kecil */
+      .item-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- 3 Kolom Metrik di Atas -->
+    <!-- 1. Tiga Kolom Metrik -->
     <div class="top-stats-row">
       <div class="stat-card">
-        <span class="label">Modal Awal</span>
+        <span class="label">Total Modal</span>
         <div class="value" id="summaryModal">Rp 0</div>
       </div>
       <div class="stat-card">
@@ -314,43 +293,76 @@
       </div>
     </div>
 
-    <!-- Form Input (Modal di Atas Nama Barang) -->
+    <!-- 2. Bagian Pencatatan Modal Awal -->
     <div class="card">
-      <div class="form-wrapper">
-        <div class="modal-row">
-          <div class="modal-label-group">
-            <h3>Modal Awal</h3>
-            <p>Masukkan total modal yang digunakan</p>
-          </div>
-          <div class="input-wrapper">
-            <span>Rp</span>
-            <input type="text" id="modalAwal" class="modal-input-field" placeholder="0" value="0" />
-          </div>
-        </div>
-
-        <form id="itemForm" class="form-grid">
+      <h3 class="section-title">Pencatatan Modal Awal</h3>
+      <form id="modalForm">
+        <!-- Baris Atas: Nominal & Keterangan -->
+        <div class="modal-grid">
           <div class="input-group">
-            <label for="namaBarang">Nama Barang</label>
-            <input type="text" id="namaBarang" placeholder="Contoh: Kemeja Polos" required />
-          </div>
-          <div class="input-group">
-            <label for="hargaJual">Harga Satuan</label>
+            <label>Nominal Modal</label>
             <div class="input-wrapper">
               <span>Rp</span>
-              <input type="text" id="hargaJual" placeholder="0" required />
+              <input type="text" id="modalNominal" placeholder="0" required />
             </div>
           </div>
           <div class="input-group">
-            <label for="qty">Jumlah</label>
-            <input type="text" id="qty" placeholder="1" value="1" required />
+            <label>Keterangan (Untuk beli apa?)</label>
+            <input type="text" id="modalKeterangan" placeholder="Contoh: Beli bahan baku" required />
           </div>
-          <button type="submit" class="btn-submit" id="btnSubmit">Tambah</button>
-        </form>
+        </div>
+        <!-- Baris Bawah: Tanggal & Tombol Tambah -->
+        <div class="modal-grid">
+          <div class="input-group">
+            <label>Tanggal</label>
+            <input type="date" id="modalTanggal" required />
+          </div>
+          <div class="input-group" style="justify-content: flex-end;">
+            <button type="submit" class="btn-submit" id="btnSubmitModal">Tambah Modal</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Tabel Daftar Modal -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Keterangan</th>
+              <th>Modal Awal</th>
+              <th style="text-align: right;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="modalTableBody"></tbody>
+        </table>
+        <div id="emptyModalState" class="empty-state">Belum ada riwayat modal yang diinput.</div>
       </div>
     </div>
 
-    <!-- Tabel Data -->
+    <!-- 3. Bagian Pencatatan Barang Penjualan -->
     <div class="card">
+      <h3 class="section-title">Pencatatan Transaksi Penjualan</h3>
+      <form id="itemForm" class="item-grid">
+        <div class="input-group">
+          <label>Nama Barang</label>
+          <input type="text" id="namaBarang" placeholder="Contoh: Kemeja Polos" required />
+        </div>
+        <div class="input-group">
+          <label>Harga Satuan</label>
+          <div class="input-wrapper">
+            <span>Rp</span>
+            <input type="text" id="hargaJual" placeholder="0" required />
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Jumlah (Qty)</label>
+          <input type="text" id="qty" placeholder="1" value="1" required />
+        </div>
+        <button type="submit" class="btn-submit" id="btnSubmitItem">Tambah Penjualan</button>
+      </form>
+
+      <!-- Tabel Daftar Penjualan -->
       <div class="table-container">
         <table>
           <thead>
@@ -364,33 +376,48 @@
           </thead>
           <tbody id="itemsTableBody"></tbody>
         </table>
-        <div id="emptyState" class="empty-state">
-          Belum ada data transaksi. Silakan input barang di atas.
-        </div>
+        <div id="emptyItemState" class="empty-state">Belum ada data transaksi penjualan.</div>
       </div>
     </div>
   </div>
 
   <script>
+    // --- KONFIGURASI FIREBASE ---
     const FIREBASE_BASE_URL = 'https://catatanmodal-default-rtdb.asia-southeast1.firebasedatabase.app';
 
-    let modalAwalValue = 0;
+    // --- STATE DATA ---
+    let modalMap = {};
     let itemsMap = {};
+    let editingModalKey = null; // Menyimpan ID jika sedang edit modal
 
-    const modalAwalInput = document.getElementById('modalAwal');
+    // --- ELEMEN DOM MODAL ---
+    const modalForm = document.getElementById('modalForm');
+    const modalNominalInput = document.getElementById('modalNominal');
+    const modalKeteranganInput = document.getElementById('modalKeterangan');
+    const modalTanggalInput = document.getElementById('modalTanggal');
+    const btnSubmitModal = document.getElementById('btnSubmitModal');
+    const modalTableBody = document.getElementById('modalTableBody');
+    const emptyModalState = document.getElementById('emptyModalState');
+
+    // --- ELEMEN DOM PENJUALAN ---
     const itemForm = document.getElementById('itemForm');
     const namaBarangInput = document.getElementById('namaBarang');
     const hargaJualInput = document.getElementById('hargaJual');
     const qtyInput = document.getElementById('qty');
+    const btnSubmitItem = document.getElementById('btnSubmitItem');
     const itemsTableBody = document.getElementById('itemsTableBody');
-    const emptyState = document.getElementById('emptyState');
-    const btnSubmit = document.getElementById('btnSubmit');
+    const emptyItemState = document.getElementById('emptyItemState');
 
+    // --- ELEMEN DOM SUMMARY ---
     const summaryModal = document.getElementById('summaryModal');
     const summaryJual = document.getElementById('summaryJual');
     const summaryLaba = document.getElementById('summaryLaba');
     const cardLaba = document.getElementById('cardLaba');
 
+    // Default Tanggal Hari Ini
+    modalTanggalInput.valueAsDate = new Date();
+
+    // --- HELPER FUNCTION ---
     function formatNumberString(str) {
       const clean = String(str).replace(/\D/g, '');
       if (!clean) return '';
@@ -403,61 +430,75 @@
 
     function formatRupiah(amount) {
       return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        maximumFractionDigits: 0
+        style: 'currency', currency: 'IDR', maximumFractionDigits: 0
       }).format(amount);
     }
 
-    function attachThousandSeparator(inputElement, onUpdateCallback) {
+    // Auto Format Titik
+    function attachThousandSeparator(inputElement) {
       inputElement.addEventListener('input', (e) => {
         const cursorPosition = e.target.selectionStart;
         const prevLength = e.target.value.length;
-
         const formatted = formatNumberString(e.target.value);
         e.target.value = formatted;
-
         const newLength = formatted.length;
-        e.target.setSelectionRange(
-          cursorPosition + (newLength - prevLength),
-          cursorPosition + (newLength - prevLength)
-        );
-
-        if (onUpdateCallback) onUpdateCallback();
+        e.target.setSelectionRange(cursorPosition + (newLength - prevLength), cursorPosition + (newLength - prevLength));
       });
     }
 
-    // Sinkronisasi input modal lokal -> Firebase
-    let modalTimer;
-    attachThousandSeparator(modalAwalInput, () => {
-      modalAwalValue = parseFormattedNumber(modalAwalInput.value);
-      render();
-
-      clearTimeout(modalTimer);
-      modalTimer = setTimeout(() => {
-        fetch(`${FIREBASE_BASE_URL}/modalAwal.json`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(modalAwalValue)
-        }).catch(err => console.error('Gagal menyimpan modal:', err));
-      }, 500);
-    });
-
+    attachThousandSeparator(modalNominalInput);
     attachThousandSeparator(hargaJualInput);
     attachThousandSeparator(qtyInput);
 
+    // --- RENDER UI UTAMA ---
     function render() {
+      // 1. Render Tabel Daftar Modal
+      modalTableBody.innerHTML = '';
+      const modalKeys = Object.keys(modalMap);
+      let totalModalAmount = 0;
+
+      if (modalKeys.length === 0) {
+        emptyModalState.style.display = 'block';
+      } else {
+        emptyModalState.style.display = 'none';
+        modalKeys.forEach(key => {
+          const m = modalMap[key];
+          totalModalAmount += m.nominal;
+          
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${m.tanggal}</td>
+            <td><strong>${m.keterangan}</strong></td>
+            <td>${formatRupiah(m.nominal)}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-icon edit" onclick="editModal('${key}')" title="Edit">
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
+                </button>
+                <button class="btn-icon delete" onclick="hapusModal('${key}')" title="Hapus">
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
+                </button>
+              </div>
+            </td>
+          `;
+          modalTableBody.appendChild(row);
+        });
+      }
+
+      // 2. Render Tabel Penjualan
       itemsTableBody.innerHTML = '';
       const itemKeys = Object.keys(itemsMap);
+      let totalPenjualanAmount = 0;
 
       if (itemKeys.length === 0) {
-        emptyState.style.display = 'block';
+        emptyItemState.style.display = 'block';
       } else {
-        emptyState.style.display = 'none';
-
-        itemKeys.forEach((key) => {
+        emptyItemState.style.display = 'none';
+        itemKeys.forEach(key => {
           const item = itemsMap[key];
           const subtotal = item.harga * item.qty;
+          totalPenjualanAmount += subtotal;
+
           const row = document.createElement('tr');
           row.innerHTML = `
             <td><strong>${item.nama}</strong></td>
@@ -465,64 +506,128 @@
             <td>${new Intl.NumberFormat('id-ID').format(item.qty)}</td>
             <td>${formatRupiah(subtotal)}</td>
             <td style="text-align: right;">
-              <button class="btn-delete" onclick="deleteItem('${key}')">Hapus</button>
+              <button class="btn-icon delete" onclick="hapusBarang('${key}')" style="margin-left:auto;" title="Hapus">
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
+              </button>
             </td>
           `;
           itemsTableBody.appendChild(row);
         });
       }
 
-      const totalPenjualan = Object.values(itemsMap).reduce((acc, curr) => acc + (curr.harga * curr.qty), 0);
-      const hasilBersih = totalPenjualan - modalAwalValue;
+      // 3. Kalkulasi Summary
+      const hasilBersih = totalPenjualanAmount - totalModalAmount;
 
-      summaryModal.textContent = formatRupiah(modalAwalValue);
-      summaryJual.textContent = formatRupiah(totalPenjualan);
+      summaryModal.textContent = formatRupiah(totalModalAmount);
+      summaryJual.textContent = formatRupiah(totalPenjualanAmount);
       summaryLaba.textContent = formatRupiah(hasilBersih);
 
+      // Warna label Hasil Bersih
       cardLaba.classList.remove('profit', 'loss');
-      if (hasilBersih > 0) {
-        cardLaba.classList.add('profit');
-      } else if (hasilBersih < 0) {
-        cardLaba.classList.add('loss');
-      }
+      if (hasilBersih > 0) cardLaba.classList.add('profit');
+      else if (hasilBersih < 0) cardLaba.classList.add('loss');
     }
 
-    // Ambil Data Awal dari Firebase Realtime Database
-    async function loadFirebaseData() {
+    // --- MENGAMBIL DATA DARI FIREBASE ---
+    async function loadData() {
       try {
-        const resModal = await fetch(`${FIREBASE_BASE_URL}/modalAwal.json`);
-        const dataModal = await resModal.json();
-        if (dataModal !== null) {
-          modalAwalValue = parseFloat(dataModal) || 0;
-          modalAwalInput.value = formatNumberString(modalAwalValue);
-        }
-
-        const resItems = await fetch(`${FIREBASE_BASE_URL}/items.json`);
-        const dataItems = await resItems.json();
-        if (dataItems) {
-          itemsMap = dataItems;
-        } else {
-          itemsMap = {};
-        }
-
+        const [resModals, resItems] = await Promise.all([
+          fetch(`${FIREBASE_BASE_URL}/modals.json`),
+          fetch(`${FIREBASE_BASE_URL}/items.json`)
+        ]);
+        
+        modalMap = (await resModals.json()) || {};
+        itemsMap = (await resItems.json()) || {};
+        
         render();
-      } catch (error) {
-        console.error('Koneksi Firebase gagal:', error);
+      } catch (err) {
+        console.error('Koneksi Firebase gagal:', err);
       }
     }
 
-    // Tambah Transaksi ke Firebase
+    // --- FUNGSI MODAL ---
+    modalForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nominal = parseFormattedNumber(modalNominalInput.value);
+      const keterangan = modalKeteranganInput.value.trim();
+      const tanggal = modalTanggalInput.value;
+
+      if (nominal <= 0 || !keterangan || !tanggal) return;
+
+      btnSubmitModal.disabled = true;
+      btnSubmitModal.textContent = 'Menyimpan...';
+
+      const payload = { nominal, keterangan, tanggal };
+
+      try {
+        if (editingModalKey) {
+          // Update Mode
+          await fetch(`${FIREBASE_BASE_URL}/modals/${editingModalKey}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          modalMap[editingModalKey] = payload;
+          editingModalKey = null; // Reset state
+          btnSubmitModal.textContent = 'Tambah Modal';
+          btnSubmitModal.classList.remove('btn-edit-mode');
+        } else {
+          // Add Mode
+          const res = await fetch(`${FIREBASE_BASE_URL}/modals.json`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const result = await res.json();
+          modalMap[result.name] = payload;
+        }
+        
+        render();
+        modalForm.reset();
+        modalTanggalInput.valueAsDate = new Date();
+      } catch (err) {
+        console.error('Gagal simpan modal:', err);
+      } finally {
+        btnSubmitModal.disabled = false;
+        if(!editingModalKey) btnSubmitModal.textContent = 'Tambah Modal';
+      }
+    });
+
+    function editModal(key) {
+      const data = modalMap[key];
+      modalNominalInput.value = formatNumberString(data.nominal);
+      modalKeteranganInput.value = data.keterangan;
+      modalTanggalInput.value = data.tanggal;
+      
+      editingModalKey = key;
+      btnSubmitModal.textContent = 'Update Modal';
+      btnSubmitModal.classList.add('btn-edit-mode');
+      modalNominalInput.focus();
+    }
+
+    async function hapusModal(key) {
+      if (!confirm('Hapus riwayat modal ini?')) return;
+      delete modalMap[key];
+      render(); // Update UI Instant
+      try {
+        await fetch(`${FIREBASE_BASE_URL}/modals/${key}.json`, { method: 'DELETE' });
+      } catch (err) {
+        console.error('Gagal hapus modal', err);
+        loadData(); // rollback jika gagal
+      }
+    }
+
+    // --- FUNGSI PENJUALAN ---
     itemForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const nama = namaBarangInput.value.trim();
       const harga = parseFormattedNumber(hargaJualInput.value);
       const qty = parseFormattedNumber(qtyInput.value) || 1;
 
       if (!nama || harga <= 0) return;
 
-      btnSubmit.disabled = true;
-      btnSubmit.textContent = 'Menyimpan...';
+      btnSubmitItem.disabled = true;
+      btnSubmitItem.textContent = 'Menyimpan...';
 
       const payload = { nama, harga, qty };
 
@@ -537,37 +642,31 @@
         itemsMap[result.name] = payload;
         render();
 
-        namaBarangInput.value = '';
-        hargaJualInput.value = '';
+        itemForm.reset();
         qtyInput.value = '1';
         namaBarangInput.focus();
       } catch (error) {
         console.error('Gagal menambah barang:', error);
       } finally {
-        btnSubmit.disabled = false;
-        btnSubmit.textContent = 'Tambah';
+        btnSubmitItem.disabled = false;
+        btnSubmitItem.textContent = 'Tambah Penjualan';
       }
     });
 
-    // Hapus Transaksi dari Firebase
-    async function deleteItem(key) {
-      if (!confirm('Hapus transaksi ini?')) return;
-
+    async function hapusBarang(key) {
+      if (!confirm('Hapus transaksi penjualan ini?')) return;
       delete itemsMap[key];
-      render();
-
+      render(); // Update UI instant
       try {
-        await fetch(`${FIREBASE_BASE_URL}/items/${key}.json`, {
-          method: 'DELETE'
-        });
+        await fetch(`${FIREBASE_BASE_URL}/items/${key}.json`, { method: 'DELETE' });
       } catch (error) {
         console.error('Gagal menghapus barang:', error);
-        loadFirebaseData();
+        loadData(); // rollback
       }
     }
 
-    // Jalankan saat pertama kali dimuat
-    loadFirebaseData();
+    // Load data otomatis saat web dibuka
+    loadData();
   </script>
 </body>
 </html>
