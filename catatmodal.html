@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalkulator Penjualan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #10b981;
+      --danger: #ef4444;
+      --radius: 12px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* 3 Kolom Metrik Kompak Horizontal */
+    .top-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .stat-card .label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+
+    .stat-card .value {
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stat-card.profit .value {
+      color: var(--success);
+    }
+
+    .stat-card.loss .value {
+      color: var(--danger);
+    }
+
+    /* Kartu Form */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .form-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-label-group h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .modal-label-group p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 0.8fr auto;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper span {
+      position: absolute;
+      left: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .input-wrapper input {
+      padding-left: 36px !important;
+    }
+
+    .input-group input,
+    .modal-input-field {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--text-main);
+      background-color: #ffffff;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .modal-input-field {
+      width: 200px;
+      font-weight: 600;
+    }
+
+    .input-group input:focus,
+    .modal-input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .btn-submit {
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      height: 39px;
+      white-space: nowrap;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--primary-hover);
+    }
+
+    /* Tabel */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th {
+      padding: 10px 12px;
+      background-color: #f1f5f9;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th:first-child { border-top-left-radius: 8px; }
+    th:last-child { border-top-right-radius: 8px; }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .btn-delete {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-delete:hover {
+      color: var(--danger);
+      background-color: #fee2e2;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px 0;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      .top-stats-row {
+        gap: 6px;
+      }
+      .stat-card {
+        padding: 8px 10px;
+      }
+      .stat-card .label {
+        font-size: 9px;
+      }
+      .stat-card .value {
+        font-size: 13px;
+      }
+      .modal-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .modal-input-field {
+        width: 100%;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 3 Kolom Metrik di Atas -->
+    <div class="top-stats-row">
+      <div class="stat-card">
+        <span class="label">Modal Awal</span>
+        <div class="value" id="summaryModal">Rp 0</div>
+      </div>
+      <div class="stat-card">
+        <span class="label">Total Pendapatan</span>
+        <div class="value" id="summaryJual">Rp 0</div>
+      </div>
+      <div class="stat-card" id="cardLaba">
+        <span class="label">Hasil Bersih</span>
+        <div class="value" id="summaryLaba">Rp 0</div>
+      </div>
+    </div>
+
+    <!-- Form Input (Modal di Atas Nama Barang) -->
+    <div class="card">
+      <div class="form-wrapper">
+        <div class="modal-row">
+          <div class="modal-label-group">
+            <h3>Modal Awal</h3>
+            <p>Masukkan total modal yang digunakan</p>
+          </div>
+          <div class="input-wrapper">
+            <span>Rp</span>
+            <input type="text" id="modalAwal" class="modal-input-field" placeholder="0" value="0" />
+          </div>
+        </div>
+
+        <form id="itemForm" class="form-grid">
+          <div class="input-group">
+            <label for="namaBarang">Nama Barang</label>
+            <input type="text" id="namaBarang" placeholder="Contoh: Kemeja Polos" required />
+          </div>
+          <div class="input-group">
+            <label for="hargaJual">Harga Satuan</label>
+            <div class="input-wrapper">
+              <span>Rp</span>
+              <input type="text" id="hargaJual" placeholder="0" required />
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="qty">Jumlah</label>
+            <input type="text" id="qty" placeholder="1" value="1" required />
+          </div>
+          <button type="submit" class="btn-submit" id="btnSubmit">Tambah</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tabel Data -->
+    <div class="card">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama Barang</th>
+              <th>Harga Satuan</th>
+              <th>Qty</th>
+              <th>Subtotal</th>
+              <th style="text-align: right;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="itemsTableBody"></tbody>
+        </table>
+        <div id="emptyState" class="empty-state">
+          Belum ada data transaksi. Silakan input barang di atas.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const FIREBASE_BASE_URL = 'https://catatanmodal-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+    let modalAwalValue = 0;
+    let itemsMap = {};
+
+    const modalAwalInput = document.getElementById('modalAwal');
+    const itemForm = document.getElementById('itemForm');
+    const namaBarangInput = document.getElementById('namaBarang');
+    const hargaJualInput = document.getElementById('hargaJual');
+    const qtyInput = document.getElementById('qty');
+    const itemsTableBody = document.getElementById('itemsTableBody');
+    const emptyState = document.getElementById('emptyState');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    const summaryModal = document.getElementById('summaryModal');
+    const summaryJual = document.getElementById('summaryJual');
+    const summaryLaba = document.getElementById('summaryLaba');
+    const cardLaba = document.getElementById('cardLaba');
+
+    function formatNumberString(str) {
+      const clean = String(str).replace(/\D/g, '');
+      if (!clean) return '';
+      return new Intl.NumberFormat('id-ID').format(clean);
+    }
+
+    function parseFormattedNumber(str) {
+      return parseFloat(String(str).replace(/\./g, '')) || 0;
+    }
+
+    function formatRupiah(amount) {
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function attachThousandSeparator(inputElement, onUpdateCallback) {
+      inputElement.addEventListener('input', (e) => {
+        const cursorPosition = e.target.selectionStart;
+        const prevLength = e.target.value.length;
+
+        const formatted = formatNumberString(e.target.value);
+        e.target.value = formatted;
+
+        const newLength = formatted.length;
+        e.target.setSelectionRange(
+          cursorPosition + (newLength - prevLength),
+          cursorPosition + (newLength - prevLength)
+        );
+
+        if (onUpdateCallback) onUpdateCallback();
+      });
+    }
+
+    // Sinkronisasi input modal lokal -> Firebase
+    let modalTimer;
+    attachThousandSeparator(modalAwalInput, () => {
+      modalAwalValue = parseFormattedNumber(modalAwalInput.value);
+      render();
+
+      clearTimeout(modalTimer);
+      modalTimer = setTimeout(() => {
+        fetch(`${FIREBASE_BASE_URL}/modalAwal.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(modalAwalValue)
+        }).catch(err => console.error('Gagal menyimpan modal:', err));
+      }, 500);
+    });
+
+    attachThousandSeparator(hargaJualInput);
+    attachThousandSeparator(qtyInput);
+
+    function render() {
+      itemsTableBody.innerHTML = '';
+      const itemKeys = Object.keys(itemsMap);
+
+      if (itemKeys.length === 0) {
+        emptyState.style.display = 'block';
+      } else {
+        emptyState.style.display = 'none';
+
+        itemKeys.forEach((key) => {
+          const item = itemsMap[key];
+          const subtotal = item.harga * item.qty;
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><strong>${item.nama}</strong></td>
+            <td>${formatRupiah(item.harga)}</td>
+            <td>${new Intl.NumberFormat('id-ID').format(item.qty)}</td>
+            <td>${formatRupiah(subtotal)}</td>
+            <td style="text-align: right;">
+              <button class="btn-delete" onclick="deleteItem('${key}')">Hapus</button>
+            </td>
+          `;
+          itemsTableBody.appendChild(row);
+        });
+      }
+
+      const totalPenjualan = Object.values(itemsMap).reduce((acc, curr) => acc + (curr.harga * curr.qty), 0);
+      const hasilBersih = totalPenjualan - modalAwalValue;
+
+      summaryModal.textContent = formatRupiah(modalAwalValue);
+      summaryJual.textContent = formatRupiah(totalPenjualan);
+      summaryLaba.textContent = formatRupiah(hasilBersih);
+
+      cardLaba.classList.remove('profit', 'loss');
+      if (hasilBersih > 0) {
+        cardLaba.classList.add('profit');
+      } else if (hasilBersih < 0) {
+        cardLaba.classList.add('loss');
+      }
+    }
+
+    // Ambil Data Awal dari Firebase Realtime Database
+    async function loadFirebaseData() {
+      try {
+        const resModal = await fetch(`${FIREBASE_BASE_URL}/modalAwal.json`);
+        const dataModal = await resModal.json();
+        if (dataModal !== null) {
+          modalAwalValue = parseFloat(dataModal) || 0;
+          modalAwalInput.value = formatNumberString(modalAwalValue);
+        }
+
+        const resItems = await fetch(`${FIREBASE_BASE_URL}/items.json`);
+        const dataItems = await resItems.json();
+        if (dataItems) {
+          itemsMap = dataItems;
+        } else {
+          itemsMap = {};
+        }
+
+        render();
+      } catch (error) {
+        console.error('Koneksi Firebase gagal:', error);
+      }
+    }
+
+    // Tambah Transaksi ke Firebase
+    itemForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nama = namaBarangInput.value.trim();
+      const harga = parseFormattedNumber(hargaJualInput.value);
+      const qty = parseFormattedNumber(qtyInput.value) || 1;
+
+      if (!nama || harga <= 0) return;
+
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Menyimpan...';
+
+      const payload = { nama, harga, qty };
+
+      try {
+        const res = await fetch(`${FIREBASE_BASE_URL}/items.json`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        
+        itemsMap[result.name] = payload;
+        render();
+
+        namaBarangInput.value = '';
+        hargaJualInput.value = '';
+        qtyInput.value = '1';
+        namaBarangInput.focus();
+      } catch (error) {
+        console.error('Gagal menambah barang:', error);
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Tambah';
+      }
+    });
+
+    // Hapus Transaksi dari Firebase
+    async function deleteItem(key) {
+      if (!confirm('Hapus transaksi ini?')) return;
+
+      delete itemsMap[key];
+      render();
+
+      try {
+        await fetch(`${FIREBASE_BASE_URL}/items/${key}.json`, {
+          method: 'DELETE'
+        });
+      } catch (error) {
+        console.error('Gagal menghapus barang:', error);
+        loadFirebaseData();
+      }
+    }
+
+    // Jalankan saat pertama kali dimuat
+    loadFirebaseData();
+  </script>
+</body>
+</html>
