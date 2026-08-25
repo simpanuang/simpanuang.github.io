@@ -33,9 +33,6 @@ h2 {
 }
 
 .summary {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
     margin-bottom: 25px;
 }
 
@@ -55,22 +52,35 @@ h2 {
     color: #0f5132;
 }
 
-/* TARGET MENABUNG STYLING */
-.target-box {
-    background: #fff3cd;
-    border: 1px solid #ffe69c;
-    text-align: left;
-}
-.target-header {
+/* TARGET MENABUNG STYLING MULTIPLE */
+.section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
+    margin-top: 25px;
+}
+.section-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #374151;
+}
+
+.target-card {
+    background: #fff3cd;
+    border: 1px solid #ffe69c;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    position: relative;
+    text-align: left;
 }
 .target-title {
     font-weight: bold;
     color: #664d03;
     font-size: 15px;
+    margin-bottom: 5px;
+    padding-right: 60px; /* space for delete button */
 }
 .target-info {
     font-size: 13px;
@@ -89,6 +99,19 @@ h2 {
     height: 100%;
     width: 0%;
     transition: width 0.4s ease-in-out;
+}
+.btn-delete-target {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .form-group { display: grid; gap: 15px; }
@@ -111,7 +134,7 @@ button:active { transform: scale(0.98); }
 .btn-add { background: #198754; }
 .btn-delete { background: #dc3545; }
 .btn-secondary { background: #f3f4f6; color: #374151; }
-.btn-target { background: #ffc107; color: #000; padding: 6px 12px; font-size: 12px; }
+.btn-target { background: #ffc107; color: #000; padding: 8px 12px; font-size: 12px; }
 
 .btn-group { display: flex; gap: 10px; margin-top: 15px; }
 .btn-group button { flex: 1; }
@@ -195,7 +218,7 @@ tbody tr.selected { background-color: #d1e7dd !important; }
 <!-- Modal Atur Target -->
 <div id="targetModal" class="modal">
     <div class="modal-content">
-        <h3>Atur Target Menabung</h3>
+        <h3>Tambah Target Menabung</h3>
         <div class="form-group">
             <div class="form-item">
                 <label>Tujuan Tabungan (Contoh: Beli HP)</label>
@@ -217,23 +240,19 @@ tbody tr.selected { background-color: #d1e7dd !important; }
     <h2>CATAT TABUNGAN</h2>
 
     <div class="summary">
-        <!-- Target Box -->
-        <div class="box target-box">
-            <div class="target-header">
-                <span class="target-title" id="targetDisplayTitle">Target: Belum diatur</span>
-                <button class="btn-target" onclick="openTargetModal()">Atur Target</button>
-            </div>
-            <div class="target-info">
-                Terkumpul <span id="progressPercent">0%</span> dari <b>Rp <span id="targetDisplayAmount">0</span></b>
-            </div>
-            <div class="progress-bg">
-                <div class="progress-fill" id="progressBar"></div>
-            </div>
-        </div>
-
         <!-- Total Tabungan -->
         <div class="box">Total Tabungan Terkumpul:<div class="val">Rp <span id="totSavings">0</span></div></div>
     </div>
+
+    <!-- Container Daftar Target -->
+    <div class="section-header">
+        <h3>Daftar Target</h3>
+        <button class="btn-target" onclick="openTargetModal()">+ Tambah Target</button>
+    </div>
+    <div id="targetContainer">
+        <!-- Kartu target akan dirender di sini oleh JavaScript -->
+    </div>
+    <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 25px 0;">
 
     <div class="form-group">
         <div class="form-item">
@@ -247,12 +266,12 @@ tbody tr.selected { background-color: #d1e7dd !important; }
     </div>
 
     <div class="btn-group">
-        <button class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addSaving()">Tambah</button>
+        <button class="btn-add" style="padding: 12px 5px; font-size: 12px;" onclick="addSaving()">Tambah Pemasukan</button>
         <button style="background: #f59e0b; color: white; padding: 12px 5px; font-size: 12px;" onclick="editSavingSelected()">Edit</button>
         <button class="btn-delete" style="padding: 12px 5px; font-size: 12px;" onclick="deleteSavingSelected()">Hapus</button>
     </div>
 
-    <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Tabungan</h3>
+    <h3 style="text-align: center; margin-top: 35px; color: #374151;">Riwayat Tabungan</h3>
     <table id="tableSaving">
         <thead>
             <tr>
@@ -274,15 +293,15 @@ const FIREBASE_TARGET_URL = "https://nabung-597ed-default-rtdb.asia-southeast1.f
 
 // Variabel Global
 let savings = [];
+let targets = []; // Sekarang berupa array untuk menyimpan banyak target
 let selectedSavingId = null;
-let currentTarget = { name: "", amount: 0 };
 let currentTotalSavings = 0;
 
 // Saat halaman dimuat
 window.onload = () => {
     document.getElementById('savingDate').valueAsDate = new Date();
     loadFromFirebase();
-    loadTargetFromFirebase();
+    loadTargetsFromFirebase();
 };
 
 // --- FUNGSI FIREBASE ---
@@ -314,26 +333,33 @@ async function saveToFirebase() {
     }
 }
 
-// Fitur Firebase Target
-async function loadTargetFromFirebase() {
+// Fitur Firebase Target (Diubah untuk Array)
+async function loadTargetsFromFirebase() {
     try {
         const response = await fetch(FIREBASE_TARGET_URL);
         const data = await response.json();
-        if(data) {
-            currentTarget = data;
+        
+        let parsedData = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+        // Support migrasi data dari versi sebelumnya (jika format lama berbentuk objek bukan array)
+        if (data && !Array.isArray(data) && data.name) {
+            targets = [data]; // Ubah objek tunggal jadi array 1 elemen
+        } else {
+            targets = parsedData.filter(t => t !== null);
         }
-        updateTargetUI();
+        
+        renderTargets();
     } catch (error) {
         console.error("Gagal memuat target:", error);
     }
 }
 
-async function saveTargetToFirebase() {
+async function saveTargetsToFirebase() {
     try {
+        const cleanTargets = targets.filter(t => t !== null);
         await fetch(FIREBASE_TARGET_URL, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(currentTarget)
+            body: JSON.stringify(cleanTargets)
         });
     } catch (error) {
         console.error("Gagal menyimpan target:", error);
@@ -365,10 +391,10 @@ function showToast(message) {
     toastTimeout = setTimeout(() => { toast.classList.remove("show"); }, 3000);
 }
 
-// --- LOGIKA TARGET MENABUNG ---
+// --- LOGIKA TARGET MENABUNG (MULTIPLE) ---
 function openTargetModal() {
-    document.getElementById('targetName').value = currentTarget.name;
-    document.getElementById('targetAmount').value = currentTarget.amount ? currentTarget.amount.toLocaleString('id-ID') : '';
+    document.getElementById('targetName').value = "";
+    document.getElementById('targetAmount').value = "";
     document.getElementById('targetModal').style.display = 'flex';
 }
 
@@ -385,45 +411,61 @@ async function saveTarget() {
         return showToast("Isi tujuan dan target dana dengan benar!");
     }
 
-    currentTarget.name = name;
-    currentTarget.amount = amount;
+    const newTarget = {
+        id: Date.now().toString(),
+        name: name,
+        amount: amount
+    };
+    
+    targets.push(newTarget);
     
     closeTargetModal();
-    updateTargetUI();
-    await saveTargetToFirebase();
-    showToast("Target menabung disimpan!");
+    renderTargets();
+    await saveTargetsToFirebase();
+    showToast("Target menabung ditambahkan!");
 }
 
-function updateTargetUI() {
-    const titleEl = document.getElementById('targetDisplayTitle');
-    const amountEl = document.getElementById('targetDisplayAmount');
-    const percentEl = document.getElementById('progressPercent');
-    const barEl = document.getElementById('progressBar');
+function deleteTarget(targetId) {
+    showConfirm("Hapus target ini?", async () => {
+        targets = targets.filter(t => String(t.id) !== String(targetId));
+        renderTargets();
+        await saveTargetsToFirebase();
+        showToast("Target dihapus!");
+    });
+}
 
-    if(currentTarget.amount > 0) {
-        titleEl.innerText = "Target: " + currentTarget.name;
-        amountEl.innerText = formatRupiah(currentTarget.amount);
-        
-        // Kalkulasi persentase
-        let percent = (currentTotalSavings / currentTarget.amount) * 100;
-        
-        // Batasi bar maksimal 100% agar tidak luber, tapi angkanya boleh lebih
+function renderTargets() {
+    const container = document.getElementById('targetContainer');
+    container.innerHTML = "";
+    
+    if (targets.length === 0) {
+        container.innerHTML = "<p style='text-align:center; font-size:13px; color:#6b7280; margin-bottom:0;'>Belum ada target menabung. Klik tombol di atas untuk menambah.</p>";
+        return;
+    }
+
+    // Membalik array agar target terbaru muncul di atas (opsional)
+    const reversedTargets = [...targets].reverse();
+
+    reversedTargets.forEach(t => {
+        // Kalkulasi persentase pencapaian
+        let percent = (currentTotalSavings / t.amount) * 100;
         let visualPercent = percent > 100 ? 100 : percent; 
         
-        percentEl.innerText = percent.toFixed(1) + "%";
-        barEl.style.width = visualPercent + "%";
-        
-        if(percent >= 100) {
-            barEl.style.background = "#198754"; // Ganti hijau kalau sudah tercapai
-        } else {
-            barEl.style.background = "#ffc107"; // Kuning kalau masih proses
-        }
-    } else {
-        titleEl.innerText = "Target: Belum diatur";
-        amountEl.innerText = "0";
-        percentEl.innerText = "0%";
-        barEl.style.width = "0%";
-    }
+        let bgColor = percent >= 100 ? "#198754" : "#ffc107";
+        let statusText = percent >= 100 ? "Tercapai!" : `Terkumpul ${percent.toFixed(1)}%`;
+
+        container.innerHTML += `
+        <div class="target-card">
+            <button class="btn-delete-target" onclick="deleteTarget('${t.id}')">Hapus</button>
+            <div class="target-title">${t.name}</div>
+            <div class="target-info">
+                ${statusText} dari <b>Rp ${formatRupiah(t.amount)}</b>
+            </div>
+            <div class="progress-bg">
+                <div class="progress-fill" style="width: ${visualPercent}%; background-color: ${bgColor};"></div>
+            </div>
+        </div>`;
+    });
 }
 // -----------------------------
 
@@ -447,7 +489,9 @@ function renderSavings() {
     });
     
     document.getElementById('totSavings').innerText = formatRupiah(currentTotalSavings);
-    updateTargetUI(); // Perbarui juga progress target setiap kali total tabungan berubah
+    
+    // Penting: Perbarui progress bar di SEMUA target tiap kali total uang berubah
+    renderTargets(); 
 }
 
 // Fungsi Pilihan Baris
@@ -484,12 +528,12 @@ async function addSaving() {
     renderSavings();
     
     await saveToFirebase();
-    showToast("Tabungan berhasil ditambahkan!");
+    showToast("Pemasukan berhasil ditambahkan!");
 }
 
 // Fungsi Edit
 function editSavingSelected() {
-    if (!selectedSavingId) return showToast("Pilih satu baris tabungan terlebih dahulu.");
+    if (!selectedSavingId) return showToast("Pilih satu baris riwayat terlebih dahulu.");
     
     const target = savings.find(s => s && String(s.id) === String(selectedSavingId));
     if (target) {
@@ -515,7 +559,7 @@ async function saveEditSaving() {
         renderSavings();
         
         await saveToFirebase();
-        showToast("Tabungan berhasil diperbarui!");
+        showToast("Riwayat berhasil diperbarui!");
     }
 }
 
@@ -543,14 +587,14 @@ document.getElementById("btnConfirmYes").onclick = function() {
 };
 
 function deleteSavingSelected() {
-    if (!selectedSavingId) return showToast("Pilih satu baris tabungan yang ingin dihapus.");
-    showConfirm("Hapus data tabungan ini?", async () => {
+    if (!selectedSavingId) return showToast("Pilih satu baris riwayat yang ingin dihapus.");
+    showConfirm("Hapus riwayat pemasukan ini?", async () => {
         savings = savings.filter(s => s && String(s.id) !== String(selectedSavingId));
         selectedSavingId = null;
         renderSavings();
         
         await saveToFirebase();
-        showToast("Tabungan berhasil dihapus!");
+        showToast("Riwayat berhasil dihapus!");
     });
 }
 
