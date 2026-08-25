@@ -35,12 +35,13 @@ h2 {
 .summary {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 15px;
     margin-bottom: 25px;
 }
 
 .box {
     background: #d1e7dd;
-    padding: 15px 10px;
+    padding: 15px;
     border-radius: 16px;
     text-align: center;
     font-size: 14px;
@@ -52,6 +53,42 @@ h2 {
     font-weight: bold;
     margin-top: 6px;
     color: #0f5132;
+}
+
+/* TARGET MENABUNG STYLING */
+.target-box {
+    background: #fff3cd;
+    border: 1px solid #ffe69c;
+    text-align: left;
+}
+.target-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.target-title {
+    font-weight: bold;
+    color: #664d03;
+    font-size: 15px;
+}
+.target-info {
+    font-size: 13px;
+    color: #664d03;
+    margin-bottom: 8px;
+}
+.progress-bg {
+    background: #ffe69c;
+    border-radius: 10px;
+    height: 14px;
+    width: 100%;
+    overflow: hidden;
+}
+.progress-fill {
+    background: #ffc107;
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease-in-out;
 }
 
 .form-group { display: grid; gap: 15px; }
@@ -74,6 +111,7 @@ button:active { transform: scale(0.98); }
 .btn-add { background: #198754; }
 .btn-delete { background: #dc3545; }
 .btn-secondary { background: #f3f4f6; color: #374151; }
+.btn-target { background: #ffc107; color: #000; padding: 6px 12px; font-size: 12px; }
 
 .btn-group { display: flex; gap: 10px; margin-top: 15px; }
 .btn-group button { flex: 1; }
@@ -92,9 +130,6 @@ tbody tr:last-child td { border-bottom: none; }
 tbody tr { cursor: pointer; transition: background-color 0.2s; background: white; }
 tbody tr:hover { background: #f9fafb; }
 tbody tr.selected { background-color: #d1e7dd !important; }
-
-#tableSaving th:nth-child(1), #tableSaving td:nth-child(1) { width: 50%; }
-#tableSaving th:nth-child(2), #tableSaving td:nth-child(2) { width: 50%; }
 
 /* MODAL & TOAST */
 .modal {
@@ -124,6 +159,7 @@ tbody tr.selected { background-color: #d1e7dd !important; }
 
 <div id="toast">Notifikasi</div>
 
+<!-- Modal Konfirmasi Hapus -->
 <div id="confirmModal" class="modal">
     <div class="modal-content" style="text-align: center;">
         <h3 id="confirmMessage" style="margin-bottom: 10px;">Apakah Anda yakin?</h3>
@@ -135,6 +171,7 @@ tbody tr.selected { background-color: #d1e7dd !important; }
     </div>
 </div>
 
+<!-- Modal Edit Tabungan -->
 <div id="editSavingModal" class="modal">
     <div class="modal-content">
         <h3>Edit Tabungan</h3>
@@ -155,11 +192,47 @@ tbody tr.selected { background-color: #d1e7dd !important; }
     </div>
 </div>
 
+<!-- Modal Atur Target -->
+<div id="targetModal" class="modal">
+    <div class="modal-content">
+        <h3>Atur Target Menabung</h3>
+        <div class="form-group">
+            <div class="form-item">
+                <label>Tujuan Tabungan (Contoh: Beli HP)</label>
+                <input type="text" id="targetName" placeholder="Tujuan">
+            </div>
+            <div class="form-item">
+                <label>Target Dana (Rp)</label>
+                <input type="text" inputmode="numeric" id="targetAmount" placeholder="0" oninput="formatInputRupiah(this)">
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-secondary" onclick="closeTargetModal()">Batal</button>
+            <button class="btn-add" onclick="saveTarget()">Simpan Target</button>
+        </div>
+    </div>
+</div>
+
 <div class="container" id="menu-nabung">
     <h2>CATAT TABUNGAN</h2>
 
     <div class="summary">
-        <div class="box">Total Tabungan:<div class="val">Rp <span id="totSavings">0</span></div></div>
+        <!-- Target Box -->
+        <div class="box target-box">
+            <div class="target-header">
+                <span class="target-title" id="targetDisplayTitle">Target: Belum diatur</span>
+                <button class="btn-target" onclick="openTargetModal()">Atur Target</button>
+            </div>
+            <div class="target-info">
+                Terkumpul <span id="progressPercent">0%</span> dari <b>Rp <span id="targetDisplayAmount">0</span></b>
+            </div>
+            <div class="progress-bg">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <!-- Total Tabungan -->
+        <div class="box">Total Tabungan Terkumpul:<div class="val">Rp <span id="totSavings">0</span></div></div>
     </div>
 
     <div class="form-group">
@@ -195,15 +268,21 @@ tbody tr.selected { background-color: #d1e7dd !important; }
 <script>
 /* ===================== JAVASCRIPT ===================== */
 
-// Variabel Global & Konfigurasi Firebase URL
+// Konfigurasi Firebase URL
 const FIREBASE_DB_URL = "https://nabung-597ed-default-rtdb.asia-southeast1.firebasedatabase.app/dataTabungan.json";
+const FIREBASE_TARGET_URL = "https://nabung-597ed-default-rtdb.asia-southeast1.firebasedatabase.app/targetTabungan.json";
+
+// Variabel Global
 let savings = [];
 let selectedSavingId = null;
+let currentTarget = { name: "", amount: 0 };
+let currentTotalSavings = 0;
 
 // Saat halaman dimuat
 window.onload = () => {
     document.getElementById('savingDate').valueAsDate = new Date();
     loadFromFirebase();
+    loadTargetFromFirebase();
 };
 
 // --- FUNGSI FIREBASE ---
@@ -212,23 +291,18 @@ async function loadFromFirebase() {
         const response = await fetch(FIREBASE_DB_URL);
         const data = await response.json();
         
-        // Memastikan data selalu menjadi Array meskipun Firebase merubahnya menjadi Object
         let parsedData = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-        
-        // Menghapus slot kosong (null) jika ada
         savings = parsedData.filter(s => s !== null);
         
         renderSavings();
         showToast("Data dimuat dari server!");
     } catch (error) {
         console.error("Gagal memuat data:", error);
-        showToast("Gagal memuat data dari database.");
     }
 }
 
 async function saveToFirebase() {
     try {
-        // Karena array akan menimpa seluruh data, kita bersihkan dulu dari null
         const cleanSavings = savings.filter(s => s !== null);
         await fetch(FIREBASE_DB_URL, {
             method: 'PUT',
@@ -237,7 +311,32 @@ async function saveToFirebase() {
         });
     } catch (error) {
         console.error("Gagal menyimpan data:", error);
-        showToast("Gagal menyimpan ke database.");
+    }
+}
+
+// Fitur Firebase Target
+async function loadTargetFromFirebase() {
+    try {
+        const response = await fetch(FIREBASE_TARGET_URL);
+        const data = await response.json();
+        if(data) {
+            currentTarget = data;
+        }
+        updateTargetUI();
+    } catch (error) {
+        console.error("Gagal memuat target:", error);
+    }
+}
+
+async function saveTargetToFirebase() {
+    try {
+        await fetch(FIREBASE_TARGET_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentTarget)
+        });
+    } catch (error) {
+        console.error("Gagal menyimpan target:", error);
     }
 }
 // -----------------------
@@ -266,18 +365,79 @@ function showToast(message) {
     toastTimeout = setTimeout(() => { toast.classList.remove("show"); }, 3000);
 }
 
-// Fungsi render tabel
+// --- LOGIKA TARGET MENABUNG ---
+function openTargetModal() {
+    document.getElementById('targetName').value = currentTarget.name;
+    document.getElementById('targetAmount').value = currentTarget.amount ? currentTarget.amount.toLocaleString('id-ID') : '';
+    document.getElementById('targetModal').style.display = 'flex';
+}
+
+function closeTargetModal() {
+    document.getElementById('targetModal').style.display = 'none';
+}
+
+async function saveTarget() {
+    const name = document.getElementById('targetName').value.trim();
+    const amountStr = document.getElementById('targetAmount').value.replace(/\./g, '');
+    const amount = parseInt(amountStr, 10);
+
+    if (!name || isNaN(amount) || amount <= 0) {
+        return showToast("Isi tujuan dan target dana dengan benar!");
+    }
+
+    currentTarget.name = name;
+    currentTarget.amount = amount;
+    
+    closeTargetModal();
+    updateTargetUI();
+    await saveTargetToFirebase();
+    showToast("Target menabung disimpan!");
+}
+
+function updateTargetUI() {
+    const titleEl = document.getElementById('targetDisplayTitle');
+    const amountEl = document.getElementById('targetDisplayAmount');
+    const percentEl = document.getElementById('progressPercent');
+    const barEl = document.getElementById('progressBar');
+
+    if(currentTarget.amount > 0) {
+        titleEl.innerText = "Target: " + currentTarget.name;
+        amountEl.innerText = formatRupiah(currentTarget.amount);
+        
+        // Kalkulasi persentase
+        let percent = (currentTotalSavings / currentTarget.amount) * 100;
+        
+        // Batasi bar maksimal 100% agar tidak luber, tapi angkanya boleh lebih
+        let visualPercent = percent > 100 ? 100 : percent; 
+        
+        percentEl.innerText = percent.toFixed(1) + "%";
+        barEl.style.width = visualPercent + "%";
+        
+        if(percent >= 100) {
+            barEl.style.background = "#198754"; // Ganti hijau kalau sudah tercapai
+        } else {
+            barEl.style.background = "#ffc107"; // Kuning kalau masih proses
+        }
+    } else {
+        titleEl.innerText = "Target: Belum diatur";
+        amountEl.innerText = "0";
+        percentEl.innerText = "0%";
+        barEl.style.width = "0%";
+    }
+}
+// -----------------------------
+
+// Fungsi render tabel & Update Total
 function renderSavings() {
     const tbody = document.querySelector("#tableSaving tbody");
     tbody.innerHTML = "";
-    let total = 0;
+    currentTotalSavings = 0;
     
     const sortedSavings = [...savings].sort((a,b) => new Date(b.date) - new Date(a.date));
 
     sortedSavings.forEach(s => {
         if (!s) return; 
-        total += s.amount;
-        // Gunakan String() untuk memastikan perbandingan aman (mencegah bug ID Number vs String)
+        currentTotalSavings += s.amount;
         const isSelected = String(selectedSavingId) === String(s.id) ? 'selected' : '';
         tbody.innerHTML += `
         <tr class="${isSelected}" onclick="toggleSavingSelection(this, '${s.id}')">
@@ -286,7 +446,8 @@ function renderSavings() {
         </tr>`;
     });
     
-    document.getElementById('totSavings').innerText = formatRupiah(total);
+    document.getElementById('totSavings').innerText = formatRupiah(currentTotalSavings);
+    updateTargetUI(); // Perbarui juga progress target setiap kali total tabungan berubah
 }
 
 // Fungsi Pilihan Baris
@@ -294,11 +455,10 @@ function toggleSavingSelection(rowElement, id) {
     const rows = document.querySelectorAll("#tableSaving tbody tr");
     rows.forEach(r => r.classList.remove('selected'));
     
-    // Gunakan String() agar tidak ada missmatch tipe data
     if (String(selectedSavingId) === String(id)) {
         selectedSavingId = null;
     } else {
-        selectedSavingId = String(id); // Simpan secara eksplisit sebagai String
+        selectedSavingId = String(id);
         rowElement.classList.add('selected');
     }
 }
@@ -331,7 +491,6 @@ async function addSaving() {
 function editSavingSelected() {
     if (!selectedSavingId) return showToast("Pilih satu baris tabungan terlebih dahulu.");
     
-    // Gunakan String() untuk pencarian
     const target = savings.find(s => s && String(s.id) === String(selectedSavingId));
     if (target) {
         document.getElementById('editSavingDate').value = target.date;
@@ -347,7 +506,6 @@ async function saveEditSaving() {
 
     if (!date || isNaN(amount) || amount <= 0) return showToast("Isi tanggal dan jumlah dengan benar!");
 
-    // Gunakan String() untuk pencarian index
     const index = savings.findIndex(s => s && String(s.id) === String(selectedSavingId));
     if (index !== -1) {
         savings[index].date = date;
@@ -378,7 +536,6 @@ function closeConfirm() {
     confirmCallback = null;
 }
 
-// Menyimpan callback sementara sebelum modal ditutup
 document.getElementById("btnConfirmYes").onclick = function() {
     let eksekusiHapus = confirmCallback; 
     closeConfirm(); 
@@ -388,7 +545,6 @@ document.getElementById("btnConfirmYes").onclick = function() {
 function deleteSavingSelected() {
     if (!selectedSavingId) return showToast("Pilih satu baris tabungan yang ingin dihapus.");
     showConfirm("Hapus data tabungan ini?", async () => {
-        // Gunakan String() untuk membandingkan ID saat memfilter array
         savings = savings.filter(s => s && String(s.id) !== String(selectedSavingId));
         selectedSavingId = null;
         renderSavings();
@@ -402,8 +558,10 @@ function deleteSavingSelected() {
 window.addEventListener('click', function(event) {
     const editSavMod = document.getElementById('editSavingModal');
     const confMod = document.getElementById('confirmModal');
+    const targetMod = document.getElementById('targetModal');
     if (event.target == editSavMod) closeEditSavingModal();
     if (event.target == confMod) closeConfirm();
+    if (event.target == targetMod) closeTargetModal();
 });
 </script>
 
