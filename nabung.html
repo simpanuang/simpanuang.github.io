@@ -80,7 +80,7 @@ h2 {
     color: #664d03;
     font-size: 15px;
     margin-bottom: 5px;
-    padding-right: 60px; /* space for delete button */
+    padding-right: 60px;
 }
 .target-info {
     font-size: 13px;
@@ -118,12 +118,15 @@ h2 {
 .form-item { display: flex; flex-direction: column; text-align: left; }
 .form-item label { margin-bottom: 6px; font-weight: 600; font-size: 14px; color: #444; }
 
-.form-item input {
+.form-item input, .form-item select {
     width: 100%; padding: 12px 15px; border-radius: 12px;
     border: 1px solid #d1d5db; font-size: 14px; box-sizing: border-box;
     height: 48px; background-color: #fafafa; transition: all 0.2s;
+    font-family: inherit; color: #333;
 }
-input:focus { outline: none; border: 2px solid #198754; background-color: #fff; }
+.form-item input:focus, .form-item select:focus { 
+    outline: none; border: 2px solid #198754; background-color: #fff; 
+}
 
 button {
     padding: 14px; border: none; border-radius: 12px; color: white;
@@ -153,6 +156,10 @@ tbody tr:last-child td { border-bottom: none; }
 tbody tr { cursor: pointer; transition: background-color 0.2s; background: white; }
 tbody tr:hover { background: #f9fafb; }
 tbody tr.selected { background-color: #d1e7dd !important; }
+
+#tableSaving th:nth-child(1), #tableSaving td:nth-child(1) { width: 28%; } /* Tanggal */
+#tableSaving th:nth-child(2), #tableSaving td:nth-child(2) { width: 38%; } /* Tujuan */
+#tableSaving th:nth-child(3), #tableSaving td:nth-child(3) { width: 34%; } /* Jumlah */
 
 /* MODAL & TOAST */
 .modal {
@@ -202,6 +209,12 @@ tbody tr.selected { background-color: #d1e7dd !important; }
             <div class="form-item">
                 <label>Tanggal</label>
                 <input type="date" id="editSavingDate">
+            </div>
+            <div class="form-item">
+                <label>Tujuan Menabung</label>
+                <select id="editSavingTarget">
+                    <option value="tanpa_target">Tanpa Target</option>
+                </select>
             </div>
             <div class="form-item">
                 <label>Jumlah Uang (Rp)</label>
@@ -260,6 +273,12 @@ tbody tr.selected { background-color: #d1e7dd !important; }
             <input type="date" id="savingDate">
         </div>
         <div class="form-item">
+            <label>Tujuan Menabung</label>
+            <select id="savingTarget">
+                <option value="tanpa_target">Tanpa Target</option>
+            </select>
+        </div>
+        <div class="form-item">
             <label>Jumlah Uang (Rp)</label>
             <input type="text" inputmode="numeric" id="savingAmount" placeholder="0" oninput="formatInputRupiah(this)">
         </div>
@@ -276,6 +295,7 @@ tbody tr.selected { background-color: #d1e7dd !important; }
         <thead>
             <tr>
                 <th>Tanggal</th>
+                <th>Tujuan</th>
                 <th>Jumlah (Rp)</th>
             </tr>
         </thead>
@@ -293,15 +313,16 @@ const FIREBASE_TARGET_URL = "https://nabung-597ed-default-rtdb.asia-southeast1.f
 
 // Variabel Global
 let savings = [];
-let targets = []; // Sekarang berupa array untuk menyimpan banyak target
+let targets = []; 
 let selectedSavingId = null;
 let currentTotalSavings = 0;
 
 // Saat halaman dimuat
-window.onload = () => {
+window.onload = async () => {
     document.getElementById('savingDate').valueAsDate = new Date();
-    loadFromFirebase();
-    loadTargetsFromFirebase();
+    // Penting: Muat target dulu agar pilihan dropdown terisi, baru muat data tabungan
+    await loadTargetsFromFirebase();
+    await loadFromFirebase();
 };
 
 // --- FUNGSI FIREBASE ---
@@ -333,16 +354,14 @@ async function saveToFirebase() {
     }
 }
 
-// Fitur Firebase Target (Diubah untuk Array)
 async function loadTargetsFromFirebase() {
     try {
         const response = await fetch(FIREBASE_TARGET_URL);
         const data = await response.json();
         
         let parsedData = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-        // Support migrasi data dari versi sebelumnya (jika format lama berbentuk objek bukan array)
         if (data && !Array.isArray(data) && data.name) {
-            targets = [data]; // Ubah objek tunggal jadi array 1 elemen
+            targets = [data]; 
         } else {
             targets = parsedData.filter(t => t !== null);
         }
@@ -391,7 +410,7 @@ function showToast(message) {
     toastTimeout = setTimeout(() => { toast.classList.remove("show"); }, 3000);
 }
 
-// --- LOGIKA TARGET MENABUNG (MULTIPLE) ---
+// --- LOGIKA TARGET MENABUNG ---
 function openTargetModal() {
     document.getElementById('targetName').value = "";
     document.getElementById('targetAmount').value = "";
@@ -426,7 +445,7 @@ async function saveTarget() {
 }
 
 function deleteTarget(targetId) {
-    showConfirm("Hapus target ini?", async () => {
+    showConfirm("Hapus target ini? Riwayat tabungan terkait tidak akan ikut terhapus.", async () => {
         targets = targets.filter(t => String(t.id) !== String(targetId));
         renderTargets();
         await saveTargetsToFirebase();
@@ -434,7 +453,27 @@ function deleteTarget(targetId) {
     });
 }
 
+function updateTargetDropdowns() {
+    const selects = [document.getElementById('savingTarget'), document.getElementById('editSavingTarget')];
+    
+    selects.forEach(select => {
+        const currentValue = select.value; 
+        select.innerHTML = '<option value="tanpa_target">Tanpa Target</option>';
+        
+        targets.forEach(t => {
+            select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+        });
+
+        // Pertahankan pilihan sebelumnya jika masih ada di daftar
+        if ([...select.options].some(o => o.value === currentValue)) {
+            select.value = currentValue;
+        }
+    });
+}
+
 function renderTargets() {
+    updateTargetDropdowns(); // Perbarui opsi dropdown tiap kali target berubah
+    
     const container = document.getElementById('targetContainer');
     container.innerHTML = "";
     
@@ -443,23 +482,26 @@ function renderTargets() {
         return;
     }
 
-    // Membalik array agar target terbaru muncul di atas (opsional)
     const reversedTargets = [...targets].reverse();
 
     reversedTargets.forEach(t => {
-        // Kalkulasi persentase pencapaian
-        let percent = (currentTotalSavings / t.amount) * 100;
+        // Logika baru: Kalkulasi jumlah uang yang KHUSUS dikumpulkan untuk target ini
+        let targetAccumulated = savings
+            .filter(s => s && String(s.targetId) === String(t.id))
+            .reduce((sum, s) => sum + s.amount, 0);
+
+        let percent = (targetAccumulated / t.amount) * 100;
         let visualPercent = percent > 100 ? 100 : percent; 
         
         let bgColor = percent >= 100 ? "#198754" : "#ffc107";
-        let statusText = percent >= 100 ? "Tercapai!" : `Terkumpul ${percent.toFixed(1)}%`;
+        let statusText = percent >= 100 ? "(Tercapai!)" : "";
 
         container.innerHTML += `
         <div class="target-card">
             <button class="btn-delete-target" onclick="deleteTarget('${t.id}')">Hapus</button>
             <div class="target-title">${t.name}</div>
             <div class="target-info">
-                ${statusText} dari <b>Rp ${formatRupiah(t.amount)}</b>
+                Terkumpul <b>Rp ${formatRupiah(targetAccumulated)}</b> dari Rp ${formatRupiah(t.amount)} <span style="color:#198754; font-weight:bold;">${statusText}</span>
             </div>
             <div class="progress-bg">
                 <div class="progress-fill" style="width: ${visualPercent}%; background-color: ${bgColor};"></div>
@@ -481,17 +523,19 @@ function renderSavings() {
         if (!s) return; 
         currentTotalSavings += s.amount;
         const isSelected = String(selectedSavingId) === String(s.id) ? 'selected' : '';
+        const tName = s.targetName || "Tanpa Target"; // Default fallback
+        
         tbody.innerHTML += `
         <tr class="${isSelected}" onclick="toggleSavingSelection(this, '${s.id}')">
             <td>${s.date}</td>
+            <td style="font-size: 12px; color: #4b5563;">${tName}</td>
             <td style="color:#198754; font-weight:bold;">Rp ${formatRupiah(s.amount)}</td>
         </tr>`;
     });
     
     document.getElementById('totSavings').innerText = formatRupiah(currentTotalSavings);
     
-    // Penting: Perbarui progress bar di SEMUA target tiap kali total uang berubah
-    renderTargets(); 
+    renderTargets(); // Perbarui info progres di dalam kartu target
 }
 
 // Fungsi Pilihan Baris
@@ -507,11 +551,15 @@ function toggleSavingSelection(rowElement, id) {
     }
 }
 
-// Fungsi Tambah
+// Fungsi Tambah Pemasukan
 async function addSaving() {
     const date = document.getElementById('savingDate').value;
     const amountStr = document.getElementById('savingAmount').value.replace(/\./g, '');
     const amount = parseInt(amountStr, 10);
+    
+    const targetSelect = document.getElementById('savingTarget');
+    const targetId = targetSelect.value;
+    const targetName = targetSelect.options[targetSelect.selectedIndex].text;
 
     if (!date || isNaN(amount) || amount <= 0) {
         return showToast("Isi tanggal dan jumlah dengan benar!");
@@ -520,6 +568,8 @@ async function addSaving() {
     const newSaving = {
         id: Date.now().toString(),
         date: date,
+        targetId: targetId,
+        targetName: targetName,
         amount: amount
     };
     
@@ -538,6 +588,7 @@ function editSavingSelected() {
     const target = savings.find(s => s && String(s.id) === String(selectedSavingId));
     if (target) {
         document.getElementById('editSavingDate').value = target.date;
+        document.getElementById('editSavingTarget').value = target.targetId || "tanpa_target";
         document.getElementById('editSavingAmount').value = target.amount.toLocaleString('id-ID');
         document.getElementById('editSavingModal').style.display = 'flex';
     }
@@ -547,13 +598,20 @@ async function saveEditSaving() {
     const date = document.getElementById('editSavingDate').value;
     const amountStr = document.getElementById('editSavingAmount').value.replace(/\./g, '');
     const amount = parseInt(amountStr, 10);
+    
+    const targetSelect = document.getElementById('editSavingTarget');
+    const targetId = targetSelect.value;
+    const targetName = targetSelect.options[targetSelect.selectedIndex].text;
 
     if (!date || isNaN(amount) || amount <= 0) return showToast("Isi tanggal dan jumlah dengan benar!");
 
     const index = savings.findIndex(s => s && String(s.id) === String(selectedSavingId));
     if (index !== -1) {
         savings[index].date = date;
+        savings[index].targetId = targetId;
+        savings[index].targetName = targetName;
         savings[index].amount = amount;
+        
         closeEditSavingModal();
         selectedSavingId = null;
         renderSavings();
