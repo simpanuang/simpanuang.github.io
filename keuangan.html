@@ -30,16 +30,17 @@ h2 {
 
 .summary {
     display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 10px; margin-bottom: 20px;
+    gap: 8px; margin-bottom: 20px;
 }
 
 .box {
-    background: #cfe2f3; padding: 15px 10px; border-radius: 16px;
-    text-align: center; font-size: 13px;
+    background: #cfe2f3; padding: 12px 5px; border-radius: 12px;
+    text-align: center; font-size: 11px; font-weight: 600;
 }
 
 .box .val {
-    display: block; font-size: 16px; font-weight: bold; margin-top: 6px;
+    display: block; font-size: 13px; font-weight: bold; margin-top: 6px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* Mencegah Rp menumpuk ke bawah */
 }
 
 .form-group { display: grid; gap: 15px; }
@@ -347,14 +348,16 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
     </div>
 
     <div id="menu-ringkasan" style="display:block;">
-        <div class="summary">
-            <div class="box">Pemasukan:<div class="val">Rp <span id="income">0</span></div></div>
-            <div class="box">Pengeluaran:<div class="val">Rp <span id="expense">0</span></div></div>
-            <div class="box">Saldo Akhir:<div class="val">Rp <span id="balance">0</span></div></div>
+        
+        <!-- RINGKASAN DIPERBARUI -->
+        <div class="summary" style="margin-bottom: 25px;">
+            <div class="box" style="background: #d1fae5; color: #065f46;">Pemasukan:<div class="val" style="color: #047857;">Rp <span id="income">0</span></div></div>
+            <div class="box" style="background: #fee2e2; color: #991b1b;">Pengeluaran:<div class="val" style="color: #b91c1c;">Rp <span id="expense">0</span></div></div>
+            <div class="box" style="background: #e0e7ff; color: #3730a3;">Saldo Akhir:<div class="val" style="color: #4338ca;">Rp <span id="balance">0</span></div></div>
         </div>
+
         <h3 style="text-align: center; margin-top: 25px; margin-bottom: 15px; color: #374151;">Data Transaksi</h3>
         
-        <!-- TABEL DETAIL AKUN BARU -->
         <div class="account-title">DETAIL AKUN</div>
         <div class="account-container">
             <div class="account-col" onclick="openAccountModal('cash', 'CASH')">
@@ -406,7 +409,6 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
             </div>
         </div>
         
-        <!-- Pemisahan Kolom Tanggal, Akun, Keterangan, Tipe, Jumlah -->
         <div class="table-responsive">
             <table id="tableData">
                 <thead>
@@ -436,11 +438,13 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
     </div>
 
     <div id="menu-anggaran" style="display:none;">
+        <!-- ANGGARAN SUMARY -->
         <div class="summary" style="margin-bottom: 25px;">
-            <div class="box" style="background: #f3f4f6;">Total Limit:<div class="val" style="color: #374151;">Rp <span id="totBudgetLimit">0</span></div></div>
-            <div class="box" style="background: #fee2e2;">Terpakai:<div class="val" style="color: #b91c1c;">Rp <span id="totBudgetUsed">0</span></div></div>
-            <div class="box" style="background: #d1fae5;">Sisa:<div class="val" style="color: #047857;">Rp <span id="totBudgetRemaining">0</span></div></div>
+            <div class="box" style="background: #f3f4f6; color: #4b5563;">Total Limit:<div class="val" style="color: #374151;">Rp <span id="totBudgetLimit">0</span></div></div>
+            <div class="box" style="background: #fee2e2; color: #991b1b;">Terpakai:<div class="val" style="color: #b91c1c;">Rp <span id="totBudgetUsed">0</span></div></div>
+            <div class="box" style="background: #d1fae5; color: #065f46;">Sisa:<div class="val" style="color: #047857;">Rp <span id="totBudgetRemaining">0</span></div></div>
         </div>
+        
         <div class="form-group">
             <div class="form-item"><label>Kategori</label><input type="text" id="budgetCategory" placeholder="Misal: Makanan, Transport"></div>
             <div class="form-item"><label>Limit Anggaran (Rp)</label><input type="text" inputmode="numeric" id="budgetAmount" placeholder="0" oninput="formatInputRupiah(this)"></div>
