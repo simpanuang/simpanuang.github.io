@@ -86,32 +86,48 @@ button:active { transform: scale(0.98); }
 #saveMenu div:hover { background-color: #f1f1f1; border-radius: 8px; }
 
 /* TABLE STYLE */
-table {
-    width: 100%; border-collapse: separate; border-spacing: 0;
-    margin-top: 15px; font-size: 13px; table-layout: fixed;
-    border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb;
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 15px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: white;
 }
-th { background: #198754; color: white; padding: 12px 4px; }
+
+table {
+    width: 100%; 
+    border-collapse: separate; 
+    border-spacing: 0;
+    font-size: 13px; 
+    table-layout: auto; 
+    min-width: 500px; 
+}
+th { 
+    background: #198754; 
+    color: white; 
+    padding: 12px 10px; 
+    white-space: nowrap; 
+}
 td {
-    padding: 12px 4px; border-bottom: 1px solid #e5e7eb;
-    text-align: center; vertical-align: middle; word-wrap: break-word; overflow-wrap: break-word;
+    padding: 12px 10px; 
+    border-bottom: 1px solid #e5e7eb;
+    text-align: center; 
+    vertical-align: middle; 
+    white-space: nowrap; 
 }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr { cursor: pointer; transition: background-color 0.2s; background: white; }
 tbody tr:hover { background: #f9fafb; }
 tbody tr.selected { background-color: #d1e7dd !important; }
 
-/* UKURAN KOLOM TABEL KHUSUS (5 Kolom) */
-#tableData th:nth-child(1), #tableData td:nth-child(1) { width: 17%; font-size: 11px; } /* Tanggal */
-#tableData th:nth-child(2), #tableData td:nth-child(2) { width: 17%; font-size: 11px; } /* Akun */
-#tableData th:nth-child(3), #tableData td:nth-child(3) { width: 28%; font-size: 12px; } /* Keterangan */
-#tableData th:nth-child(4), #tableData td:nth-child(4) { width: 16%; font-size: 11px; } /* Tipe */
-#tableData th:nth-child(5), #tableData td:nth-child(5) { width: 22%; font-size: 11px; } /* Jumlah */
+#tableData th, #tableData td { font-size: 12px; }
+#tableData td:nth-child(3) { text-align: left; }
 
-#tableViewBudget { font-size: 12px; }
-#tableViewBudget th:nth-child(1), #tableViewBudget td:nth-child(1) { width: 25%; }
-#tableViewBudget th:nth-child(2), #tableViewBudget td:nth-child(2) { width: 45%; text-align: left; padding-left: 8px; }
-#tableViewBudget th:nth-child(3), #tableViewBudget td:nth-child(3) { width: 30%; text-align: right; padding-right: 8px; }
+#tableViewBudget { font-size: 12px; min-width: 400px; }
+#tableViewBudget th:nth-child(2), #tableViewBudget td:nth-child(2) { text-align: left; padding-left: 8px; }
+#tableViewBudget th:nth-child(3), #tableViewBudget td:nth-child(3) { text-align: right; padding-right: 8px; }
 #tableViewBudget tbody tr:nth-child(even) { background: #f9fafb; }
 
 /* GRAFIK / DASHBOARD */
@@ -391,18 +407,20 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
         </div>
         
         <!-- Pemisahan Kolom Tanggal, Akun, Keterangan, Tipe, Jumlah -->
-        <table id="tableData">
-            <thead>
-                <tr>
-                    <th>Tanggal</th>
-                    <th>Akun</th>
-                    <th>Keterangan</th>
-                    <th>Tipe</th>
-                    <th>Jumlah</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="tableData">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Akun</th>
+                        <th>Keterangan</th>
+                        <th>Tipe</th>
+                        <th>Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <div id="menu-transaksi" style="display:none;">
@@ -442,7 +460,9 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
         </div>
 
         <h3 style="text-align: center; margin-top: 35px; color: #374151;">Daftar Anggaran</h3>
-        <table id="tableBudget"><thead><tr><th>Kategori</th><th>Limit</th><th>Terpakai</th><th>Sisa</th></tr></thead><tbody></tbody></table>
+        <div class="table-responsive">
+            <table id="tableBudget"><thead><tr><th>Kategori</th><th>Limit</th><th>Terpakai</th><th>Sisa</th></tr></thead><tbody></tbody></table>
+        </div>
     </div>
 
 </div> 
@@ -477,7 +497,7 @@ h4 { margin: 0 0 15px 0; color: #198754; text-align: center; }
     <div class="modal-content" style="max-width: 450px;">
         <h3 id="viewBudgetTitle" style="margin-bottom: 10px;">Rincian Anggaran</h3>
         <p id="viewBudgetTotal" style="text-align: center; color: #b91c1c; font-weight: bold; margin-top: 0; margin-bottom: 15px;">Total: Rp 0</p>
-        <div style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
+        <div style="max-height: 300px; overflow-y: auto; overflow-x: auto; margin-bottom: 15px;">
             <table id="tableViewBudget"><thead><tr><th>Tanggal</th><th style="text-align: left; padding-left: 8px;">Keterangan</th><th style="text-align: right; padding-right: 8px;">Jumlah</th></tr></thead><tbody></tbody></table>
             <p id="viewBudgetEmpty" style="text-align: center; font-size: 13px; color: #6b7280; display: none; margin-top: 20px;">Belum ada pengeluaran di bulan ini.</p>
         </div>
