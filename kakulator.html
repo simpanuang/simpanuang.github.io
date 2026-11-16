@@ -89,7 +89,8 @@
         }
         .allocation-group.simpanan { border-left-color: #17a2b8; }
         .allocation-group.pokok { border-left-color: #fd7e14; }
-        .allocation-group.reward { border-left-color: #6f42c1; }
+        .allocation-group.pribadi { border-left-color: #6f42c1; }
+        .allocation-group.hutang { border-left-color: #dc3545; }
         
         .allocation-details {
             flex-grow: 1;
@@ -163,14 +164,27 @@
         </div>
     </div>
 
-    <!-- Dana Reward Diri Sendiri -->
-    <div class="allocation-group reward">
+    <!-- Dana Kebutuhan Pribadi -->
+    <div class="allocation-group pribadi">
         <div class="allocation-details">
-            <div class="allocation-title">Reward Diri Sendiri</div>
-            <div class="allocation-amount" id="hasil-reward">Rp 0</div>
+            <div class="allocation-title">Kebutuhan Pribadi</div>
+            <div class="allocation-amount" id="hasil-pribadi">Rp 0</div>
         </div>
         <div class="percentage-input">
-            <input type="number" id="persen-reward" value="30" oninput="hitungSemua()"> <span style="margin-left:5px;">%</span>
+            <!-- Persentase diubah menjadi 20 agar total default tetap 100% -->
+            <input type="number" id="persen-pribadi" value="20" oninput="hitungSemua()"> <span style="margin-left:5px;">%</span>
+        </div>
+    </div>
+
+    <!-- Dana Hutang -->
+    <div class="allocation-group hutang">
+        <div class="allocation-details">
+            <div class="allocation-title">Dana Hutang</div>
+            <div class="allocation-amount" id="hasil-hutang">Rp 0</div>
+        </div>
+        <div class="percentage-input">
+            <!-- Persentase default diset 10 agar total default tetap 100% -->
+            <input type="number" id="persen-hutang" value="10" oninput="hitungSemua()"> <span style="margin-left:5px;">%</span>
         </div>
     </div>
 </div>
@@ -205,17 +219,20 @@
         // Ambil persentase alokasi
         const pSimpanan = parseFloat(document.getElementById('persen-simpanan').value) || 0;
         const pPokok = parseFloat(document.getElementById('persen-pokok').value) || 0;
-        const pReward = parseFloat(document.getElementById('persen-reward').value) || 0;
+        const pPribadi = parseFloat(document.getElementById('persen-pribadi').value) || 0;
+        const pHutang = parseFloat(document.getElementById('persen-hutang').value) || 0;
 
         // Jika ada untung, bagi dananya. Jika rugi atau 0, set alokasi ke 0
         const danaSimpanan = keuntungan > 0 ? (keuntungan * pSimpanan / 100) : 0;
         const danaPokok = keuntungan > 0 ? (keuntungan * pPokok / 100) : 0;
-        const danaReward = keuntungan > 0 ? (keuntungan * pReward / 100) : 0;
+        const danaPribadi = keuntungan > 0 ? (keuntungan * pPribadi / 100) : 0;
+        const danaHutang = keuntungan > 0 ? (keuntungan * pHutang / 100) : 0;
 
         // Tampilkan hasil alokasi
         document.getElementById('hasil-simpanan').textContent = formatRupiah(danaSimpanan);
         document.getElementById('hasil-pokok').textContent = formatRupiah(danaPokok);
-        document.getElementById('hasil-reward').textContent = formatRupiah(danaReward);
+        document.getElementById('hasil-pribadi').textContent = formatRupiah(danaPribadi);
+        document.getElementById('hasil-hutang').textContent = formatRupiah(danaHutang);
     }
 </script>
 
