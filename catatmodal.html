@@ -16,8 +16,8 @@
       --border: #e2e8f0;
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
-      --secondary: #64748b;
-      --secondary-hover: #475569;
+      --secondary: #f1f5f9;
+      --secondary-hover: #e2e8f0;
       --success: #10b981;
       --danger: #ef4444;
       --warning: #f59e0b;
@@ -133,7 +133,7 @@
       padding-left: 36px !important;
     }
 
-    input {
+    input, select {
       width: 100%;
       padding: 9px 12px;
       border: 1px solid var(--border);
@@ -145,23 +145,29 @@
       transition: all 0.2s ease;
     }
 
-    input:focus {
+    input:focus, select:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
 
-    /* Layout Form Modal Baru */
+    select {
+      cursor: pointer;
+    }
+
+    /* Layout Form Modal */
     .modal-form-row {
       display: grid;
       grid-template-columns: 150px 1fr 1.5fr; /* Tanggal | Nominal | Keterangan */
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .form-actions {
       display: flex;
-      justify-content: flex-start; /* Tombol di kiri */
-      gap: 10px; /* Jarak antar tombol */
+      justify-content: flex-start;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .btn-submit {
@@ -176,7 +182,7 @@
       transition: background-color 0.2s ease;
       height: 38px;
       white-space: nowrap;
-      width: max-content; /* Ukuran sesuai teks */
+      width: max-content;
     }
 
     .btn-submit:hover {
@@ -187,13 +193,42 @@
       background-color: var(--warning);
     }
 
-    /* Tombol Sortir */
-    .btn-sort {
+    /* Area Sortir/Filter */
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       background-color: var(--secondary);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
     }
 
-    .btn-sort:hover {
-      background-color: var(--secondary-hover);
+    .filter-group select {
+      border: none;
+      background-color: transparent;
+      padding: 6px 10px;
+      height: 30px;
+      font-weight: 600;
+      box-shadow: none;
+    }
+    
+    .filter-group select:focus {
+      box-shadow: none;
+      background-color: #ffffff;
+      border-radius: 6px;
+    }
+
+    .custom-date-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-right: 6px;
+    }
+
+    .custom-date-group input {
+      padding: 4px 8px;
+      height: 30px;
     }
 
     /* Pengaturan Tabel */
@@ -203,7 +238,7 @@
       overflow-y: auto;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
-      margin-top: 14px;
+      margin-top: 16px;
       border: 1px solid var(--border);
       border-radius: 8px;
       background-color: #ffffff;
@@ -276,6 +311,10 @@
 
     @media (max-width: 600px) {
       .modal-form-row { grid-template-columns: 1fr; }
+      .form-actions { flex-direction: column; align-items: stretch; }
+      .btn-submit { width: 100%; }
+      .filter-group { flex-direction: column; align-items: stretch; padding: 10px; }
+      .custom-date-group { padding: 0; }
     }
   </style>
 </head>
@@ -294,7 +333,6 @@
     <div class="card">
       <h3 class="section-title">Pencatatan Modal Awal</h3>
       <form id="modalForm">
-        <!-- Input Form Baris Baru: Tanggal - Nominal - Keterangan -->
         <div class="modal-form-row">
           <div class="input-group">
             <label>Tanggal</label>
@@ -313,10 +351,25 @@
           </div>
         </div>
         
-        <!-- Tombol Aksi di Kiri -->
+        <!-- Tombol Aksi & Sortir di Kiri -->
         <div class="form-actions">
           <button type="submit" class="btn-submit" id="btnSubmitModal">Tambah Modal</button>
-          <button type="button" class="btn-submit btn-sort" id="btnSortModal">Sortir: Terbaru</button>
+          
+          <div class="filter-group">
+            <select id="filterType">
+              <option value="semua">Semua Waktu</option>
+              <option value="harian">Sortir Harian</option>
+              <option value="mingguan">Sortir Mingguan</option>
+              <option value="bulanan">Sortir Bulanan</option>
+              <option value="kustom">Rentang Tanggal</option>
+            </select>
+
+            <div id="customDateContainer" class="custom-date-group" style="display: none;">
+              <input type="date" id="startDate" title="Tanggal Mulai" />
+              <span style="color: var(--text-muted); font-weight: bold;">-</span>
+              <input type="date" id="endDate" title="Tanggal Selesai" />
+            </div>
+          </div>
         </div>
       </form>
 
@@ -343,26 +396,39 @@
 
     let modalMap = {};
     let editingModalKey = null; 
-    let sortDescending = true; // Status sorting default (Terbaru)
 
     const modalForm = document.getElementById('modalForm');
     const modalNominalInput = document.getElementById('modalNominal');
     const modalKeteranganInput = document.getElementById('modalKeterangan');
     const modalTanggalInput = document.getElementById('modalTanggal');
     const btnSubmitModal = document.getElementById('btnSubmitModal');
-    const btnSortModal = document.getElementById('btnSortModal');
+    
+    // Elemen Filter
+    const filterType = document.getElementById('filterType');
+    const customDateContainer = document.getElementById('customDateContainer');
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+
     const modalTableBody = document.getElementById('modalTableBody');
     const emptyModalState = document.getElementById('emptyModalState');
     const summaryModal = document.getElementById('summaryModal');
 
     modalTanggalInput.valueAsDate = new Date();
 
-    // Event Listener untuk Tombol Sortir
-    btnSortModal.addEventListener('click', () => {
-      sortDescending = !sortDescending;
-      btnSortModal.textContent = sortDescending ? 'Sortir: Terbaru' : 'Sortir: Terlama';
+    // Event Listeners Filter
+    filterType.addEventListener('change', (e) => {
+      if (e.target.value === 'kustom') {
+        customDateContainer.style.display = 'flex';
+      } else {
+        customDateContainer.style.display = 'none';
+        startDate.value = '';
+        endDate.value = '';
+      }
       render();
     });
+
+    startDate.addEventListener('change', render);
+    endDate.addEventListener('change', render);
 
     function formatNumberString(str) {
       const clean = String(str).replace(/\D/g, '');
@@ -393,6 +459,13 @@
 
     attachThousandSeparator(modalNominalInput);
 
+    // Bantuan Parsing Tanggal Aman agar tidak terkena offset zona waktu
+    function parseDateLocal(dateStr) {
+      if (!dateStr) return null;
+      const [y, m, d] = dateStr.split('-');
+      return new Date(y, m - 1, d);
+    }
+
     function render() {
       modalTableBody.innerHTML = '';
       const modalKeys = Object.keys(modalMap);
@@ -403,22 +476,60 @@
         summaryModal.textContent = formatRupiah(0);
         return;
       } 
-      
-      emptyModalState.style.display = 'none';
 
-      // Ubah data object ke array agar bisa di-sort
+      // 1. Ubah ke array
       let modalList = modalKeys.map(key => {
         return { id: key, ...modalMap[key] };
       });
 
-      // Proses sorting berdasarkan tanggal
-      modalList.sort((a, b) => {
-        const dateA = new Date(a.tanggal);
-        const dateB = new Date(b.tanggal);
-        return sortDescending ? (dateB - dateA) : (dateA - dateB);
+      // 2. Filter berdasarkan pilihan sortir
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      modalList = modalList.filter(m => {
+        const itemDate = parseDateLocal(m.tanggal);
+        const fType = filterType.value;
+
+        if (fType === 'semua') return true;
+        
+        if (fType === 'harian') {
+          return itemDate.getTime() === today.getTime();
+        }
+        
+        if (fType === 'mingguan') {
+          const lastWeek = new Date(today);
+          lastWeek.setDate(today.getDate() - 7);
+          return itemDate >= lastWeek && itemDate <= today;
+        }
+        
+        if (fType === 'bulanan') {
+          return itemDate.getMonth() === today.getMonth() && itemDate.getFullYear() === today.getFullYear();
+        }
+        
+        if (fType === 'kustom') {
+          const sDate = parseDateLocal(startDate.value);
+          const eDate = parseDateLocal(endDate.value);
+          
+          if (sDate && eDate) return itemDate >= sDate && itemDate <= eDate;
+          if (sDate) return itemDate >= sDate;
+          if (eDate) return itemDate <= eDate;
+          return true; 
+        }
+
+        return true;
       });
 
-      // Render data yang sudah disortir
+      // 3. Urutkan berdasarkan tanggal (Terbaru di atas)
+      modalList.sort((a, b) => parseDateLocal(b.tanggal) - parseDateLocal(a.tanggal));
+
+      if (modalList.length === 0) {
+        emptyModalState.style.display = 'block';
+        emptyModalState.textContent = 'Tidak ada modal pada rentang waktu ini.';
+      } else {
+        emptyModalState.style.display = 'none';
+      }
+
+      // 4. Render Row & Hitung Total
       modalList.forEach(m => {
         totalModalAmount += m.nominal;
         
