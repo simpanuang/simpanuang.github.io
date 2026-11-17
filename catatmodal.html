@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kalkulator Penjualan</title>
+  <title>Pencatatan Modal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -47,11 +47,10 @@
       gap: 14px;
     }
 
-    /* 3 Kolom Metrik Kompak Horizontal */
-    .top-stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+    /* Total Modal di Tengah Atas */
+    .top-stats-container {
+      display: flex;
+      justify-content: center;
       width: 100%;
     }
 
@@ -59,36 +58,29 @@
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px 12px;
+      padding: 12px 24px;
       box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: center;
-      min-width: 0;
+      min-width: 250px;
     }
 
     .stat-card .label {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
       margin-bottom: 4px;
     }
 
     .stat-card .value {
-      font-size: 15px;
+      font-size: 20px;
       font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      color: var(--primary);
     }
-
-    .stat-card.profit .value { color: var(--success); }
-    .stat-card.loss .value { color: var(--danger); }
 
     /* Kartu & Form Umum */
     .card {
@@ -156,25 +148,24 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
 
-    .modal-grid {
+    /* Layout Form Modal Baru */
+    .modal-form-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 150px 1fr 1.5fr; /* Tanggal | Nominal | Keterangan */
       gap: 12px;
       margin-bottom: 12px;
     }
 
-    .item-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr 0.8fr auto;
-      gap: 10px;
-      align-items: flex-end;
+    .form-actions {
+      display: flex;
+      justify-content: flex-start; /* Tombol di kiri */
     }
 
     .btn-submit {
       background-color: var(--primary);
       color: #ffffff;
       border: none;
-      padding: 10px 16px;
+      padding: 10px 20px;
       border-radius: 8px;
       font-size: 13px;
       font-weight: 600;
@@ -182,7 +173,7 @@
       transition: background-color 0.2s ease;
       height: 38px;
       white-space: nowrap;
-      width: 100%;
+      width: max-content; /* Ukuran sesuai teks */
     }
 
     .btn-submit:hover {
@@ -193,12 +184,12 @@
       background-color: var(--warning);
     }
 
-    /* Pengaturan Tabel (Geser Kanan-Kiri & Atas-Bawah) */
+    /* Pengaturan Tabel */
     .table-container {
       width: 100%;
-      max-height: 220px; /* Membatasi tinggi agar muat sekitar 3 baris */
-      overflow-y: auto; /* Mengaktifkan scroll atas-bawah */
-      overflow-x: auto; /* Mengaktifkan scroll kanan-kiri */
+      max-height: 300px;
+      overflow-y: auto;
+      overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       margin-top: 14px;
       border: 1px solid var(--border);
@@ -225,7 +216,7 @@
     }
 
     th {
-      position: sticky; /* Membuat header tetap menempel saat di-scroll ke bawah */
+      position: sticky;
       top: 0;
       z-index: 10;
       background-color: #f1f5f9;
@@ -234,12 +225,12 @@
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      box-shadow: inset 0 -1px 0 var(--border); /* Pengganti border-bottom untuk efek sticky */
+      box-shadow: inset 0 -1px 0 var(--border);
     }
 
     tr:last-child td { border-bottom: none; }
 
-    /* Tombol Aksi (Icon) */
+    /* Tombol Aksi */
     .action-btns {
       display: flex;
       gap: 8px;
@@ -272,30 +263,18 @@
     }
 
     @media (max-width: 600px) {
-      .top-stats-row { gap: 6px; }
-      .stat-card { padding: 8px 10px; }
-      .stat-card .label { font-size: 9px; }
-      .stat-card .value { font-size: 13px; }
-      .item-grid { grid-template-columns: 1fr; }
+      .modal-form-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- 1. Tiga Kolom Metrik -->
-    <div class="top-stats-row">
+    <!-- 1. Total Modal di Tengah Atas -->
+    <div class="top-stats-container">
       <div class="stat-card">
         <span class="label">Total Modal</span>
         <div class="value" id="summaryModal">Rp 0</div>
-      </div>
-      <div class="stat-card">
-        <span class="label">Total Pendapatan</span>
-        <div class="value" id="summaryJual">Rp 0</div>
-      </div>
-      <div class="stat-card" id="cardLaba">
-        <span class="label">Hasil Bersih</span>
-        <div class="value" id="summaryLaba">Rp 0</div>
       </div>
     </div>
 
@@ -303,7 +282,12 @@
     <div class="card">
       <h3 class="section-title">Pencatatan Modal Awal</h3>
       <form id="modalForm">
-        <div class="modal-grid">
+        <!-- Input Form Baris Baru: Tanggal - Nominal - Keterangan -->
+        <div class="modal-form-row">
+          <div class="input-group">
+            <label>Tanggal</label>
+            <input type="date" id="modalTanggal" required />
+          </div>
           <div class="input-group">
             <label>Nominal Modal</label>
             <div class="input-wrapper">
@@ -316,14 +300,10 @@
             <input type="text" id="modalKeterangan" placeholder="Contoh: Beli bahan baku" required />
           </div>
         </div>
-        <div class="modal-grid">
-          <div class="input-group">
-            <label>Tanggal</label>
-            <input type="date" id="modalTanggal" required />
-          </div>
-          <div class="input-group" style="justify-content: flex-end;">
-            <button type="submit" class="btn-submit" id="btnSubmitModal">Tambah Modal</button>
-          </div>
+        
+        <!-- Tombol Aksi di Kiri -->
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" id="btnSubmitModal">Tambah Modal</button>
         </div>
       </form>
 
@@ -343,53 +323,12 @@
         <div id="emptyModalState" class="empty-state">Belum ada riwayat modal yang diinput.</div>
       </div>
     </div>
-
-    <!-- 3. Bagian Pencatatan Barang Penjualan -->
-    <div class="card">
-      <h3 class="section-title">Pencatatan Transaksi Penjualan</h3>
-      <form id="itemForm" class="item-grid">
-        <div class="input-group">
-          <label>Nama Barang</label>
-          <input type="text" id="namaBarang" placeholder="Contoh: Kemeja Polos" required />
-        </div>
-        <div class="input-group">
-          <label>Harga Satuan</label>
-          <div class="input-wrapper">
-            <span>Rp</span>
-            <input type="text" id="hargaJual" placeholder="0" required />
-          </div>
-        </div>
-        <div class="input-group">
-          <label>Jumlah (Qty)</label>
-          <input type="text" id="qty" placeholder="1" value="1" required />
-        </div>
-        <button type="submit" class="btn-submit" id="btnSubmitItem">Tambah Penjualan</button>
-      </form>
-
-      <!-- Tabel Daftar Penjualan -->
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Nama Barang</th>
-              <th>Harga Satuan</th>
-              <th>Qty</th>
-              <th>Subtotal</th>
-              <th style="text-align: right;">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="itemsTableBody"></tbody>
-        </table>
-        <div id="emptyItemState" class="empty-state">Belum ada data transaksi penjualan.</div>
-      </div>
-    </div>
   </div>
 
   <script>
     const FIREBASE_BASE_URL = 'https://catatanmodal-default-rtdb.asia-southeast1.firebasedatabase.app';
 
     let modalMap = {};
-    let itemsMap = {};
     let editingModalKey = null; 
 
     const modalForm = document.getElementById('modalForm');
@@ -399,19 +338,7 @@
     const btnSubmitModal = document.getElementById('btnSubmitModal');
     const modalTableBody = document.getElementById('modalTableBody');
     const emptyModalState = document.getElementById('emptyModalState');
-
-    const itemForm = document.getElementById('itemForm');
-    const namaBarangInput = document.getElementById('namaBarang');
-    const hargaJualInput = document.getElementById('hargaJual');
-    const qtyInput = document.getElementById('qty');
-    const btnSubmitItem = document.getElementById('btnSubmitItem');
-    const itemsTableBody = document.getElementById('itemsTableBody');
-    const emptyItemState = document.getElementById('emptyItemState');
-
     const summaryModal = document.getElementById('summaryModal');
-    const summaryJual = document.getElementById('summaryJual');
-    const summaryLaba = document.getElementById('summaryLaba');
-    const cardLaba = document.getElementById('cardLaba');
 
     modalTanggalInput.valueAsDate = new Date();
 
@@ -443,11 +370,8 @@
     }
 
     attachThousandSeparator(modalNominalInput);
-    attachThousandSeparator(hargaJualInput);
-    attachThousandSeparator(qtyInput);
 
     function render() {
-      // 1. Render Tabel Daftar Modal
       modalTableBody.innerHTML = '';
       const modalKeys = Object.keys(modalMap);
       let totalModalAmount = 0;
@@ -480,58 +404,13 @@
         });
       }
 
-      // 2. Render Tabel Penjualan
-      itemsTableBody.innerHTML = '';
-      const itemKeys = Object.keys(itemsMap);
-      let totalPenjualanAmount = 0;
-
-      if (itemKeys.length === 0) {
-        emptyItemState.style.display = 'block';
-      } else {
-        emptyItemState.style.display = 'none';
-        itemKeys.forEach(key => {
-          const item = itemsMap[key];
-          const subtotal = item.harga * item.qty;
-          totalPenjualanAmount += subtotal;
-
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td><strong>${item.nama}</strong></td>
-            <td>${formatRupiah(item.harga)}</td>
-            <td>${new Intl.NumberFormat('id-ID').format(item.qty)}</td>
-            <td>${formatRupiah(subtotal)}</td>
-            <td style="text-align: right;">
-              <button class="btn-icon delete" onclick="hapusBarang('${key}')" style="margin-left:auto;" title="Hapus">
-                <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
-              </button>
-            </td>
-          `;
-          itemsTableBody.appendChild(row);
-        });
-      }
-
-      // 3. Kalkulasi Summary
-      const hasilBersih = totalPenjualanAmount - totalModalAmount;
-
       summaryModal.textContent = formatRupiah(totalModalAmount);
-      summaryJual.textContent = formatRupiah(totalPenjualanAmount);
-      summaryLaba.textContent = formatRupiah(hasilBersih);
-
-      cardLaba.classList.remove('profit', 'loss');
-      if (hasilBersih > 0) cardLaba.classList.add('profit');
-      else if (hasilBersih < 0) cardLaba.classList.add('loss');
     }
 
     async function loadData() {
       try {
-        const [resModals, resItems] = await Promise.all([
-          fetch(`${FIREBASE_BASE_URL}/modals.json`),
-          fetch(`${FIREBASE_BASE_URL}/items.json`)
-        ]);
-        
+        const resModals = await fetch(`${FIREBASE_BASE_URL}/modals.json`);
         modalMap = (await resModals.json()) || {};
-        itemsMap = (await resItems.json()) || {};
-        
         render();
       } catch (err) {
         console.error('Koneksi Firebase gagal:', err);
@@ -603,53 +482,6 @@
         await fetch(`${FIREBASE_BASE_URL}/modals/${key}.json`, { method: 'DELETE' });
       } catch (err) {
         console.error('Gagal hapus modal', err);
-        loadData(); 
-      }
-    }
-
-    itemForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const nama = namaBarangInput.value.trim();
-      const harga = parseFormattedNumber(hargaJualInput.value);
-      const qty = parseFormattedNumber(qtyInput.value) || 1;
-
-      if (!nama || harga <= 0) return;
-
-      btnSubmitItem.disabled = true;
-      btnSubmitItem.textContent = 'Menyimpan...';
-
-      const payload = { nama, harga, qty };
-
-      try {
-        const res = await fetch(`${FIREBASE_BASE_URL}/items.json`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const result = await res.json();
-        
-        itemsMap[result.name] = payload;
-        render();
-
-        itemForm.reset();
-        qtyInput.value = '1';
-        namaBarangInput.focus();
-      } catch (error) {
-        console.error('Gagal menambah barang:', error);
-      } finally {
-        btnSubmitItem.disabled = false;
-        btnSubmitItem.textContent = 'Tambah Penjualan';
-      }
-    });
-
-    async function hapusBarang(key) {
-      if (!confirm('Hapus transaksi penjualan ini?')) return;
-      delete itemsMap[key];
-      render(); 
-      try {
-        await fetch(`${FIREBASE_BASE_URL}/items/${key}.json`, { method: 'DELETE' });
-      } catch (error) {
-        console.error('Gagal menghapus barang:', error);
         loadData(); 
       }
     }
