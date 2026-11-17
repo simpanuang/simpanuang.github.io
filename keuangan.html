@@ -818,21 +818,54 @@ function closeViewBudgetModal() { document.getElementById('viewBudgetModal').sty
 function editSelected() {
     if (selectedIds.length === 0) return showToast("Pilih SATU transaksi yang ingin diedit.");
     if (selectedIds.length > 1) return showToast("Hanya bisa edit satu transaksi sekaligus.");
-    editTargetId = selectedIds[0]; const item = data.find(d => d.id.toString() === editTargetId);
+    
+    editTargetId = selectedIds[0]; 
+    const item = data.find(d => d && String(d.id) === editTargetId);
+    
     if (item) {
-        document.getElementById('editDate').value = item.date; document.getElementById('editDesc').value = item.desc; document.getElementById('selectedEditDescText').innerText = item.desc || "Pilih Keterangan";
-        document.getElementById('editMethod').value = item.method || 'cash'; document.getElementById('selectedEditMethodText').innerText = (item.method || 'cash').toUpperCase();
-        document.getElementById('editType').value = item.type; document.getElementById('selectedEditTypeText').innerText = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
-        document.getElementById('editCategory').value = item.category || ""; document.getElementById('selectedEditCategoryText').innerText = item.category || "Pilih Kategori"; document.getElementById('editAmount').value = item.amount.toLocaleString('id-ID');
+        document.getElementById('editDate').value = item.date || ""; 
+        document.getElementById('editDesc').value = item.desc || ""; 
+        document.getElementById('selectedEditDescText').innerText = item.desc || "Pilih Keterangan";
+        document.getElementById('editMethod').value = item.method || 'cash'; 
+        document.getElementById('selectedEditMethodText').innerText = (item.method || 'cash').toUpperCase();
+        document.getElementById('editType').value = item.type || 'expense'; 
+        document.getElementById('selectedEditTypeText').innerText = item.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
+        document.getElementById('editCategory').value = item.category || ""; 
+        document.getElementById('selectedEditCategoryText').innerText = item.category || "Pilih Kategori"; 
+        document.getElementById('editAmount').value = Number(item.amount || 0).toLocaleString('id-ID');
         document.getElementById('editModal').style.display = 'flex';
     }
 }
+
 function closeEditModal() { document.getElementById('editModal').style.display = 'none'; editTargetId = null; }
+
 function saveEdit() {
-    const date = document.getElementById('editDate').value; const desc = document.getElementById('editDesc').value.trim(); const method = document.getElementById('editMethod').value; const type = document.getElementById('editType').value; const category = document.getElementById('editCategory').value; const amountStr = document.getElementById('editAmount').value.replace(/\./g, ''); const amount = parseInt(amountStr, 10);
-    if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) return showToast("Mohon isi semua data dengan benar!");
-    database.ref('transactions/' + editTargetId).update({ date: date, desc: desc, method: method, type: type, category: category, amount: amount }).then(() => { closeEditModal(); selectedIds = []; showToast("Data berhasil diperbarui!"); });
+    const date = document.getElementById('editDate').value; 
+    const desc = document.getElementById('editDesc').value.trim(); 
+    const method = document.getElementById('editMethod').value; 
+    const type = document.getElementById('editType').value; 
+    const category = document.getElementById('editCategory').value; 
+    const amountStr = document.getElementById('editAmount').value.replace(/\D/g, ''); 
+    const amount = parseInt(amountStr, 10);
+    
+    if (!date || !desc || !category || !type || isNaN(amount) || amount <= 0) {
+        return showToast("Mohon isi semua data dengan benar!"); 
+    }
+    
+    database.ref('transactions/' + editTargetId).update({ 
+        date: date, 
+        desc: desc, 
+        method: method, 
+        type: type, 
+        category: category, 
+        amount: amount 
+    }).then(() => { 
+        closeEditModal(); 
+        selectedIds = []; 
+        showToast("Data berhasil diperbarui!"); 
+    });
 }
+
 function deleteSelected() {
     if (selectedIds.length === 0) return showToast("Pilih transaksi yang ingin dihapus.");
     showConfirm(`Hapus ${selectedIds.length} transaksi terpilih?`, () => { selectedIds.forEach(id => { database.ref('transactions/' + id).remove(); }); selectedIds = []; showToast("Transaksi berhasil dihapus!"); });
@@ -941,7 +974,7 @@ function closeAccountModal() {
 
 function saveAccountBalance() {
     const key = document.getElementById('currentEditAccountKey').value;
-    const amountStr = document.getElementById('accountAmountInput').value.replace(/\./g, '');
+    const amountStr = document.getElementById('accountAmountInput').value.replace(/\D/g, '');
     const targetAmount = parseInt(amountStr, 10);
     
     if (isNaN(targetAmount)) {
